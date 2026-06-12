@@ -249,7 +249,7 @@ export class SettingsComponent {
   get config() {
     const cfg = this.formBuilder.formConfig();
     if (!cfg.lifecycle) {
-      cfg.lifecycle = { onInit: '', beforeRender: '', afterRender: '' };
+      cfg.lifecycle = { onInit: '', beforeRender: '', afterRender: '', onClose: '', onLoad: '' };
     }
     if (cfg.dataSource?.config?.disableUntilHydrated === undefined) {
       cfg.dataSource.config.disableUntilHydrated = false;

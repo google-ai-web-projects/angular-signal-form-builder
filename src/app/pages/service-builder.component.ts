@@ -339,11 +339,9 @@ export class ServiceBuilderComponent {
 
   deleteService(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Are you sure you want to delete this service?')) {
-      this.serviceManager.deleteService(id);
-      if (this.selectedService()?.id === id) {
-        this.selectedService.set(null);
-      }
+    this.serviceManager.deleteService(id);
+    if (this.selectedService()?.id === id) {
+      this.selectedService.set(null);
     }
   }
 

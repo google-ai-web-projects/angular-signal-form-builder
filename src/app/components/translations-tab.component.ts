@@ -190,6 +190,9 @@ import {
                 <option value="placeholder">Placeholder</option>
                 <option value="error">Error Message</option>
                 <option value="help">Help Text</option>
+                <option value="messageHeader">Message Header</option>
+                <option value="messageTitle">Message Title</option>
+                <option value="messageContent">Message Content</option>
                 <option value="custom">Custom Key</option>
               </select>
             </div>
@@ -466,13 +469,11 @@ export class TranslationsTabComponent {
   }
 
   onDelete(id: string) {
-    if (confirm("Are you sure you want to delete this translation?")) {
-      const updatedTranslations = this.translations().filter(
-        (t) => t.id !== id,
-      );
-      this.formBuilderService.updateField(this.field.id, {
-        translations: updatedTranslations,
-      });
-    }
+    const updatedTranslations = this.translations().filter(
+      (t) => t.id !== id,
+    );
+    this.formBuilderService.updateField(this.field.id, {
+      translations: updatedTranslations,
+    });
   }
 }

@@ -16,12 +16,13 @@ import { ServiceBuilderComponent } from './service-builder.component';
 import { SubmitServiceBlockComponent } from '../components/submit-service-block.component';
 import { SettingsComponent } from './settings.component';
 import { FunctionBuilderComponent } from './function-builder.component';
+import { VersionsComponent } from './versions.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, CanvasComponent, PropertiesComponent, PreviewComponent, BlockBuilderComponent, ServiceBuilderComponent, SubmitServiceBlockComponent, SettingsComponent, FunctionBuilderComponent, MatIconModule, DragDropModule, RouterModule],
+  imports: [CommonModule, FormsModule, SidebarComponent, CanvasComponent, PropertiesComponent, PreviewComponent, BlockBuilderComponent, ServiceBuilderComponent, SubmitServiceBlockComponent, SettingsComponent, FunctionBuilderComponent, VersionsComponent, MatIconModule, DragDropModule, RouterModule],
   template: `
     <div class="h-screen flex flex-col bg-gray-100 overflow-hidden font-sans" cdkDropListGroup>
       <header class="bg-white border-b border-gray-200 px-4 md:px-6 py-2.5 flex items-center justify-between shrink-0 gap-4">
@@ -52,6 +53,9 @@ import { FunctionBuilderComponent } from './function-builder.component';
           </button>
           <button (click)="viewMode.set('settings')" [class.bg-white]="viewMode() === 'settings'" [class.shadow-sm]="viewMode() === 'settings'" [class.text-indigo-600]="viewMode() === 'settings'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">settings</mat-icon> <span class="hidden md:inline">Settings</span>
+          </button>
+          <button (click)="viewMode.set('versions')" [class.bg-white]="viewMode() === 'versions'" [class.shadow-sm]="viewMode() === 'versions'" [class.text-indigo-600]="viewMode() === 'versions'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+            <mat-icon class="text-[18px] w-[18px] h-[18px]">history</mat-icon> <span class="hidden md:inline">Versions</span>
           </button>
           <button (click)="viewMode.set('preview')" [class.bg-white]="viewMode() === 'preview'" [class.shadow-sm]="viewMode() === 'preview'" [class.text-indigo-600]="viewMode() === 'preview'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">visibility</mat-icon> <span class="hidden md:inline">Preview</span>
@@ -130,6 +134,8 @@ import { FunctionBuilderComponent } from './function-builder.component';
           <app-submit-service-block class="flex-1 flex overflow-hidden w-full h-full"></app-submit-service-block>
         } @else if (viewMode() === 'settings') {
           <app-settings class="flex-1 flex overflow-hidden w-full h-full"></app-settings>
+        } @else if (viewMode() === 'versions') {
+          <app-versions class="flex-1 flex overflow-hidden w-full h-full"></app-versions>
         } @else {
           <div class="flex-1 w-full h-full overflow-hidden flex flex-col">
             <app-preview class="flex-1 h-full overflow-hidden flex flex-col"></app-preview>
@@ -140,7 +146,7 @@ import { FunctionBuilderComponent } from './function-builder.component';
   `
 })
 export class BuilderComponent {
-  viewMode = signal<'editor' | 'preview' | 'block-builder' | 'service-builder' | 'function-builder' | 'submit-service-block' | 'settings'>('editor');
+  viewMode = signal<'editor' | 'preview' | 'block-builder' | 'service-builder' | 'function-builder' | 'submit-service-block' | 'settings' | 'versions'>('editor');
   showProperties = signal<boolean>(true);
   formBuilder = inject(FormBuilderService);
   i18nService = inject(I18nService);

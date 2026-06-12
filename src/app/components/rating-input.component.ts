@@ -45,6 +45,7 @@ export class RatingInputComponent implements ControlValueAccessor {
   @Input() icon = 'star';
   @Input() allowHalf = false;
   @Input() disabled = false;
+  @Input() readonly = false;
 
   value = 0;
   hoverValue = 0;
@@ -74,7 +75,7 @@ export class RatingInputComponent implements ControlValueAccessor {
   }
 
   onMouseMove(event: MouseEvent, index: number) {
-    if (this.disabled) return;
+    if (this.disabled || this.readonly) return;
     this.isHovering = true;
     
     if (this.allowHalf) {
@@ -89,13 +90,13 @@ export class RatingInputComponent implements ControlValueAccessor {
   }
 
   onMouseLeave() {
-    if (this.disabled) return;
+    if (this.disabled || this.readonly) return;
     this.isHovering = false;
     this.hoverValue = 0;
   }
 
   onClick() {
-    if (this.disabled) return;
+    if (this.disabled || this.readonly) return;
     
     // If clicking the same value, we might want to clear it, but usually ratings just set it.
     // Let's just set the value to the current hoverValue.

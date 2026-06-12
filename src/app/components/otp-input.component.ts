@@ -32,6 +32,7 @@ import { CommonModule } from '@angular/common';
             'bg-gray-50 text-gray-500 cursor-not-allowed border-gray-200': disabled
           }"
           [disabled]="disabled"
+          [readOnly]="readonly"
         />
       }
     </div>
@@ -40,6 +41,7 @@ import { CommonModule } from '@angular/common';
 export class OtpInputComponent implements ControlValueAccessor, OnInit {
   @Input() length = 6;
   @Input() invalid = false;
+  @Input() readonly = false;
   @ViewChildren('otpInput') inputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   digits = signal<string[]>([]);

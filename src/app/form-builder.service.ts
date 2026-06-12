@@ -2,7 +2,7 @@ import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { EventBusService } from './events.service';
 
-export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'date-range' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'section' | 'calculated' | 'group' | 'array' | 'phone' | 'otp' | 'slider' | 'rating' | 'divider' | 'color' | 'button' | 'alert' | 'autocomplete';
+export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'date-range' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'section' | 'calculated' | 'group' | 'array' | 'phone' | 'otp' | 'slider' | 'rating' | 'divider' | 'color' | 'button' | 'alert' | 'autocomplete' | 'file' | 'inline-message';
 
 export interface ServiceParamMapping {
   key: string;
@@ -24,7 +24,7 @@ export interface PayloadMapping {
 export interface TranslationEntry {
   id: string;
   language: string;
-  type: 'label' | 'placeholder' | 'error' | 'help' | 'custom';
+  type: 'label' | 'placeholder' | 'error' | 'help' | 'custom' | 'messageHeader' | 'messageTitle' | 'messageContent';
   value: string;
   direction: 'LTR' | 'RTL';
   activation: {
@@ -54,6 +54,16 @@ export interface CustomFunction {
   description?: string;
 }
 
+export interface FieldValidationRule {
+  id: string;
+  type: 'expression' | 'function';
+  expression?: string;
+  functionId?: string;
+  functionArgs?: { name: string; expression: string }[];
+  translationKey?: string;
+  defaultMessage?: string;
+}
+
 export interface FormField {
   id: string;
   type: FieldType;
@@ -65,6 +75,7 @@ export interface FormField {
   translationKey?: string;
   translations?: TranslationEntry[];
   options?: { label: string; value: string }[];
+  validations?: FieldValidationRule[];
   dataSourceType?: 'static' | 'service';
   serviceId?: string;
   dataPath?: string;
@@ -91,8 +102,10 @@ export interface FormField {
   maxDate?: string;
   visibilityExpression?: string;
   disabled?: boolean;
-  valueExpression?: string;
   disabledExpression?: string;
+  readOnly?: boolean;
+  readOnlyExpression?: string;
+  valueExpression?: string;
   pattern?: string;
   patternMessage?: string;
   validationExpression?: string;
@@ -125,6 +138,13 @@ export interface FormField {
   alertMessage?: string;
   actionButtons?: { label: string; actionExpression: string; closeOnAction?: boolean; }[];
   
+  // Inline Message
+  messageHeader?: string;
+  messageTitle?: string;
+  messageContent?: string;
+  showCloseButton?: boolean;
+  onCloseActionExpression?: string;
+  
   // Autocomplete
   multiSelect?: boolean;
   freeText?: boolean;
@@ -132,6 +152,15 @@ export interface FormField {
   secondaryKey?: string;
   groupKey?: string;
   emptyMessage?: string;
+
+  // File Upload
+  maxFiles?: number;
+  maxFileSizeMB?: number;
+  allowedFileTypes?: string;
+  convertToBase64?: boolean;
+  fileMaxFilesMessage?: string;
+  fileMaxSizeMessage?: string;
+  fileInvalidFormatMessage?: string;
 
   colSpan?: number;
   groupLayout?: '1' | '2' | '3';
@@ -161,6 +190,8 @@ export interface FormConfig {
   };
   lifecycle?: {
     onInit?: string;
+    onClose?: string;
+    onLoad?: string;
     beforeRender?: string;
     afterRender?: string;
   };
@@ -653,6 +684,61 @@ export class FormBuilderService {
     if (this.selectedFieldId() === id) {
       this.selectedFieldId.set(null);
     }
+  }
+
+  cleanupFunctionReferences(functionId: string) {
+    this.flushHistory();
+    let changed = false;
+    this.fields.update(fields => {
+      const cloned = JSON.parse(JSON.stringify(fields));
+      changed = this.clearFunctionRefs(cloned, functionId);
+      return changed ? cloned : fields;
+    });
+    if (changed) this.saveHistory(this.fields());
+  }
+
+  private clearFunctionRefs(fields: FormField[], functionId: string): boolean {
+    let changed = false;
+    for (const f of fields) {
+      if (f.customFunctionId === functionId) {
+        f.customFunctionId = '';
+        changed = true;
+      }
+      if (f.validations && f.validations.length > 0) {
+        const len = f.validations.length;
+        f.validations = f.validations.filter(v => !(v.type === 'function' && v.functionId === functionId));
+        if (f.validations.length !== len) changed = true;
+      }
+      if (f.fields && f.fields.length > 0) {
+        if (this.clearFunctionRefs(f.fields, functionId)) changed = true;
+      }
+    }
+    return changed;
+  }
+
+  cleanupSubmissionReferences(mappingId: string) {
+    this.flushHistory();
+    let changed = false;
+    this.fields.update(fields => {
+      const cloned = JSON.parse(JSON.stringify(fields));
+      changed = this.clearSubmissionRefs(cloned, mappingId);
+      return changed ? cloned : fields;
+    });
+    if (changed) this.saveHistory(this.fields());
+  }
+
+  private clearSubmissionRefs(fields: FormField[], mappingId: string): boolean {
+    let changed = false;
+    for (const f of fields) {
+      if (f.submitMappingId === mappingId) {
+        f.submitMappingId = '';
+        changed = true;
+      }
+      if (f.fields && f.fields.length > 0) {
+         if (this.clearSubmissionRefs(f.fields, mappingId)) changed = true;
+      }
+    }
+    return changed;
   }
 
   private findParentList(fields: FormField[], id: string): FormField[] | null {

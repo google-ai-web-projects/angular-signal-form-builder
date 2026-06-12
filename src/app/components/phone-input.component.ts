@@ -227,14 +227,17 @@ const COUNTRIES: Country[] = [
     <div class="flex relative">
       <button
         type="button"
-        (click)="toggleDropdown()"
+        (click)="!disabled && !readonly && toggleDropdown()"
         class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-700 sm:text-sm hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        [class.opacity-50]="disabled"
+        [class.cursor-not-allowed]="disabled || readonly"
+        [disabled]="disabled"
       >
         <span class="mr-1">{{ selectedCountry.flag }}</span>
         <span class="text-xs text-gray-500">+{{ selectedCountry.dialCode }}</span>
       </button>
 
-      @if (showDropdown) {
+      @if (showDropdown && !disabled && !readonly) {
         <div class="absolute z-10 mt-10 w-64 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 flex flex-col focus:outline-none sm:text-sm">
           <div class="px-2 pb-1 pt-1 border-b border-gray-100 sticky top-0 bg-white z-20">
             <input
@@ -274,10 +277,13 @@ const COUNTRIES: Country[] = [
         (input)="onPhoneInput($event)"
         (blur)="onTouched()"
         [placeholder]="placeholder"
+        [disabled]="disabled"
+        [readOnly]="readonly"
         class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         [ngClass]="{
           'border-red-300': invalid || (!isValid && phoneNumber.length > 0),
-          'border-gray-300': !invalid && (isValid || phoneNumber.length === 0)
+          'border-gray-300': !invalid && (isValid || phoneNumber.length === 0),
+          'bg-gray-50 cursor-not-allowed opacity-70': disabled
         }"
       />
     </div>
@@ -285,6 +291,8 @@ const COUNTRIES: Country[] = [
 })
 export class PhoneInputComponent implements ControlValueAccessor, Validator, OnInit {
   @Input() invalid = false;
+  @Input() disabled = false;
+  @Input() readonly = false;
   
   countries = COUNTRIES;
   selectedCountry = this.countries.find(c => c.iso2 === 'US') || this.countries[0];
@@ -366,6 +374,10 @@ export class PhoneInputComponent implements ControlValueAccessor, Validator, OnI
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
   validate(control: AbstractControl): ValidationErrors | null {

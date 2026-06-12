@@ -1,5 +1,16 @@
-import { Component, inject, signal, OnInit, effect, HostListener } from "@angular/core";
-import { FormBuilderService, FormField, TranslationEntry } from "../form-builder.service";
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  effect,
+  HostListener,
+} from "@angular/core";
+import {
+  FormBuilderService,
+  FormField,
+  TranslationEntry,
+} from "../form-builder.service";
 import { I18nService } from "../i18n.service";
 import { MockHttpService } from "../mock-http.service";
 import { CommonModule } from "@angular/common";
@@ -18,6 +29,7 @@ import { PhoneInputComponent } from "./phone-input.component";
 import { MultiSelectComponent } from "./multi-select.component";
 import { OtpInputComponent } from "./otp-input.component";
 import { RatingInputComponent } from "./rating-input.component";
+import { FileUploadComponent } from "./file-upload.component";
 import { PhoneNumberUtil } from "google-libphonenumber";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Subscription } from "rxjs";
@@ -66,6 +78,7 @@ export class ConfirmDialogComponent {}
     MultiSelectComponent,
     OtpInputComponent,
     RatingInputComponent,
+    FileUploadComponent,
     MatButtonModule,
     MatDialogModule,
     MatDatepickerModule,
@@ -107,21 +120,34 @@ export class ConfirmDialogComponent {}
               Simulation
             </button>
           </div>
-          
-          @if (formBuilder.formConfig().global.i18n.languages && formBuilder.formConfig().global.i18n.languages!.length > 0) {
+
+          @if (
+            formBuilder.formConfig().global.i18n.languages &&
+            formBuilder.formConfig().global.i18n.languages!.length > 0
+          ) {
             <div class="px-4 py-1.5 flex items-center gap-2">
-              <label for="previewLangSelect" class="text-sm font-medium text-gray-700 flex items-center gap-1">
-                <mat-icon class="text-gray-400 w-4 h-4 text-[16px]">language</mat-icon>
+              <label
+                for="previewLangSelect"
+                class="text-sm font-medium text-gray-700 flex items-center gap-1"
+              >
+                <mat-icon class="text-gray-400 w-4 h-4 text-[16px]"
+                  >language</mat-icon
+                >
                 Language
               </label>
-              <select 
+              <select
                 id="previewLangSelect"
-                [ngModel]="i18n.currentLanguage()" 
+                [ngModel]="i18n.currentLanguage()"
                 (ngModelChange)="i18n.setLanguage($event)"
                 class="text-sm border border-gray-200 bg-white font-medium text-gray-700 py-1 pl-2 pr-6 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer outline-none"
               >
-                @for (lang of formBuilder.formConfig().global.i18n.languages; track lang.locale) {
-                  <option [value]="lang.locale">{{ lang.label }} ({{ lang.locale }})</option>
+                @for (
+                  lang of formBuilder.formConfig().global.i18n.languages;
+                  track lang.locale
+                ) {
+                  <option [value]="lang.locale">
+                    {{ lang.label }} ({{ lang.locale }})
+                  </option>
                 }
               </select>
             </div>
@@ -161,13 +187,26 @@ export class ConfirmDialogComponent {}
               </div>
               <div class="p-8 bg-white min-h-[400px]">
                 @if (isHydrating()) {
-                  <div class="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-b-xl border-t border-gray-100">
-                    <mat-icon class="text-indigo-600 animate-spin mb-4" style="font-size: 32px; width: 32px; height: 32px;">refresh</mat-icon>
-                    <span class="text-indigo-900 font-medium tracking-tight">Hydrating form data...</span>
-                    <span class="text-indigo-500/80 text-sm mt-1">Please wait</span>
+                  <div
+                    class="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-b-xl border-t border-gray-100"
+                  >
+                    <mat-icon
+                      class="text-indigo-600 animate-spin mb-4"
+                      style="font-size: 32px; width: 32px; height: 32px;"
+                      >refresh</mat-icon
+                    >
+                    <span class="text-indigo-900 font-medium tracking-tight"
+                      >Hydrating form data...</span
+                    >
+                    <span class="text-indigo-500/80 text-sm mt-1"
+                      >Please wait</span
+                    >
                   </div>
                 }
-                <form [formGroup]="liveForm" class="flex flex-col gap-5 relative">
+                <form
+                  [formGroup]="liveForm"
+                  class="flex flex-col gap-5 relative"
+                >
                   @if (formBuilder.fields().length === 0) {
                     <div class="text-center py-12 text-gray-500">
                       <mat-icon class="text-4xl mb-2 opacity-50">info</mat-icon>
@@ -210,7 +249,9 @@ export class ConfirmDialogComponent {}
                             }}</span>
                           } @else if (control?.hasError("customValidation")) {
                             <span>{{
-                              field.validationMessage || "Invalid value"
+                              control?.getError("customValidation")?.message ||
+                                field.validationMessage ||
+                                "Invalid value"
                             }}</span>
                           } @else if (control?.hasError("invalidPhone")) {
                             <span>Invalid phone</span>
@@ -250,11 +291,23 @@ export class ConfirmDialogComponent {}
                                 >
                                   <div>
                                     <h3 class="text-lg font-bold text-gray-800">
-                                      {{ getTranslatedText(field, 'label', field.label) }}
+                                      {{
+                                        getTranslatedText(
+                                          field,
+                                          "label",
+                                          field.label
+                                        )
+                                      }}
                                     </h3>
                                     @if (field.placeholder) {
                                       <p class="text-sm text-gray-500">
-                                        {{ getTranslatedText(field, 'placeholder', field.placeholder) }}
+                                        {{
+                                          getTranslatedText(
+                                            field,
+                                            "placeholder",
+                                            field.placeholder
+                                          )
+                                        }}
                                       </p>
                                     }
                                   </div>
@@ -332,7 +385,13 @@ export class ConfirmDialogComponent {}
                                     <h3
                                       class="text-md font-semibold text-gray-700"
                                     >
-                                      {{ getTranslatedText(field, 'label', field.label) }}
+                                      {{
+                                        getTranslatedText(
+                                          field,
+                                          "label",
+                                          field.label
+                                        )
+                                      }}
                                     </h3>
                                     @if (field.validationPlacement === "top") {
                                       <ng-container
@@ -478,9 +537,26 @@ export class ConfirmDialogComponent {}
                                       [for]="'live-' + field.id"
                                       class="block text-sm font-medium text-gray-700"
                                     >
-                                      {{ getTranslatedText(field, 'label', field.label) }}
-                                      @if (isTranslationMissing(field, 'label')) {
-                                        <span class="inline-flex items-center justify-center bg-yellow-100 text-yellow-800 text-[10px] px-1 py-0.5 rounded ml-1 cursor-pointer" title="Missing translation" (click)="activeTab.set('json')" (keydown.enter)="activeTab.set('json')" tabindex="0">T</span>
+                                      {{
+                                        getTranslatedText(
+                                          field,
+                                          "label",
+                                          field.label
+                                        )
+                                      }}
+                                      @if (
+                                        isTranslationMissing(field, "label")
+                                      ) {
+                                        <span
+                                          class="inline-flex items-center justify-center bg-yellow-100 text-yellow-800 text-[10px] px-1 py-0.5 rounded ml-1 cursor-pointer"
+                                          title="Missing translation"
+                                          (click)="activeTab.set('json')"
+                                          (keydown.enter)="
+                                            activeTab.set('json')
+                                          "
+                                          tabindex="0"
+                                          >T</span
+                                        >
                                       }
                                       @if (field.required) {
                                         <span class="text-red-500">*</span>
@@ -550,6 +626,8 @@ export class ConfirmDialogComponent {}
                                               formGroup.get(field.name)
                                                 ?.touched)
                                           ),
+                                        'cursor-not-allowed opacity-50 pointer-events-none':
+                                          readOnlyFields()[field.id],
                                       }"
                                     />
                                     <span
@@ -560,6 +638,41 @@ export class ConfirmDialogComponent {}
                                       }}</span
                                     >
                                   </div>
+                                }
+                                @case ("file") {
+                                  <app-file-upload
+                                    [formControlName]="field.name"
+                                    [maxFiles]="field.maxFiles || 0"
+                                    [maxFileSizeMB]="field.maxFileSizeMB || 0"
+                                    [allowedFileTypes]="
+                                      field.allowedFileTypes || ''
+                                    "
+                                    [convertToBase64]="
+                                      field.convertToBase64 || false
+                                    "
+                                    [disabled]="disabledFields()[field.id]"
+                                    [fileMaxFilesMessage]="
+                                      field.fileMaxFilesMessage
+                                        ? i18n.translate(
+                                            field.fileMaxFilesMessage
+                                          )
+                                        : 'Exceeded maximum number of files'
+                                    "
+                                    [fileMaxSizeMessage]="
+                                      field.fileMaxSizeMessage
+                                        ? i18n.translate(
+                                            field.fileMaxSizeMessage
+                                          )
+                                        : 'File size exceeds the limit'
+                                    "
+                                    [fileInvalidFormatMessage]="
+                                      field.fileInvalidFormatMessage
+                                        ? i18n.translate(
+                                            field.fileInvalidFormatMessage
+                                          )
+                                        : 'Invalid file format'
+                                    "
+                                  ></app-file-upload>
                                 }
                                 @case ("text") {
                                   <div class="relative">
@@ -579,6 +692,7 @@ export class ConfirmDialogComponent {}
                                       [formControlName]="field.name"
                                       [placeholder]="field.placeholder || ''"
                                       [mask]="field.mask || ''"
+                                      [readonly]="readOnlyFields()[field.id]"
                                       class="w-full px-3 py-2 border rounded-md sm:text-sm transition-colors"
                                       [ngClass]="{
                                         'border-red-300 focus:ring-red-500 focus:border-red-500':
@@ -627,6 +741,7 @@ export class ConfirmDialogComponent {}
                                       [id]="'live-' + field.id"
                                       [formControlName]="field.name"
                                       [placeholder]="field.placeholder || ''"
+                                      [readonly]="readOnlyFields()[field.id]"
                                       class="w-full px-3 py-2 border rounded-md sm:text-sm transition-colors"
                                       rows="3"
                                       [ngClass]="{
@@ -642,6 +757,8 @@ export class ConfirmDialogComponent {}
                                               formGroup.get(field.name)
                                                 ?.touched)
                                           ),
+                                        'bg-gray-50 text-gray-600':
+                                          readOnlyFields()[field.id],
                                       }"
                                       [class.pr-8]="
                                         field.clearable &&
@@ -686,6 +803,7 @@ export class ConfirmDialogComponent {}
                                       type="number"
                                       [formControlName]="field.name"
                                       [placeholder]="field.placeholder || ''"
+                                      [readonly]="readOnlyFields()[field.id]"
                                       class="w-full px-3 py-2 border rounded-md sm:text-sm transition-colors"
                                       [ngClass]="{
                                         'border-red-300 focus:ring-red-500 focus:border-red-500':
@@ -700,6 +818,8 @@ export class ConfirmDialogComponent {}
                                               formGroup.get(field.name)
                                                 ?.touched)
                                           ),
+                                        'bg-gray-50 text-gray-600':
+                                          readOnlyFields()[field.id],
                                       }"
                                       [class.pl-10]="field.icon"
                                       [class.pr-8]="
@@ -729,9 +849,17 @@ export class ConfirmDialogComponent {}
                                   </div>
                                 }
                                 @case ("date") {
-                                  <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                  <mat-form-field
+                                    appearance="outline"
+                                    class="w-full"
+                                    subscriptSizing="dynamic"
+                                  >
                                     @if (field.icon) {
-                                      <mat-icon matIconPrefix class="text-gray-400 mr-2">{{ field.icon }}</mat-icon>
+                                      <mat-icon
+                                        matIconPrefix
+                                        class="text-gray-400 mr-2"
+                                        >{{ field.icon }}</mat-icon
+                                      >
                                     }
                                     <input
                                       matInput
@@ -740,25 +868,65 @@ export class ConfirmDialogComponent {}
                                       [formControlName]="field.name"
                                       [min]="field.minDate || null"
                                       [max]="field.maxDate || null"
-                                      [placeholder]="field.placeholder || 'Choose a date'"
+                                      [placeholder]="
+                                        field.placeholder || 'Choose a date'
+                                      "
+                                      [readonly]="readOnlyFields()[field.id]"
                                     />
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker-toggle
+                                      matIconSuffix
+                                      [for]="picker"
+                                      [disabled]="readOnlyFields()[field.id]"
+                                    ></mat-datepicker-toggle>
                                     <mat-datepicker #picker></mat-datepicker>
                                   </mat-form-field>
                                 }
                                 @case ("date-range") {
-                                  <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                  <mat-form-field
+                                    appearance="outline"
+                                    class="w-full"
+                                    subscriptSizing="dynamic"
+                                  >
                                     <mat-date-range-input
-                                      [formGroup]="getNestedFormGroup(formGroup, field.name)"
+                                      [formGroup]="
+                                        getNestedFormGroup(
+                                          formGroup,
+                                          field.name
+                                        )
+                                      "
                                       [rangePicker]="rangePicker"
                                       [min]="field.minDate || null"
                                       [max]="field.maxDate || null"
                                     >
-                                      <input matStartDate formControlName="start" [placeholder]="field.placeholder ? field.placeholder + ' (start)' : 'Start date'">
-                                      <input matEndDate formControlName="end" [placeholder]="field.placeholder ? field.placeholder + ' (end)' : 'End date'">
+                                      <input
+                                        matStartDate
+                                        formControlName="start"
+                                        [placeholder]="
+                                          field.placeholder
+                                            ? field.placeholder + ' (start)'
+                                            : 'Start date'
+                                        "
+                                        [readonly]="readOnlyFields()[field.id]"
+                                      />
+                                      <input
+                                        matEndDate
+                                        formControlName="end"
+                                        [placeholder]="
+                                          field.placeholder
+                                            ? field.placeholder + ' (end)'
+                                            : 'End date'
+                                        "
+                                        [readonly]="readOnlyFields()[field.id]"
+                                      />
                                     </mat-date-range-input>
-                                    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
-                                    <mat-date-range-picker #rangePicker></mat-date-range-picker>
+                                    <mat-datepicker-toggle
+                                      matIconSuffix
+                                      [for]="rangePicker"
+                                      [disabled]="readOnlyFields()[field.id]"
+                                    ></mat-datepicker-toggle>
+                                    <mat-date-range-picker
+                                      #rangePicker
+                                    ></mat-date-range-picker>
                                   </mat-form-field>
                                 }
                                 @case ("phone") {
@@ -766,6 +934,7 @@ export class ConfirmDialogComponent {}
                                     <app-phone-input
                                       [id]="'live-' + field.id"
                                       [formControlName]="field.name"
+                                      [readonly]="readOnlyFields()[field.id]"
                                       [invalid]="
                                         (formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
@@ -800,6 +969,7 @@ export class ConfirmDialogComponent {}
                                     [id]="'live-' + field.id"
                                     [formControlName]="field.name"
                                     [length]="field.otpLength || 6"
+                                    [readonly]="readOnlyFields()[field.id]"
                                     [invalid]="
                                       (formGroup.get(field.name)?.invalid &&
                                         (formGroup.get(field.name)?.dirty ||
@@ -816,6 +986,7 @@ export class ConfirmDialogComponent {}
                                     [max]="field.ratingMax || 5"
                                     [icon]="field.ratingIcon || 'star'"
                                     [allowHalf]="field.ratingAllowHalf || false"
+                                    [readonly]="readOnlyFields()[field.id]"
                                   ></app-rating-input>
                                 }
                                 @case ("select") {
@@ -847,7 +1018,13 @@ export class ConfirmDialogComponent {}
                                       track opt.value
                                     ) {
                                       <option [value]="opt.value">
-                                        {{ getTranslatedOption(field, opt.value, opt.label) }}
+                                        {{
+                                          getTranslatedOption(
+                                            field,
+                                            opt.value,
+                                            opt.label
+                                          )
+                                        }}
                                       </option>
                                     }
                                   </select>
@@ -892,10 +1069,16 @@ export class ConfirmDialogComponent {}
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched)
                                         ),
+                                        'pointer-events-none opacity-60 bg-gray-100':
+                                          readOnlyFields()[field.id],
                                       }"
                                     />
                                     <span class="text-sm text-gray-600">{{
-                                      getTranslatedText(field, 'label', field.label)
+                                      getTranslatedText(
+                                        field,
+                                        "label",
+                                        field.label
+                                      )
                                     }}</span>
                                   </div>
                                 }
@@ -931,6 +1114,8 @@ export class ConfirmDialogComponent {}
                                                 formGroup.get(field.name)
                                                   ?.touched)
                                             ),
+                                            'pointer-events-none opacity-60 bg-gray-100':
+                                              readOnlyFields()[field.id],
                                           }"
                                         />
                                         <label
@@ -938,7 +1123,13 @@ export class ConfirmDialogComponent {}
                                             'live-' + field.id + '-' + opt.value
                                           "
                                           class="text-sm text-gray-600"
-                                          >{{ getTranslatedOption(field, opt.value, opt.label) }}</label
+                                          >{{
+                                            getTranslatedOption(
+                                              field,
+                                              opt.value,
+                                              opt.label
+                                            )
+                                          }}</label
                                         >
                                       </div>
                                     }
@@ -951,6 +1142,12 @@ export class ConfirmDialogComponent {}
                                       [formControlName]="field.name"
                                       [id]="'live-' + field.id"
                                       class="w-full"
+                                      [class.pointer-events-none]="
+                                        readOnlyFields()[field.id]
+                                      "
+                                      [class.opacity-50]="
+                                        readOnlyFields()[field.id]
+                                      "
                                       [min]="field.min || 0"
                                       [max]="field.max || 100"
                                       [step]="field.step || 1"
@@ -996,69 +1193,268 @@ export class ConfirmDialogComponent {}
                                         >{{ field.icon }}</mat-icon
                                       >
                                     }
-                                    {{ getTranslatedText(field, field.content ? 'content' : 'label', field.content || field.label || "Button") }}
+                                    {{
+                                      getTranslatedText(
+                                        field,
+                                        field.content ? "content" : "label",
+                                        field.content || field.label || "Button"
+                                      )
+                                    }}
                                   </button>
                                 }
                                 @case ("alert") {
                                   @if (!hiddenAlerts()[field.id]) {
-                                    <div class="px-4 py-3 rounded-md border flex items-start gap-3 w-full relative"
+                                    <div
+                                      class="px-4 py-3 rounded-md border flex items-start gap-3 w-full relative"
                                       [ngClass]="{
-                                        'bg-blue-50 border-blue-200 text-blue-800': field.severity === 'info' || !field.severity,
-                                        'bg-green-50 border-green-200 text-green-800': field.severity === 'success',
-                                        'bg-yellow-50 border-yellow-200 text-yellow-800': field.severity === 'warning',
-                                        'bg-red-50 border-red-200 text-red-800': field.severity === 'error' || field.severity === 'critical'
-                                      }">
+                                        'bg-blue-50 border-blue-200 text-blue-800':
+                                          field.severity === 'info' ||
+                                          !field.severity,
+                                        'bg-green-50 border-green-200 text-green-800':
+                                          field.severity === 'success',
+                                        'bg-yellow-50 border-yellow-200 text-yellow-800':
+                                          field.severity === 'warning',
+                                        'bg-red-50 border-red-200 text-red-800':
+                                          field.severity === 'error' ||
+                                          field.severity === 'critical',
+                                      }"
+                                    >
                                       @if (field.icon) {
-                                        <mat-icon class="mt-0.5" [ngClass]="{
-                                        'text-blue-500': field.severity === 'info' || !field.severity,
-                                        'text-green-500': field.severity === 'success',
-                                        'text-yellow-500': field.severity === 'warning',
-                                        'text-red-500': field.severity === 'error' || field.severity === 'critical'
-                                      }">{{field.icon}}</mat-icon>
+                                        <mat-icon
+                                          class="mt-0.5"
+                                          [ngClass]="{
+                                            'text-blue-500':
+                                              field.severity === 'info' ||
+                                              !field.severity,
+                                            'text-green-500':
+                                              field.severity === 'success',
+                                            'text-yellow-500':
+                                              field.severity === 'warning',
+                                            'text-red-500':
+                                              field.severity === 'error' ||
+                                              field.severity === 'critical',
+                                          }"
+                                          >{{ field.icon }}</mat-icon
+                                        >
                                       }
                                       <div class="flex-1">
-                                        @if (field.alertTitle) { <h4 class="font-bold text-sm">{{field.alertTitle}}</h4> }
-                                        @if (field.alertSubtitle) { <div class="text-xs opacity-90 mb-1">{{field.alertSubtitle}}</div> }
-                                        @if (field.alertMessage) { <div class="text-sm opacity-90">{{field.alertMessage}}</div> }
+                                        @if (field.alertTitle) {
+                                          <h4 class="font-bold text-sm">
+                                            {{ field.alertTitle }}
+                                          </h4>
+                                        }
+                                        @if (field.alertSubtitle) {
+                                          <div class="text-xs opacity-90 mb-1">
+                                            {{ field.alertSubtitle }}
+                                          </div>
+                                        }
+                                        @if (field.alertMessage) {
+                                          <div class="text-sm opacity-90">
+                                            {{ field.alertMessage }}
+                                          </div>
+                                        }
                                       </div>
-                                      @if (field.timeoutMs === 0 || !field.timeoutMs) {
-                                        <button (click)="dismissAlert(field.id)" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                                          <mat-icon class="w-4 h-4 text-[16px]">close</mat-icon>
+                                      @if (
+                                        field.timeoutMs === 0 ||
+                                        !field.timeoutMs
+                                      ) {
+                                        <button
+                                          (click)="dismissAlert(field.id)"
+                                          class="text-gray-400 hover:text-gray-600 focus:outline-none"
+                                        >
+                                          <mat-icon class="w-4 h-4 text-[16px]"
+                                            >close</mat-icon
+                                          >
+                                        </button>
+                                      }
+                                    </div>
+                                  }
+                                }
+                                @case ("inline-message") {
+                                  @if (!hiddenAlerts()[field.id]) {
+                                    <div
+                                      class="px-4 py-3 rounded-md border flex items-start justify-between gap-3 relative w-full"
+                                      [ngClass]="{
+                                        'bg-blue-50 border-blue-200 text-blue-800':
+                                          field.severity === 'info' ||
+                                          !field.severity,
+                                        'bg-green-50 border-green-200 text-green-800':
+                                          field.severity === 'success',
+                                        'bg-yellow-50 border-yellow-200 text-yellow-800':
+                                          field.severity === 'warning',
+                                        'bg-red-50 border-red-200 text-red-800':
+                                          field.severity === 'error' ||
+                                          field.severity === 'critical',
+                                      }"
+                                    >
+                                      <div
+                                        class="flex items-start gap-3 w-full"
+                                      >
+                                        @if (field.icon) {
+                                          <mat-icon
+                                            class="mt-0.5"
+                                            [ngClass]="{
+                                              'text-blue-500':
+                                                field.severity === 'info' ||
+                                                !field.severity,
+                                              'text-green-500':
+                                                field.severity === 'success',
+                                              'text-yellow-500':
+                                                field.severity === 'warning',
+                                              'text-red-500':
+                                                field.severity === 'error' ||
+                                                field.severity === 'critical',
+                                            }"
+                                            >{{ field.icon }}</mat-icon
+                                          >
+                                        }
+                                        <div
+                                          class="flex-1 break-words overflow-hidden"
+                                        >
+                                          @if (field.messageHeader) {
+                                            <div
+                                              class="text-xs font-semibold uppercase tracking-wider mb-1 opacity-70"
+                                            >
+                                              {{
+                                                getTranslatedText(
+                                                  field,
+                                                  "messageHeader",
+                                                  field.messageHeader
+                                                )
+                                              }}
+                                            </div>
+                                          }
+                                          @if (field.messageTitle) {
+                                            <h4 class="font-bold text-sm mb-1">
+                                              {{
+                                                getTranslatedText(
+                                                  field,
+                                                  "messageTitle",
+                                                  field.messageTitle
+                                                )
+                                              }}
+                                            </h4>
+                                          }
+                                          @if (field.messageContent) {
+                                            <div class="text-sm opacity-90">
+                                              {{
+                                                getTranslatedText(
+                                                  field,
+                                                  "messageContent",
+                                                  field.messageContent
+                                                )
+                                              }}
+                                            </div>
+                                          }
+                                        </div>
+                                      </div>
+                                      @if (field.showCloseButton) {
+                                        <button
+                                          type="button"
+                                          (click)="dismissInlineMessage(field)"
+                                          class="text-gray-400 hover:text-gray-600 focus:outline-none flex-shrink-0"
+                                        >
+                                          <mat-icon
+                                            class="text-[18px] w-[18px] h-[18px]"
+                                            >close</mat-icon
+                                          >
                                         </button>
                                       }
                                     </div>
                                   }
                                 }
                                 @case ("autocomplete") {
-                                  <div class="relative w-full" id="autocomplete-{{field.id}}">
+                                  <div
+                                    class="relative w-full"
+                                    id="autocomplete-{{ field.id }}"
+                                  >
                                     @if (field.icon) {
-                                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                                        <mat-icon class="text-gray-400 w-5 h-5 text-[20px]">{{field.icon}}</mat-icon>
+                                      <div
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10"
+                                      >
+                                        <mat-icon
+                                          class="text-gray-400 w-5 h-5 text-[20px]"
+                                          >{{ field.icon }}</mat-icon
+                                        >
                                       </div>
                                     }
-                                    
+
                                     @if (field.multiSelect) {
                                       <!-- Multi-select chips area inside input lookalike -->
-                                      <div 
-                                      class="flex flex-wrap items-center gap-1 w-full border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow min-h-[38px] py-1"
-                                      [ngClass]="{'pl-10': field.icon, 'opacity-50 cursor-not-allowed bg-gray-50': disabledFields()[field.id]}"
-                                      (click)="!disabledFields()[field.id] && onAutocompleteFocus(field.id)" tabindex="0" (keydown.enter)="!disabledFields()[field.id] && onAutocompleteFocus(field.id)">
-                                        @for (item of autocompleteSelectedItems()[field.id] || []; track $index) {
-                                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                                      <div
+                                        class="flex flex-wrap items-center gap-1 w-full border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow min-h-[38px] py-1"
+                                        [ngClass]="{
+                                          'pl-10': field.icon,
+                                          'opacity-50 cursor-not-allowed bg-gray-50':
+                                            disabledFields()[field.id],
+                                        }"
+                                        (click)="
+                                          !disabledFields()[field.id] &&
+                                            onAutocompleteFocus(field.id)
+                                        "
+                                        tabindex="0"
+                                        (keydown.enter)="
+                                          !disabledFields()[field.id] &&
+                                            onAutocompleteFocus(field.id)
+                                        "
+                                      >
+                                        @for (
+                                          item of autocompleteSelectedItems()[
+                                            field.id
+                                          ] || [];
+                                          track $index
+                                        ) {
+                                          <span
+                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
+                                          >
                                             {{ getDisplayLabel(item, field) }}
-                                            <button type="button" class="text-indigo-600 hover:text-indigo-900 focus:outline-none" (click)="removeSelectedItem(field, item, $event)">
-                                              <mat-icon class="w-3 h-3 text-[12px]">close</mat-icon>
+                                            <button
+                                              type="button"
+                                              class="text-indigo-600 hover:text-indigo-900 focus:outline-none"
+                                              (click)="
+                                                removeSelectedItem(
+                                                  field,
+                                                  item,
+                                                  $event
+                                                )
+                                              "
+                                            >
+                                              <mat-icon
+                                                class="w-3 h-3 text-[12px]"
+                                                >close</mat-icon
+                                              >
                                             </button>
                                           </span>
                                         }
                                         <input
                                           type="text"
                                           class="flex-1 min-w-[50px] border-none bg-transparent p-0 text-sm focus:ring-0"
-                                          [placeholder]="(autocompleteSelectedItems()[field.id]?.length ? '' : getTranslatedText(field, 'placeholder', field.placeholder || 'Search...'))"
-                                          [value]="autocompleteSearchTerms()[field.id] || ''"
-                                          (input)="onAutocompleteInput(field, $event)"
-                                          (focus)="onAutocompleteFocus(field.id)"
-                                          [disabled]="disabledFields()[field.id]"
+                                          [placeholder]="
+                                            autocompleteSelectedItems()[
+                                              field.id
+                                            ]?.length
+                                              ? ''
+                                              : getTranslatedText(
+                                                  field,
+                                                  'placeholder',
+                                                  field.placeholder ||
+                                                    'Search...'
+                                                )
+                                          "
+                                          [value]="
+                                            autocompleteSearchTerms()[
+                                              field.id
+                                            ] || ''
+                                          "
+                                          (input)="
+                                            onAutocompleteInput(field, $event)
+                                          "
+                                          (focus)="
+                                            onAutocompleteFocus(field.id)
+                                          "
+                                          [disabled]="
+                                            disabledFields()[field.id]
+                                          "
                                         />
                                       </div>
                                     } @else {
@@ -1067,19 +1463,44 @@ export class ConfirmDialogComponent {}
                                         class="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-[38px]"
                                         [ngClass]="{
                                           'pl-10': field.icon,
-                                          'bg-gray-50 text-gray-500 cursor-not-allowed opacity-70': disabledFields()[field.id],
-                                          'pr-10': autocompleteSearchTerms()[field.id]
+                                          'bg-gray-50 text-gray-500 cursor-not-allowed opacity-70':
+                                            disabledFields()[field.id],
+                                          'pr-10':
+                                            autocompleteSearchTerms()[field.id],
                                         }"
-                                        [placeholder]="getTranslatedText(field, 'placeholder', field.placeholder || 'Search...')"
-                                        [value]="autocompleteSearchTerms()[field.id] || ''"
-                                        (input)="onAutocompleteInput(field, $event)"
+                                        [placeholder]="
+                                          getTranslatedText(
+                                            field,
+                                            'placeholder',
+                                            field.placeholder || 'Search...'
+                                          )
+                                        "
+                                        [value]="
+                                          autocompleteSearchTerms()[field.id] ||
+                                          ''
+                                        "
+                                        (input)="
+                                          onAutocompleteInput(field, $event)
+                                        "
                                         (focus)="onAutocompleteFocus(field.id)"
                                         [disabled]="disabledFields()[field.id]"
                                       />
-                                      @if (autocompleteSearchTerms()[field.id] && !disabledFields()[field.id]) {
-                                        <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
-                                          <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" (click)="clearAutocomplete(field)">
-                                            <mat-icon class="w-4 h-4 text-[16px]">close</mat-icon>
+                                      @if (
+                                        autocompleteSearchTerms()[field.id] &&
+                                        !disabledFields()[field.id]
+                                      ) {
+                                        <div
+                                          class="absolute inset-y-0 right-0 pr-2 flex items-center"
+                                        >
+                                          <button
+                                            type="button"
+                                            class="text-gray-400 hover:text-gray-600 focus:outline-none"
+                                            (click)="clearAutocomplete(field)"
+                                          >
+                                            <mat-icon
+                                              class="w-4 h-4 text-[16px]"
+                                              >close</mat-icon
+                                            >
                                           </button>
                                         </div>
                                       }
@@ -1087,34 +1508,99 @@ export class ConfirmDialogComponent {}
 
                                     <!-- Dropdown -->
                                     @if (autocompleteShowDropdown()[field.id]) {
-                                      <div class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                      <div
+                                        class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                                      >
                                         @if (autocompleteLoading()[field.id]) {
-                                          <div class="px-4 py-2 text-sm text-gray-500 flex items-center gap-2">
-                                            <mat-icon class="animate-spin w-4 h-4 text-[16px]">refresh</mat-icon> Loading...
+                                          <div
+                                            class="px-4 py-2 text-sm text-gray-500 flex items-center gap-2"
+                                          >
+                                            <mat-icon
+                                              class="animate-spin w-4 h-4 text-[16px]"
+                                              >refresh</mat-icon
+                                            >
+                                            Loading...
                                           </div>
-                                        } @else if ((autocompleteOptions()[field.id] || []).length === 0) {
-                                          <div class="px-4 py-2 text-sm text-gray-500 italic">
-                                            {{ field.emptyMessage || 'No results found' }}
+                                        } @else if (
+                                          (
+                                            autocompleteOptions()[field.id] ||
+                                            []
+                                          ).length === 0
+                                        ) {
+                                          <div
+                                            class="px-4 py-2 text-sm text-gray-500 italic"
+                                          >
+                                            {{
+                                              field.emptyMessage ||
+                                                "No results found"
+                                            }}
                                           </div>
                                         } @else {
-                                          @for (option of autocompleteOptions()[field.id]; track option) {
-                                            <div 
+                                          @for (
+                                            option of autocompleteOptions()[
+                                              field.id
+                                            ];
+                                            track option
+                                          ) {
+                                            <div
                                               class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50 hover:text-indigo-900"
-                                              (click)="selectAutocompleteOption(field, option)"
+                                              (click)="
+                                                selectAutocompleteOption(
+                                                  field,
+                                                  option
+                                                )
+                                              "
                                               tabindex="0"
-                                              (keydown.enter)="selectAutocompleteOption(field, option)"
+                                              (keydown.enter)="
+                                                selectAutocompleteOption(
+                                                  field,
+                                                  option
+                                                )
+                                              "
                                             >
                                               <div class="flex flex-col">
-                                                <span class="block truncate" [class.font-semibold]="isOptionSelected(field, option)">
-                                                    {{ getDisplayLabel(option, field) }}
+                                                <span
+                                                  class="block truncate"
+                                                  [class.font-semibold]="
+                                                    isOptionSelected(
+                                                      field,
+                                                      option
+                                                    )
+                                                  "
+                                                >
+                                                  {{
+                                                    getDisplayLabel(
+                                                      option,
+                                                      field
+                                                    )
+                                                  }}
                                                 </span>
-                                                @if (field.secondaryKey && $any(option)[field.secondaryKey]) {
-                                                  <span class="block text-xs text-gray-500 truncate mt-0.5">{{ $any(option)[field.secondaryKey] }}</span>
+                                                @if (
+                                                  field.secondaryKey &&
+                                                  $any(option)[
+                                                    field.secondaryKey
+                                                  ]
+                                                ) {
+                                                  <span
+                                                    class="block text-xs text-gray-500 truncate mt-0.5"
+                                                    >{{
+                                                      $any(option)[
+                                                        field.secondaryKey
+                                                      ]
+                                                    }}</span
+                                                  >
                                                 }
                                               </div>
-                                              @if (isOptionSelected(field, option)) {
-                                                <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
-                                                  <mat-icon class="w-5 h-5 text-[20px]">check</mat-icon>
+                                              @if (
+                                                isOptionSelected(field, option)
+                                              ) {
+                                                <span
+                                                  class="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600"
+                                                >
+                                                  <mat-icon
+                                                    class="w-5 h-5 text-[20px]"
+                                                    >check</mat-icon
+                                                  >
                                                 </span>
                                               }
                                             </div>
@@ -1173,32 +1659,6 @@ export class ConfirmDialogComponent {}
               </h3>
               <div class="flex flex-col gap-3">
                 <button
-                  (click)="sendForm()"
-                  [disabled]="isSending()"
-                  class="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-3 rounded-md hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:bg-indigo-400"
-                >
-                  @if (isSending()) {
-                    <mat-icon class="animate-spin text-sm">refresh</mat-icon>
-                    Sending...
-                  } @else {
-                    <mat-icon class="text-sm">send</mat-icon> Send Form
-                  }
-                </button>
-
-                <button
-                  (click)="submitForm()"
-                  [disabled]="isSubmitting()"
-                  class="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-md hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:bg-emerald-400"
-                >
-                  @if (isSubmitting()) {
-                    <mat-icon class="animate-spin text-sm">refresh</mat-icon>
-                    Submitting...
-                  } @else {
-                    <mat-icon class="text-sm">check_circle</mat-icon> Submit
-                  }
-                </button>
-
-                <button
                   (click)="clearForm()"
                   class="flex items-center justify-center gap-2 bg-red-50 text-red-700 border border-red-200 px-4 py-3 rounded-md hover:bg-red-100 transition-colors font-medium mt-2"
                 >
@@ -1222,43 +1682,75 @@ export class ConfirmDialogComponent {}
                 }
               </div>
             </div>
-            
-            @if (activeTab() === 'simulation') {
-              <div class="w-full lg:w-[400px] flex-shrink-0 border border-gray-200 rounded-xl bg-gray-900 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-12rem)] min-h-[500px] sticky top-6">
-                <div class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700">
-                   <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                      <mat-icon class="text-indigo-400 text-[18px] w-[18px] h-[18px]">terminal</mat-icon>
-                      Simulation Log
-                   </h3>
-                   <button (click)="clearSimulationLog()" class="text-gray-400 hover:text-white transition-colors" title="Clear log">
-                      <mat-icon class="text-[18px] w-[18px] h-[18px]">delete_outline</mat-icon>
-                   </button>
+
+            @if (activeTab() === "simulation") {
+              <div
+                class="w-full lg:w-[400px] flex-shrink-0 border border-gray-200 rounded-xl bg-gray-900 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-12rem)] min-h-[500px] sticky top-6"
+              >
+                <div
+                  class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700"
+                >
+                  <h3
+                    class="text-sm font-semibold text-white flex items-center gap-2"
+                  >
+                    <mat-icon
+                      class="text-indigo-400 text-[18px] w-[18px] h-[18px]"
+                      >terminal</mat-icon
+                    >
+                    Simulation Log
+                  </h3>
+                  <button
+                    (click)="clearSimulationLog()"
+                    class="text-gray-400 hover:text-white transition-colors"
+                    title="Clear log"
+                  >
+                    <mat-icon class="text-[18px] w-[18px] h-[18px]"
+                      >delete_outline</mat-icon
+                    >
+                  </button>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 font-mono text-xs text-gray-300">
-                   @for (log of simulationLogs(); track log.id) {
-                      <div class="mb-3 border-b border-gray-800 pb-2 last:border-0 last:pb-0 last:mb-0">
-                         <div class="flex items-center justify-between text-gray-500 mb-1">
-                            <span>[{{ log.time | date:'HH:mm:ss.SSS' }}]</span>
-                            <span [class]="getLogColor(log.type)" class="font-bold">{{ log.type }}</span>
-                         </div>
-                         <div class="whitespace-pre-wrap text-gray-200">{{ log.message }}</div>
-                         @if (log.payload) {
-                            <pre class="mt-2 pl-2 border-l-2 border-indigo-500/50 text-indigo-300 overflow-x-auto bg-gray-950 p-2 rounded">{{ log.payload | json }}</pre>
-                         }
+                <div
+                  class="flex-1 overflow-y-auto p-4 font-mono text-xs text-gray-300"
+                >
+                  @for (log of simulationLogs(); track log.id) {
+                    <div
+                      class="mb-3 border-b border-gray-800 pb-2 last:border-0 last:pb-0 last:mb-0"
+                    >
+                      <div
+                        class="flex items-center justify-between text-gray-500 mb-1"
+                      >
+                        <span>[{{ log.time | date: "HH:mm:ss.SSS" }}]</span>
+                        <span
+                          [class]="getLogColor(log.type)"
+                          class="font-bold"
+                          >{{ log.type }}</span
+                        >
                       </div>
-                   }
-                   @if (simulationLogs().length === 0) {
-                      <div class="text-center text-gray-600 mt-10">
-                         <mat-icon class="mb-2 opacity-50 w-8 h-8 text-[32px]">touch_app</mat-icon>
-                         <p>No events recorded.</p>
-                         <p class="mt-1">Interact with the form to see events.</p>
+                      <div class="whitespace-pre-wrap text-gray-200">
+                        {{ log.message }}
                       </div>
-                   }
+                      @if (log.payload) {
+                        <pre
+                          class="mt-2 pl-2 border-l-2 border-indigo-500/50 text-indigo-300 overflow-x-auto bg-gray-950 p-2 rounded"
+                          >{{ log.payload | json }}</pre
+                        >
+                      }
+                    </div>
+                  }
+                  @if (simulationLogs().length === 0) {
+                    <div class="text-center text-gray-600 mt-10">
+                      <mat-icon class="mb-2 opacity-50 w-8 h-8 text-[32px]"
+                        >touch_app</mat-icon
+                      >
+                      <p>No events recorded.</p>
+                      <p class="mt-1">Interact with the form to see events.</p>
+                    </div>
+                  }
                 </div>
               </div>
             }
           </div>
-        } @else if (activeTab() === 'json') {
+        } @else if (activeTab() === "json") {
           <div class="flex gap-6 flex-col lg:flex-row max-w-6xl mx-auto w-full">
             <!-- FORM SCHEMA BLOCK -->
             <div
@@ -1573,88 +2065,128 @@ export class PreviewComponent implements OnInit {
   http = inject(MockHttpService);
   fb = inject(FormBuilder);
 
-  appInitialLanguage = 'en';
+  appInitialLanguage = "en";
 
   i18n = inject(I18nService);
 
-  getTranslatedOption(field: FormField, optValue: any, defaultLabel: string): string {
+  getTranslatedOption(
+    field: FormField,
+    optValue: any,
+    defaultLabel: string,
+  ): string {
     const valString = String(optValue);
-    const key = field.translationKey ? `${field.translationKey}.options.${valString}` : `${field.id}.options.${valString}`;
-    
+    const key = field.translationKey
+      ? `${field.translationKey}.options.${valString}`
+      : `${field.id}.options.${valString}`;
+
     if (this.i18n.hasTranslation(key)) {
       return this.i18n.translate(key);
     }
     return defaultLabel;
   }
-  
-  getTranslatedText(field: FormField, type: 'label'|'placeholder'|'error'|'help'|'custom'|'content', defaultValue: string): string {
-    const key = field.translationKey ? `${field.translationKey}` : `${field.id}.${type}`;
-    
+
+  getTranslatedText(
+    field: FormField,
+    type: string,
+    defaultValue: string,
+  ): string {
+    const key = field.translationKey
+      ? `${field.translationKey}`
+      : `${field.id}.${type}`;
+
     if (this.i18n.hasTranslation(key)) {
       return this.i18n.translate(key);
     }
-    
+
     if (this.i18n.hasTranslation(`${key}.${type}`)) {
       return this.i18n.translate(`${key}.${type}`);
     }
 
     // Otherwise fallback to old translation methodology
     if (field && field.translations && field.translations.length > 0) {
-      const resolved = this.resolveTranslationEntry(field, type);
+      const resolved = this.resolveTranslationEntry(field, type as any);
       if (resolved) return resolved.value;
     }
-    
-    return defaultValue || '';
+
+    return defaultValue || "";
   }
 
-  isTranslationMissing(field: FormField, type: 'label'|'placeholder'|'error'|'help'|'custom'|'content'): boolean {
-    const key = field.translationKey ? `${field.translationKey}` : `${field.id}.${type}`;
-    if (this.i18n.hasTranslation(key) || this.i18n.hasTranslation(`${key}.${type}`)) return false;
-    
+  isTranslationMissing(field: FormField, type: string): boolean {
+    const key = field.translationKey
+      ? `${field.translationKey}`
+      : `${field.id}.${type}`;
+    if (
+      this.i18n.hasTranslation(key) ||
+      this.i18n.hasTranslation(`${key}.${type}`)
+    )
+      return false;
+
     // Using old translations implies it's not totally missing, but we still consider it not in global map
     // Let's assume if neither found, it's missing
     if (field && field.translations && field.translations.length > 0) {
       const resolved = this.resolveTranslationEntry(field, type);
       if (resolved) return false;
     }
-    
+
     // It's missing if we are not in the default language!
     const config = this.formBuilder.formConfig();
-    const isDefault = this.i18n.currentLanguage() === config.global.i18n.defaultLanguage;
+    const isDefault =
+      this.i18n.currentLanguage() === config.global.i18n.defaultLanguage;
     return !isDefault; // Missing only if we are in a non-default language and it wasn't found
   }
 
-  getTranslationDirection(field: FormField, type: 'label'|'placeholder'|'error'|'help'|'custom', defaultDir: 'ltr'|'rtl'|'auto' = 'auto'): string {
-    if (!field || !field.translations || field.translations.length === 0) return defaultDir;
+  getTranslationDirection(
+    field: FormField,
+    type: "label" | "placeholder" | "error" | "help" | "custom",
+    defaultDir: "ltr" | "rtl" | "auto" = "auto",
+  ): string {
+    if (!field || !field.translations || field.translations.length === 0)
+      return defaultDir;
     const resolved = this.resolveTranslationEntry(field, type);
-    return resolved ? (resolved.direction === 'RTL' ? 'rtl' : 'ltr') : defaultDir;
+    return resolved
+      ? resolved.direction === "RTL"
+        ? "rtl"
+        : "ltr"
+      : defaultDir;
   }
 
-  resolveTranslationEntry(field: FormField, type: string): TranslationEntry | null {
-    const matches = field.translations!.filter(t => t.type === type);
+  resolveTranslationEntry(
+    field: FormField,
+    type: string,
+  ): TranslationEntry | null {
+    const matches = field.translations!.filter((t) => t.type === type);
     if (!matches.length) return null;
-    
-    matches.sort((a,b) => (b.priority || 0) - (a.priority || 0));
+
+    matches.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 
     for (const t of matches) {
-      if (t.activation.type === 'Global') return t;
-      if (t.activation.type === 'InitOnly' && t.language === this.appInitialLanguage) return t;
-      if (t.activation.type === 'RuntimeKey') {
-         try {
-           const storage = t.activation.storageType === 'local' ? localStorage : sessionStorage;
-           if (storage) {
-              const val = storage.getItem(t.activation.key || '');
-              if (val === t.activation.expectedValue) return t;
-           }
-         } catch {
-            // Ignore storage access errors
-         }
+      if (t.activation.type === "Global") return t;
+      if (
+        t.activation.type === "InitOnly" &&
+        t.language === this.appInitialLanguage
+      )
+        return t;
+      if (t.activation.type === "RuntimeKey") {
+        try {
+          const storage =
+            t.activation.storageType === "local"
+              ? localStorage
+              : sessionStorage;
+          if (storage) {
+            const val = storage.getItem(t.activation.key || "");
+            if (val === t.activation.expectedValue) return t;
+          }
+        } catch {
+          // Ignore storage access errors
+        }
       }
     }
-    
-    const fallback = matches.find(t => t.fallbackLanguage && t.language === t.fallbackLanguage);
+
+    const fallback = matches.find(
+      (t) => t.fallbackLanguage && t.language === t.fallbackLanguage,
+    );
     if (fallback) return fallback;
-    
+
     return null;
   }
 
@@ -1664,7 +2196,9 @@ export class PreviewComponent implements OnInit {
   dynamicSubscriptions: Subscription[] = [];
 
   activeTab = signal<"form" | "json" | "simulation">("form");
-  simulationLogs = signal<{id: number, time: Date, type: string, message: string, payload?: any}[]>([]);
+  simulationLogs = signal<
+    { id: number; time: Date; type: string; message: string; payload?: any }[]
+  >([]);
   private logId = 0;
 
   clearSimulationLog() {
@@ -1672,20 +2206,29 @@ export class PreviewComponent implements OnInit {
   }
 
   logSimulationEvent(type: string, message: string, payload?: any) {
-    this.simulationLogs.update(logs => {
-      const newLogs = [{id: ++this.logId, time: new Date(), type, message, payload}, ...logs];
+    this.simulationLogs.update((logs) => {
+      const newLogs = [
+        { id: ++this.logId, time: new Date(), type, message, payload },
+        ...logs,
+      ];
       return newLogs.slice(0, 100); // Keep last 100
     });
   }
 
   getLogColor(type: string): string {
     switch (type) {
-      case 'VALIDATION_ERROR': return 'text-red-400';
-      case 'VALIDATION_SUCCESS': return 'text-green-400';
-      case 'VALUE_CHANGE': return 'text-indigo-400';
-      case 'SUBMIT': return 'text-blue-400';
-      case 'API_CALL': return 'text-amber-400';
-      default: return 'text-gray-400';
+      case "VALIDATION_ERROR":
+        return "text-red-400";
+      case "VALIDATION_SUCCESS":
+        return "text-green-400";
+      case "VALUE_CHANGE":
+        return "text-indigo-400";
+      case "SUBMIT":
+        return "text-blue-400";
+      case "API_CALL":
+        return "text-amber-400";
+      default:
+        return "text-gray-400";
     }
   }
   format = signal<"object" | "base64">("object");
@@ -1702,12 +2245,13 @@ export class PreviewComponent implements OnInit {
 
   visibleFields = signal<Record<string, boolean>>({});
   disabledFields = signal<Record<string, boolean>>({});
+  readOnlyFields = signal<Record<string, boolean>>({});
   collapsedSections = signal<Record<string, boolean>>({});
   hiddenAlerts = signal<Record<string, boolean>>({});
 
   formValidity = signal<boolean>(true);
   formErrors = signal<Record<string, Record<string, boolean>>>({});
-  
+
   // Autocomplete state
   autocompleteSearchTerms = signal<Record<string, string>>({});
   autocompleteOptions = signal<Record<string, unknown[]>>({});
@@ -1748,225 +2292,309 @@ export class PreviewComponent implements OnInit {
     }));
   }
 
+  dismissInlineMessage(field: FormField) {
+    this.hiddenAlerts.update((state) => ({
+      ...state,
+      [field.id]: true,
+    }));
+
+    if (field.onCloseActionExpression && this.liveForm) {
+      const values = this.liveForm.getRawValue();
+      try {
+        const expression = field.onCloseActionExpression.trim();
+        // Check if it's an arrow function
+        if (expression.startsWith("(") || expression.includes("=>")) {
+          const func = new Function("return (" + expression + ")")();
+          if (typeof func === "function") {
+            func(values, field, this.liveForm);
+            return;
+          }
+        }
+
+        // Provide context for the expression
+        const executeAction = new Function(
+          "values",
+          "field",
+          "form",
+          `
+          try {
+            ${expression}
+          } catch (e) {
+            console.error('Error executing close action:', e);
+          }
+        `,
+        );
+        executeAction(values, field, this.liveForm);
+      } catch (e) {
+        console.error("Error creating close action:", e);
+      }
+    }
+  }
+
   // Autocomplete methods
-  private autocompleteTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+  private autocompleteTimers: Record<string, ReturnType<typeof setTimeout>> =
+    {};
 
   onAutocompleteFocus(fieldId: string) {
-    this.autocompleteShowDropdown.update(v => ({ ...v, [fieldId]: true }));
-    const term = this.autocompleteSearchTerms()[fieldId] || '';
-    const field = this.formBuilder.fields().find(f => f.id === fieldId) || this.formBuilder.fields().flatMap(f => f.fields || []).find(f => f.id === fieldId);
+    this.autocompleteShowDropdown.update((v) => ({ ...v, [fieldId]: true }));
+    const term = this.autocompleteSearchTerms()[fieldId] || "";
+    const field =
+      this.formBuilder.fields().find((f) => f.id === fieldId) ||
+      this.formBuilder
+        .fields()
+        .flatMap((f) => f.fields || [])
+        .find((f) => f.id === fieldId);
     if (field && term.length >= (field.minChars || 0)) {
-       this.fetchAutocompleteOptions(field, term);
+      this.fetchAutocompleteOptions(field, term);
     }
   }
 
   onAutocompleteInput(field: FormField, event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value;
-    
-    this.autocompleteSearchTerms.update(state => ({
-       ...state,
-       [field.id]: value
+
+    this.autocompleteSearchTerms.update((state) => ({
+      ...state,
+      [field.id]: value,
     }));
 
     if (!field.multiSelect && field.freeText) {
-       this.liveForm.get(field.name)?.setValue(value);
+      this.liveForm.get(field.name)?.setValue(value);
     } else if (!field.multiSelect) {
-       // Clear form value if typing and not free text
-       this.liveForm.get(field.name)?.setValue(null);
+      // Clear form value if typing and not free text
+      this.liveForm.get(field.name)?.setValue(null);
     }
-    
-    this.autocompleteShowDropdown.update(v => ({ ...v, [field.id]: true }));
-    
+
+    this.autocompleteShowDropdown.update((v) => ({ ...v, [field.id]: true }));
+
     if (value.length >= (field.minChars || 0)) {
-       if (this.autocompleteTimers[field.id]) clearTimeout(this.autocompleteTimers[field.id]);
-       this.autocompleteTimers[field.id] = setTimeout(() => {
-          this.fetchAutocompleteOptions(field, value);
-       }, field.debounceTime || 300);
+      if (this.autocompleteTimers[field.id])
+        clearTimeout(this.autocompleteTimers[field.id]);
+      this.autocompleteTimers[field.id] = setTimeout(() => {
+        this.fetchAutocompleteOptions(field, value);
+      }, field.debounceTime || 300);
     } else {
-       this.autocompleteOptions.update(v => ({ ...v, [field.id]: [] }));
+      this.autocompleteOptions.update((v) => ({ ...v, [field.id]: [] }));
     }
   }
-  
+
   clearAutocomplete(field: FormField) {
-     this.autocompleteSearchTerms.update(v => ({...v, [field.id]: ''}));
-     this.liveForm.get(field.name)?.setValue(null);
-     this.autocompleteOptions.update(v => ({...v, [field.id]: []}));
+    this.autocompleteSearchTerms.update((v) => ({ ...v, [field.id]: "" }));
+    this.liveForm.get(field.name)?.setValue(null);
+    this.autocompleteOptions.update((v) => ({ ...v, [field.id]: [] }));
   }
 
   async fetchAutocompleteOptions(field: FormField, term: string) {
-    if (field.dataSourceType === 'static') {
-       const mappedTerm = term.toLowerCase();
-       const filtered = (field.options || []).filter(o => 
-          o.label.toLowerCase().includes(mappedTerm) || 
-          o.value.toLowerCase().includes(mappedTerm)
-       );
-       this.autocompleteOptions.update(v => ({ ...v, [field.id]: filtered }));
-       return;
+    if (field.dataSourceType === "static") {
+      const mappedTerm = term.toLowerCase();
+      const filtered = (field.options || []).filter(
+        (o) =>
+          o.label.toLowerCase().includes(mappedTerm) ||
+          o.value.toLowerCase().includes(mappedTerm),
+      );
+      this.autocompleteOptions.update((v) => ({ ...v, [field.id]: filtered }));
+      return;
     }
-    
+
     if (field.serviceId) {
-      this.autocompleteLoading.update(v => ({ ...v, [field.id]: true }));
+      this.autocompleteLoading.update((v) => ({ ...v, [field.id]: true }));
       try {
         const srv = this.serviceManager
           .services()
           .find((s) => s.id === field.serviceId);
-          
+
         if (srv && srv.url) {
-           let url = srv.url;
-           let headers = new HttpHeaders();
-           let params = new HttpParams();
-           
-           srv.headers.forEach((h) => {
-             if (h.key && h.value) headers = headers.set(h.key, h.value);
-           });
-           srv.queryParams.forEach((p) => {
-             if (p.key && p.value) params = params.set(p.key, p.value);
-           });
-           
-           const formVals = this.liveForm?.value || {};
-            
-           let bodyPayload: any = null;
-           if (srv.body) {
-             try {
-               bodyPayload = JSON.parse(srv.body);
-             } catch (e) {
-               console.warn("Failed to parse service body as JSON", e);
-             }
-           }
-           
-           if (field.serviceParams) {
-             field.serviceParams.forEach((mp) => {
-               const val = mp.valueSource === "static" ? mp.value : formVals[mp.value];
-               if (val !== undefined && val !== null && val !== "") {
-                 if (mp.type === "query") {
-                   params = params.set(mp.key, String(val));
-                 } else if (mp.type === "header") {
-                   headers = headers.set(mp.key, String(val));
-                 } else if (mp.type === "path") {
-                   const strVal = Array.isArray(val) ? val.join(',') : String(val); if (url.includes(`{${mp.key}}`) || url.includes(`:${mp.key}`)) { url = url.replace(`{${mp.key}}`, encodeURIComponent(strVal)).replace(`:${mp.key}`, encodeURIComponent(strVal)); } else { if (!url.includes('?')) { url += (url.endsWith('/') ? '' : '/') + encodeURIComponent(strVal); } else { const urlParts = url.split('?'); urlParts[0] += (urlParts[0].endsWith('/') ? '' : '/') + encodeURIComponent(strVal); url = urlParts.join('?'); } }
-                 } else if (mp.type === "body") {
-                   if (!bodyPayload) bodyPayload = {};
-                   const parts = mp.key.split(".");
-                   let curr = bodyPayload;
-                   for (let i = 0; i < parts.length - 1; i++) {
-                     curr[parts[i]] = curr[parts[i]] || {};
-                     curr = curr[parts[i]];
-                   }
-                   curr[parts[parts.length - 1]] = val;
-                 }
-               }
-             });
-           }
-           
-           // Append the term implicitly to query params (assuming REST best practice API handles it)
-           // and if not, the developer can explicitly map it.
-           params = params.set('term', term);
-           params = params.set('q', term);
+          let url = srv.url;
+          let headers = new HttpHeaders();
+          let params = new HttpParams();
 
-           const req$ = this.httpClient.request(srv.method, url, {
-             headers,
-             params,
-             body: bodyPayload,
-           });
+          srv.headers.forEach((h) => {
+            if (h.key && h.value) headers = headers.set(h.key, h.value);
+          });
+          srv.queryParams.forEach((p) => {
+            if (p.key && p.value) params = params.set(p.key, p.value);
+          });
 
-            
-           const result = await req$.toPromise() as any;
-           
-           if (result) {
-              const resData = result.data || result;
-               
-              const resolvePathLocal = (obj: any, p: string) => {
-                return p.split(".").reduce((o, k) => (o || {})[k], obj);
-              };
+          const formVals = this.liveForm?.value || {};
 
-              let optionsData = Array.isArray(resData) ? resData : 
-                 (field.dataPath ? resolvePathLocal(resData, field.dataPath) : []);
-              if (!Array.isArray(optionsData)) optionsData = [optionsData];
-              
-              if (field.labelKey || field.valueKey) {
-                  
-                 optionsData = optionsData.map((item: any) => ({
-                    ...item,
-                    label: item[field.labelKey || 'label'] || JSON.stringify(item),
-                    value: item[field.valueKey || 'value'] || item
-                 }));
+          let bodyPayload: any = null;
+          if (srv.body) {
+            try {
+              bodyPayload = JSON.parse(srv.body);
+            } catch (e) {
+              console.warn("Failed to parse service body as JSON", e);
+            }
+          }
+
+          if (field.serviceParams) {
+            field.serviceParams.forEach((mp) => {
+              const val =
+                mp.valueSource === "static" ? mp.value : formVals[mp.value];
+              if (val !== undefined && val !== null && val !== "") {
+                if (mp.type === "query") {
+                  params = params.set(mp.key, String(val));
+                } else if (mp.type === "header") {
+                  headers = headers.set(mp.key, String(val));
+                } else if (mp.type === "path") {
+                  const strVal = Array.isArray(val)
+                    ? val.join(",")
+                    : String(val);
+                  if (
+                    url.includes(`{${mp.key}}`) ||
+                    url.includes(`:${mp.key}`)
+                  ) {
+                    url = url
+                      .replace(`{${mp.key}}`, encodeURIComponent(strVal))
+                      .replace(`:${mp.key}`, encodeURIComponent(strVal));
+                  } else {
+                    if (!url.includes("?")) {
+                      url +=
+                        (url.endsWith("/") ? "" : "/") +
+                        encodeURIComponent(strVal);
+                    } else {
+                      const urlParts = url.split("?");
+                      urlParts[0] +=
+                        (urlParts[0].endsWith("/") ? "" : "/") +
+                        encodeURIComponent(strVal);
+                      url = urlParts.join("?");
+                    }
+                  }
+                } else if (mp.type === "body") {
+                  if (!bodyPayload) bodyPayload = {};
+                  const parts = mp.key.split(".");
+                  let curr = bodyPayload;
+                  for (let i = 0; i < parts.length - 1; i++) {
+                    curr[parts[i]] = curr[parts[i]] || {};
+                    curr = curr[parts[i]];
+                  }
+                  curr[parts[parts.length - 1]] = val;
+                }
               }
-              this.autocompleteOptions.update(v => ({ ...v, [field.id]: optionsData }));
-           }
+            });
+          }
+
+          // Append the term implicitly to query params (assuming REST best practice API handles it)
+          // and if not, the developer can explicitly map it.
+          params = params.set("term", term);
+          params = params.set("q", term);
+
+          const req$ = this.httpClient.request(srv.method, url, {
+            headers,
+            params,
+            body: bodyPayload,
+          });
+
+          const result = (await req$.toPromise()) as any;
+
+          if (result) {
+            const resData = result.data || result;
+
+            const resolvePathLocal = (obj: any, p: string) => {
+              return p.split(".").reduce((o, k) => (o || {})[k], obj);
+            };
+
+            let optionsData = Array.isArray(resData)
+              ? resData
+              : field.dataPath
+                ? resolvePathLocal(resData, field.dataPath)
+                : [];
+            if (!Array.isArray(optionsData)) optionsData = [optionsData];
+
+            if (field.labelKey || field.valueKey) {
+              optionsData = optionsData.map((item: any) => ({
+                ...item,
+                label: item[field.labelKey || "label"] || JSON.stringify(item),
+                value: item[field.valueKey || "value"] || item,
+              }));
+            }
+            this.autocompleteOptions.update((v) => ({
+              ...v,
+              [field.id]: optionsData,
+            }));
+          }
         }
       } catch (err) {
         console.error("Autocomplete fetch error", err);
-        this.autocompleteOptions.update(v => ({ ...v, [field.id]: [] }));
+        this.autocompleteOptions.update((v) => ({ ...v, [field.id]: [] }));
       } finally {
-        this.autocompleteLoading.update(v => ({ ...v, [field.id]: false }));
+        this.autocompleteLoading.update((v) => ({ ...v, [field.id]: false }));
       }
     }
   }
 
-   
   selectAutocompleteOption(field: FormField, option: any) {
-     if (field.multiSelect) {
-        const currentSelected = this.autocompleteSelectedItems()[field.id] || [];
-         
-        const isSelected = currentSelected.some((o: any) => o.value === option.value || o === option);
-        if (!isSelected) {
-            const next = [...currentSelected, option];
-            this.autocompleteSelectedItems.update(v => ({...v, [field.id]: next}));
-             
-            this.liveForm.get(field.name)?.setValue(next.map((n: any) => n.value || n));
-        }
-        this.autocompleteSearchTerms.update(v => ({...v, [field.id]: ''}));
-     } else {
-        this.autocompleteSearchTerms.update(v => ({...v, [field.id]: option.label || option.value || option}));
-        this.liveForm.get(field.name)?.setValue(option.value || option);
-     }
-     this.autocompleteShowDropdown.update(v => ({...v, [field.id]: false}));
-  }
+    if (field.multiSelect) {
+      const currentSelected = this.autocompleteSelectedItems()[field.id] || [];
 
-   
-  removeSelectedItem(field: FormField, item: any, event: Event) {
-     event.stopPropagation();
-     const currentSelected = this.autocompleteSelectedItems()[field.id] || [];
-     const next = currentSelected.filter(o => o !== item);
-     this.autocompleteSelectedItems.update(v => ({...v, [field.id]: next}));
-      
-     this.liveForm.get(field.name)?.setValue(next.length ? next.map((n: any) => n.value || n) : null);
-  }
+      const isSelected = currentSelected.some(
+        (o: any) => o.value === option.value || o === option,
+      );
+      if (!isSelected) {
+        const next = [...currentSelected, option];
+        this.autocompleteSelectedItems.update((v) => ({
+          ...v,
+          [field.id]: next,
+        }));
 
-   
-  isOptionSelected(field: FormField, option: any) {
-     const value = this.liveForm.get(field.name)?.value;
-     if (field.multiSelect) {
-         if (Array.isArray(value)) {
-             return value.includes(option.value || option);
-         }
-         return false;
-     }
-     return value === (option.value || option);
-  }
-
-   
-  getDisplayLabel(option: any, field: FormField) {
-     if (typeof option === 'string') return option;
-     return field.labelKey ? option[field.labelKey] : option.label || option.value;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event) {
-      if (!event.target) return;
-      const targetElement = event.target as HTMLElement;
-      
-      const states = this.autocompleteShowDropdown();
-      for (const [key, isShowing] of Object.entries(states)) {
-          if (isShowing) {
-             const elementId = `autocomplete-${key}`;
-             const element = document.getElementById(elementId);
-             if (element && !element.contains(targetElement)) {
-                 this.autocompleteShowDropdown.update(v => ({...v, [key]: false}));
-             }
-          }
+        this.liveForm
+          .get(field.name)
+          ?.setValue(next.map((n: any) => n.value || n));
       }
+      this.autocompleteSearchTerms.update((v) => ({ ...v, [field.id]: "" }));
+    } else {
+      this.autocompleteSearchTerms.update((v) => ({
+        ...v,
+        [field.id]: option.label || option.value || option,
+      }));
+      this.liveForm.get(field.name)?.setValue(option.value || option);
+    }
+    this.autocompleteShowDropdown.update((v) => ({ ...v, [field.id]: false }));
+  }
+
+  removeSelectedItem(field: FormField, item: any, event: Event) {
+    event.stopPropagation();
+    const currentSelected = this.autocompleteSelectedItems()[field.id] || [];
+    const next = currentSelected.filter((o) => o !== item);
+    this.autocompleteSelectedItems.update((v) => ({ ...v, [field.id]: next }));
+
+    this.liveForm
+      .get(field.name)
+      ?.setValue(next.length ? next.map((n: any) => n.value || n) : null);
+  }
+
+  isOptionSelected(field: FormField, option: any) {
+    const value = this.liveForm.get(field.name)?.value;
+    if (field.multiSelect) {
+      if (Array.isArray(value)) {
+        return value.includes(option.value || option);
+      }
+      return false;
+    }
+    return value === (option.value || option);
+  }
+
+  getDisplayLabel(option: any, field: FormField) {
+    if (typeof option === "string") return option;
+    return field.labelKey
+      ? option[field.labelKey]
+      : option.label || option.value;
+  }
+
+  @HostListener("document:click", ["$event"])
+  onDocumentClick(event: Event) {
+    if (!event.target) return;
+    const targetElement = event.target as HTMLElement;
+
+    const states = this.autocompleteShowDropdown();
+    for (const [key, isShowing] of Object.entries(states)) {
+      if (isShowing) {
+        const elementId = `autocomplete-${key}`;
+        const element = document.getElementById(elementId);
+        if (element && !element.contains(targetElement)) {
+          this.autocompleteShowDropdown.update((v) => ({ ...v, [key]: false }));
+        }
+      }
+    }
   }
 
   ngOnInit() {
@@ -2039,7 +2667,6 @@ export class PreviewComponent implements OnInit {
     clearArrayRecursive(this.liveForm);
   }
 
-   
   dropArrayItem(event: CdkDragDrop<any>, arrayName: string, parentGroup: any) {
     if (event.previousIndex === event.currentIndex) return;
 
@@ -2061,7 +2688,6 @@ export class PreviewComponent implements OnInit {
   }
 
   private buildFormRecursive(fields: FormField[]): FormGroup {
-     
     const group: Record<string, any> = {};
     fields.forEach((field) => {
       if (field.type === "divider" || field.type === "button") return;
@@ -2092,7 +2718,6 @@ export class PreviewComponent implements OnInit {
         const arr = new FormArray([] as FormGroup[]);
 
         if (items.length > 0) {
-           
           items.forEach((itemVal: any) => {
             const itemGroup = this.buildFormRecursive(field.fields || []);
             itemGroup.patchValue(itemVal);
@@ -2114,9 +2739,76 @@ export class PreviewComponent implements OnInit {
               values,
             );
             if (isValid === false) {
-              return { customValidation: true };
+              return {
+                customValidation: {
+                  message: field.validationMessage || "Invalid value",
+                },
+              };
             }
             return null;
+          });
+        }
+
+        if (field.validations && field.validations.length > 0) {
+          field.validations.forEach((rule) => {
+            arrValidators.push((control: AbstractControl) => {
+              const root = control.root as FormGroup;
+              if (!root || typeof root.getRawValue !== "function") return null;
+              const values = root.getRawValue();
+
+              let isValid = true;
+              try {
+                if (rule.type === "expression" && rule.expression) {
+                  isValid = this.evaluateExpression(rule.expression, values);
+                } else if (rule.type === "function" && rule.functionId) {
+                  const fnConfig = this.formBuilder
+                    .formConfig()
+                    .global.functions?.find((f) => f.id === rule.functionId);
+                  if (fnConfig) {
+                    const paramNames = fnConfig.isVoid
+                      ? []
+                      : fnConfig.parameters.map((p) => p.name);
+
+                    const args = (rule.functionArgs || []).map((arg) => {
+                      return this.evaluateExpression(
+                        arg.expression || "",
+                        values,
+                      );
+                    });
+
+                    const formState = { ...values };
+                    const helpers = {
+                      log: (...logs: any[]) =>
+                        console.log(`[Validation: ${fnConfig.name}]`, ...logs),
+                      setValue: (path: string, val: any) =>
+                        console.log(
+                          "setValue not implemented in sync validator",
+                        ),
+                      getValue: (path: string) => root.get(path)?.value,
+                      dispatch: (action: any) =>
+                        console.log("dispatch:", action),
+                    };
+
+                    const fn = new Function(
+                      ...paramNames,
+                      fnConfig.body,
+                    );
+                    isValid = fn(...args);
+                  }
+                }
+              } catch (err) {
+                console.error("Validation error:", err);
+                isValid = false;
+              }
+
+              if (isValid === false) {
+                const message = rule.translationKey
+                  ? this.i18n.translate(rule.translationKey)
+                  : rule.defaultMessage || "Validation failed.";
+                return { customValidation: { message } };
+              }
+              return null;
+            });
           });
         }
         arr.setValidators(arrValidators);
@@ -2183,9 +2875,77 @@ export class PreviewComponent implements OnInit {
             values,
           );
           if (isValid === false) {
-            return { customValidation: true };
+            return {
+              customValidation: {
+                message: field.validationMessage || "Invalid value",
+              },
+            };
           }
           return null;
+        });
+      }
+
+      if (field.validations && field.validations.length > 0) {
+        field.validations.forEach((rule) => {
+          validators.push((control: AbstractControl) => {
+            const root = control.root as FormGroup;
+            if (!root || typeof root.getRawValue !== "function") return null;
+            const values = root.getRawValue();
+
+            let isValid = true;
+
+            try {
+              if (rule.type === "expression" && rule.expression) {
+                isValid = this.evaluateExpression(rule.expression, values);
+              } else if (rule.type === "function" && rule.functionId) {
+                const fnConfig = this.formBuilder
+                  .formConfig()
+                  .global.functions?.find((f) => f.id === rule.functionId);
+                if (fnConfig) {
+                  const paramNames = fnConfig.isVoid
+                    ? []
+                    : fnConfig.parameters.map((p) => p.name);
+
+                  // Evaluate arguments
+                  const args = (rule.functionArgs || []).map((arg) => {
+                    // evaluate arg.expression
+                    return this.evaluateExpression(
+                      arg.expression || "",
+                      values,
+                    );
+                  });
+
+                  const formState = { ...values };
+                  const helpers = {
+                    log: (...logs: any[]) =>
+                      console.log(`[Validation: ${fnConfig.name}]`, ...logs),
+                    setValue: (path: string, val: any) =>
+                      console.log("setValue not implemented in sync validator"),
+                    getValue: (path: string) => root.get(path)?.value,
+                    dispatch: (action: any) => console.log("dispatch:", action),
+                  };
+
+                  // Using sync Function because validators are sync
+                  const fn = new Function(
+                    ...paramNames,
+                    fnConfig.body,
+                  );
+                  isValid = fn(...args);
+                }
+              }
+            } catch (err) {
+              console.error("Validation error:", err);
+              isValid = false;
+            }
+
+            if (isValid === false) {
+              const message = rule.translationKey
+                ? this.i18n.translate(rule.translationKey)
+                : rule.defaultMessage || "Validation failed.";
+              return { customValidation: { message } };
+            }
+            return null;
+          });
         });
       }
 
@@ -2227,7 +2987,7 @@ export class PreviewComponent implements OnInit {
 
     // Lifecycle: onInit
     if (config.lifecycle?.onInit) {
-      this.executeLifecycleHook(config.lifecycle.onInit, 'onInit');
+      this.executeLifecycleHook(config.lifecycle.onInit, "onInit");
     }
 
     // clear old subscriptions
@@ -2238,17 +2998,21 @@ export class PreviewComponent implements OnInit {
 
     this.liveForm.valueChanges.subscribe((vals) => {
       this.evaluateConditions();
-      if (this.activeTab() === 'simulation') {
-        this.logSimulationEvent('VALUE_CHANGE', 'Form values updated', vals);
+      if (this.activeTab() === "simulation") {
+        this.logSimulationEvent("VALUE_CHANGE", "Form values updated", vals);
       }
     });
     this.liveForm.statusChanges.subscribe((status) => {
       this.updateValidationSignals();
-      if (this.activeTab() === 'simulation') {
-        if (status === 'INVALID') {
-           this.logSimulationEvent('VALIDATION_ERROR', 'Form became invalid', this.formErrors());
-        } else if (status === 'VALID') {
-           this.logSimulationEvent('VALIDATION_SUCCESS', 'Form became valid');
+      if (this.activeTab() === "simulation") {
+        if (status === "INVALID") {
+          this.logSimulationEvent(
+            "VALIDATION_ERROR",
+            "Form became invalid",
+            this.formErrors(),
+          );
+        } else if (status === "VALID") {
+          this.logSimulationEvent("VALIDATION_SUCCESS", "Form became valid");
         }
       }
     });
@@ -2265,7 +3029,7 @@ export class PreviewComponent implements OnInit {
     console.log(`Executing lifecycle hook [${hookName}]:`, functionStr);
     try {
       // In a real sandbox, safely evaluate. Here we simulate execution.
-      new Function('form', functionStr)(this.liveForm);
+      new Function("form", functionStr)(this.liveForm);
     } catch (e) {
       console.warn(`Error executing lifecycle hook ${hookName}:`, e);
     }
@@ -2273,7 +3037,7 @@ export class PreviewComponent implements OnInit {
 
   hydrateForm(config: any) {
     if (config.lifecycle?.beforeRender) {
-      this.executeLifecycleHook(config.lifecycle.beforeRender, 'beforeRender');
+      this.executeLifecycleHook(config.lifecycle.beforeRender, "beforeRender");
     }
 
     const dsConfig = config.dataSource?.config;
@@ -2294,7 +3058,10 @@ export class PreviewComponent implements OnInit {
             this.isHydrating.set(false);
           }
           if (config.lifecycle?.afterRender) {
-            this.executeLifecycleHook(config.lifecycle.afterRender, 'afterRender');
+            this.executeLifecycleHook(
+              config.lifecycle.afterRender,
+              "afterRender",
+            );
           }
         },
         error: (err) => {
@@ -2304,14 +3071,20 @@ export class PreviewComponent implements OnInit {
             this.isHydrating.set(false);
           }
           if (config.lifecycle?.afterRender) {
-            this.executeLifecycleHook(config.lifecycle.afterRender, 'afterRender');
+            this.executeLifecycleHook(
+              config.lifecycle.afterRender,
+              "afterRender",
+            );
           }
-        }
+        },
       });
     } else {
       if (config.lifecycle?.afterRender) {
         setTimeout(() => {
-          this.executeLifecycleHook(config.lifecycle!.afterRender!, 'afterRender');
+          this.executeLifecycleHook(
+            config.lifecycle!.afterRender!,
+            "afterRender",
+          );
         }, 0);
       }
     }
@@ -2322,13 +3095,13 @@ export class PreviewComponent implements OnInit {
     if (autoMap && this.liveForm) {
       // Auto patch keys that match.
       try {
-         this.liveForm.patchValue(data);
-         console.log("Hydrated form with autoMap:", data);
+        this.liveForm.patchValue(data);
+        console.log("Hydrated form with autoMap:", data);
       } catch (e) {
-         console.warn("Hydration mapping error:", e);
-         if (config.dataSource?.mapping?.strict) {
-           throw e;
-         }
+        console.warn("Hydration mapping error:", e);
+        if (config.dataSource?.mapping?.strict) {
+          throw e;
+        }
       }
     }
   }
@@ -2357,20 +3130,28 @@ export class PreviewComponent implements OnInit {
           });
           this.dynamicSubscriptions.push(sub);
         }
-      } else if (field.type === "autocomplete" && field.dependsOn && field.dependsOn.length > 0) {
-          let prevDeps = field.dependsOn.map(dep => this.liveForm?.get(dep)?.value);
-          const sub = this.liveForm!.valueChanges.pipe(
-            debounceTime(field.debounceTime ?? 300),
-          ).subscribe(() => {
-             const currDeps = field.dependsOn!.map(dep => this.liveForm?.get(dep)?.value);
-             const changed = prevDeps.some((val, i) => val !== currDeps[i]);
-             if (changed) {
-                // Clear the child autocomplete
-                this.clearAutocomplete(field);
-                prevDeps = currDeps;
-             }
-          });
-          this.dynamicSubscriptions.push(sub);
+      } else if (
+        field.type === "autocomplete" &&
+        field.dependsOn &&
+        field.dependsOn.length > 0
+      ) {
+        let prevDeps = field.dependsOn.map(
+          (dep) => this.liveForm?.get(dep)?.value,
+        );
+        const sub = this.liveForm!.valueChanges.pipe(
+          debounceTime(field.debounceTime ?? 300),
+        ).subscribe(() => {
+          const currDeps = field.dependsOn!.map(
+            (dep) => this.liveForm?.get(dep)?.value,
+          );
+          const changed = prevDeps.some((val, i) => val !== currDeps[i]);
+          if (changed) {
+            // Clear the child autocomplete
+            this.clearAutocomplete(field);
+            prevDeps = currDeps;
+          }
+        });
+        this.dynamicSubscriptions.push(sub);
       }
     });
   }
@@ -2403,24 +3184,29 @@ export class PreviewComponent implements OnInit {
 
     const formVals = this.liveForm?.value || {};
     const getFieldVal = (path: string) => {
-         const parts = path.split('.');
-         let curr = formVals;
-         for (const part of parts) {
-             if (curr === undefined || curr === null) return undefined;
-             curr = curr[part];
-         }
-         return curr;
+      const parts = path.split(".");
+      let curr = formVals;
+      for (const part of parts) {
+        if (curr === undefined || curr === null) return undefined;
+        curr = curr[part];
+      }
+      return curr;
     };
 
     let url = srv.url;
     if (srv.pathParams) {
       srv.pathParams.forEach((p) => {
         if (p.key && p.value) {
-           const resolvedValue = p.valueSource === 'field' ? getFieldVal(p.value) : p.value;
-           if (resolvedValue !== undefined && resolvedValue !== null) {
-              const strVal = Array.isArray(resolvedValue) ? resolvedValue.join(",") : String(resolvedValue);
-              url = url.replace(`{${p.key}}`, encodeURIComponent(strVal)).replace(`:${p.key}`, encodeURIComponent(strVal));
-           }
+          const resolvedValue =
+            p.valueSource === "field" ? getFieldVal(p.value) : p.value;
+          if (resolvedValue !== undefined && resolvedValue !== null) {
+            const strVal = Array.isArray(resolvedValue)
+              ? resolvedValue.join(",")
+              : String(resolvedValue);
+            url = url
+              .replace(`{${p.key}}`, encodeURIComponent(strVal))
+              .replace(`:${p.key}`, encodeURIComponent(strVal));
+          }
         }
       });
     }
@@ -2430,30 +3216,33 @@ export class PreviewComponent implements OnInit {
 
     srv.headers.forEach((h) => {
       if (h.key && h.value) {
-          const resolvedValue = h.valueSource === 'field' ? getFieldVal(h.value) : h.value;
-          if (resolvedValue !== undefined && resolvedValue !== null) {
-             const strVal = Array.isArray(resolvedValue) ? resolvedValue.join(",") : String(resolvedValue);
-             headers = headers.set(h.key, strVal);
-          }
+        const resolvedValue =
+          h.valueSource === "field" ? getFieldVal(h.value) : h.value;
+        if (resolvedValue !== undefined && resolvedValue !== null) {
+          const strVal = Array.isArray(resolvedValue)
+            ? resolvedValue.join(",")
+            : String(resolvedValue);
+          headers = headers.set(h.key, strVal);
+        }
       }
     });
 
     srv.queryParams.forEach((p) => {
       if (p.key && p.value) {
-          const resolvedValue = p.valueSource === 'field' ? getFieldVal(p.value) : p.value;
-          if (resolvedValue !== undefined && resolvedValue !== null) {
-              if (Array.isArray(resolvedValue)) {
-                  resolvedValue.forEach(v => {
-                      params = params.append(p.key, String(v));
-                  });
-              } else {
-                  params = params.set(p.key, String(resolvedValue));
-              }
+        const resolvedValue =
+          p.valueSource === "field" ? getFieldVal(p.value) : p.value;
+        if (resolvedValue !== undefined && resolvedValue !== null) {
+          if (Array.isArray(resolvedValue)) {
+            resolvedValue.forEach((v) => {
+              params = params.append(p.key, String(v));
+            });
+          } else {
+            params = params.set(p.key, String(resolvedValue));
           }
+        }
       }
     });
 
-     
     let bodyPayload: any = null;
     if (srv.body) {
       try {
@@ -2466,13 +3255,16 @@ export class PreviewComponent implements OnInit {
     const pathAppends: string[] = [];
     if (field.serviceParams) {
       field.serviceParams.forEach((mp) => {
-        const val = mp.valueSource === "static" ? mp.value : getFieldVal(mp.value);
+        const val =
+          mp.valueSource === "static" ? mp.value : getFieldVal(mp.value);
         if (val !== undefined && val !== null && val !== "") {
           if (mp.type === "query") {
             if (Array.isArray(val)) {
-               val.forEach(v => { params = params.append(mp.key, String(v)); });
+              val.forEach((v) => {
+                params = params.append(mp.key, String(v));
+              });
             } else {
-               params = params.set(mp.key, String(val));
+              params = params.set(mp.key, String(val));
             }
           } else if (mp.type === "header") {
             const strVal = Array.isArray(val) ? val.join(",") : String(val);
@@ -2480,9 +3272,11 @@ export class PreviewComponent implements OnInit {
           } else if (mp.type === "path") {
             const strVal = Array.isArray(val) ? val.join(",") : String(val);
             if (url.includes(`{${mp.key}}`) || url.includes(`:${mp.key}`)) {
-               url = url.replace(`{${mp.key}}`, encodeURIComponent(strVal)).replace(`:${mp.key}`, encodeURIComponent(strVal));
+              url = url
+                .replace(`{${mp.key}}`, encodeURIComponent(strVal))
+                .replace(`:${mp.key}`, encodeURIComponent(strVal));
             } else {
-               pathAppends.push(encodeURIComponent(strVal));
+              pathAppends.push(encodeURIComponent(strVal));
             }
           } else if (mp.type === "body") {
             if (!bodyPayload) bodyPayload = {};
@@ -2498,17 +3292,18 @@ export class PreviewComponent implements OnInit {
       });
     }
     if (pathAppends.length > 0) {
-       if (!url.includes('?')) {
-          url += (url.endsWith('/') ? '' : '/') + pathAppends.join('/');
-       } else {
-          const urlParts = url.split('?');
-          urlParts[0] += (urlParts[0].endsWith('/') ? '' : '/') + pathAppends.join('/');
-          url = urlParts.join('?');
-       }
+      if (!url.includes("?")) {
+        url += (url.endsWith("/") ? "" : "/") + pathAppends.join("/");
+      } else {
+        const urlParts = url.split("?");
+        urlParts[0] +=
+          (urlParts[0].endsWith("/") ? "" : "/") + pathAppends.join("/");
+        url = urlParts.join("?");
+      }
     }
 
     if (!url) {
-      console.warn('Service execution skipped: URL is empty');
+      console.warn("Service execution skipped: URL is empty");
       return;
     }
 
@@ -2528,13 +3323,11 @@ export class PreviewComponent implements OnInit {
         if (field.dataPath) {
           const parts = field.dataPath.split(".");
           data = parts.reduce(
-             
             (acc: any, part: string) => acc && (acc as any)[part],
             res,
           );
         }
         if (Array.isArray(data)) {
-           
           const opts = data.map((item: any) => {
             let label = item;
             let value = item;
@@ -2542,7 +3335,6 @@ export class PreviewComponent implements OnInit {
               const lParts = field.labelPath.split(".");
               label =
                 lParts.reduce(
-                   
                   (acc: any, part: string) => acc && (acc as any)[part],
                   item,
                 ) ?? item;
@@ -2551,7 +3343,6 @@ export class PreviewComponent implements OnInit {
               const vParts = field.valuePath.split(".");
               value =
                 vParts.reduce(
-                   
                   (acc: any, part: string) => acc && (acc as any)[part],
                   item,
                 ) ?? item;
@@ -2600,6 +3391,7 @@ export class PreviewComponent implements OnInit {
     currentValues: Record<string, unknown>,
     visibility: Record<string, boolean>,
     disabledMap: Record<string, boolean>,
+    readOnlyMap: Record<string, boolean>,
     formGroup: FormGroup,
     parentVisible = true,
   ) {
@@ -2626,6 +3418,7 @@ export class PreviewComponent implements OnInit {
             currentValues,
             visibility,
             disabledMap,
+            readOnlyMap,
             formGroup,
             isVisible,
           );
@@ -2639,6 +3432,7 @@ export class PreviewComponent implements OnInit {
             (currentValues[field.name] as Record<string, unknown>) || {},
             visibility,
             disabledMap,
+            readOnlyMap,
             nestedGroup,
             isVisible,
           );
@@ -2648,7 +3442,6 @@ export class PreviewComponent implements OnInit {
         if (nestedArr) {
           nestedArr.controls.forEach((ctrl, index) => {
             const rowValues =
-               
               (currentValues[field.name] as any[])?.[index] || {};
             this.evaluateConditionsRecursive(
               field.fields || [],
@@ -2656,6 +3449,7 @@ export class PreviewComponent implements OnInit {
               rowValues,
               visibility,
               disabledMap,
+              readOnlyMap,
               ctrl as FormGroup,
               isVisible,
             );
@@ -2676,6 +3470,18 @@ export class PreviewComponent implements OnInit {
           }
         }
         disabledMap[field.id] = isDisabled;
+
+        let isReadOnly = field.readOnly || false;
+        if (field.readOnlyExpression) {
+          const result = this.evaluateExpression(
+            field.readOnlyExpression,
+            rootValues,
+          );
+          if (result !== null) {
+            isReadOnly = !!result;
+          }
+        }
+        readOnlyMap[field.id] = isReadOnly;
 
         const control = formGroup.get(field.name);
         if (control) {
@@ -2706,7 +3512,12 @@ export class PreviewComponent implements OnInit {
             if (control.disabled) control.enable({ emitEvent: false });
           }
 
-          if (field.validationExpression && isVisible && !isDisabled) {
+          if (
+            (field.validationExpression ||
+              (field.validations && field.validations.length > 0)) &&
+            isVisible &&
+            !isDisabled
+          ) {
             control.updateValueAndValidity({ emitEvent: false });
           }
         }
@@ -2719,6 +3530,7 @@ export class PreviewComponent implements OnInit {
     const values = this.liveForm.getRawValue();
     const visibility: Record<string, boolean> = {};
     const disabledMap: Record<string, boolean> = {};
+    const readOnlyMap: Record<string, boolean> = {};
 
     this.evaluateConditionsRecursive(
       this.formBuilder.fields(),
@@ -2726,11 +3538,13 @@ export class PreviewComponent implements OnInit {
       values,
       visibility,
       disabledMap,
+      readOnlyMap,
       this.liveForm,
     );
 
     this.visibleFields.set(visibility);
     this.disabledFields.set(disabledMap);
+    this.readOnlyFields.set(readOnlyMap);
   }
 
   getNestedFormGroup(parent: FormGroup, name: string): FormGroup {
@@ -2738,13 +3552,20 @@ export class PreviewComponent implements OnInit {
   }
 
   handleButtonClick(field: FormField) {
-    if (this.activeTab() === 'simulation') {
-       this.logSimulationEvent('BUTTON_CLICK', `Button clicked: ${field.label}`, { type: field.buttonType });
+    if (this.activeTab() === "simulation") {
+      this.logSimulationEvent(
+        "BUTTON_CLICK",
+        `Button clicked: ${field.label}`,
+        { type: field.buttonType },
+      );
     }
-    
+
     if (field.buttonType === "submit_service" && field.submitMappingId) {
-      if (this.activeTab() === 'simulation') {
-         this.logSimulationEvent('API_CALL', `Executing submit service for mapping ID: ${field.submitMappingId}`);
+      if (this.activeTab() === "simulation") {
+        this.logSimulationEvent(
+          "API_CALL",
+          `Executing submit service for mapping ID: ${field.submitMappingId}`,
+        );
       }
       this.executeSubmitService(field);
       return;
@@ -2752,13 +3573,16 @@ export class PreviewComponent implements OnInit {
     if (field.buttonType === "submit") {
       this.submitForm();
     } else if (field.buttonType === "reset") {
-      if (this.activeTab() === 'simulation') {
-         this.logSimulationEvent('RESET', `Form resetting`);
+      if (this.activeTab() === "simulation") {
+        this.logSimulationEvent("RESET", `Form resetting`);
       }
       this.clearForm();
     } else if (field.buttonType === "call_service" && field.actionServiceId) {
-      if (this.activeTab() === 'simulation') {
-         this.logSimulationEvent('API_CALL', `Executing action service ID: ${field.actionServiceId}`);
+      if (this.activeTab() === "simulation") {
+        this.logSimulationEvent(
+          "API_CALL",
+          `Executing action service ID: ${field.actionServiceId}`,
+        );
       }
       if (!this.liveForm) return;
       const srv = this.serviceManager
@@ -2768,24 +3592,29 @@ export class PreviewComponent implements OnInit {
 
       const formVals = this.liveForm.getRawValue();
       const getFieldVal = (path: string) => {
-         const parts = path.split('.');
-         let curr = formVals;
-         for (const part of parts) {
-             if (curr === undefined || curr === null) return undefined;
-             curr = curr[part];
-         }
-         return curr;
+        const parts = path.split(".");
+        let curr = formVals;
+        for (const part of parts) {
+          if (curr === undefined || curr === null) return undefined;
+          curr = curr[part];
+        }
+        return curr;
       };
 
       let url = srv.url;
       if (srv.pathParams) {
         srv.pathParams.forEach((p) => {
           if (p.key && p.value) {
-             const resolvedValue = p.valueSource === 'field' ? getFieldVal(p.value) : p.value;
-             if (resolvedValue !== undefined && resolvedValue !== null) {
-                const strVal = Array.isArray(resolvedValue) ? resolvedValue.join(",") : String(resolvedValue);
-                url = url.replace(`{${p.key}}`, encodeURIComponent(strVal)).replace(`:${p.key}`, encodeURIComponent(strVal));
-             }
+            const resolvedValue =
+              p.valueSource === "field" ? getFieldVal(p.value) : p.value;
+            if (resolvedValue !== undefined && resolvedValue !== null) {
+              const strVal = Array.isArray(resolvedValue)
+                ? resolvedValue.join(",")
+                : String(resolvedValue);
+              url = url
+                .replace(`{${p.key}}`, encodeURIComponent(strVal))
+                .replace(`:${p.key}`, encodeURIComponent(strVal));
+            }
           }
         });
       }
@@ -2794,29 +3623,32 @@ export class PreviewComponent implements OnInit {
 
       srv.headers.forEach((h) => {
         if (h.key && h.value) {
-            const resolvedValue = h.valueSource === 'field' ? getFieldVal(h.value) : h.value;
-            if (resolvedValue !== undefined && resolvedValue !== null) {
-                const strVal = Array.isArray(resolvedValue) ? resolvedValue.join(",") : String(resolvedValue);
-                headers = headers.set(h.key, strVal);
-            }
+          const resolvedValue =
+            h.valueSource === "field" ? getFieldVal(h.value) : h.value;
+          if (resolvedValue !== undefined && resolvedValue !== null) {
+            const strVal = Array.isArray(resolvedValue)
+              ? resolvedValue.join(",")
+              : String(resolvedValue);
+            headers = headers.set(h.key, strVal);
+          }
         }
       });
       srv.queryParams.forEach((p) => {
         if (p.key && p.value) {
-            const resolvedValue = p.valueSource === 'field' ? getFieldVal(p.value) : p.value;
-            if (resolvedValue !== undefined && resolvedValue !== null) {
-                if (Array.isArray(resolvedValue)) {
-                    resolvedValue.forEach(v => {
-                        params = params.append(p.key, String(v));
-                    });
-                } else {
-                    params = params.set(p.key, String(resolvedValue));
-                }
+          const resolvedValue =
+            p.valueSource === "field" ? getFieldVal(p.value) : p.value;
+          if (resolvedValue !== undefined && resolvedValue !== null) {
+            if (Array.isArray(resolvedValue)) {
+              resolvedValue.forEach((v) => {
+                params = params.append(p.key, String(v));
+              });
+            } else {
+              params = params.set(p.key, String(resolvedValue));
             }
+          }
         }
       });
 
-       
       let bodyPayload: any = null;
       if (srv.body) {
         try {
@@ -2839,9 +3671,11 @@ export class PreviewComponent implements OnInit {
             } else if (mp.type === "path") {
               const strVal = Array.isArray(val) ? val.join(",") : String(val);
               if (url.includes(`{${mp.key}}`) || url.includes(`:${mp.key}`)) {
-                 url = url.replace(`{${mp.key}}`, encodeURIComponent(strVal)).replace(`:${mp.key}`, encodeURIComponent(strVal));
+                url = url
+                  .replace(`{${mp.key}}`, encodeURIComponent(strVal))
+                  .replace(`:${mp.key}`, encodeURIComponent(strVal));
               } else {
-                 pathAppends.push(encodeURIComponent(strVal));
+                pathAppends.push(encodeURIComponent(strVal));
               }
             } else if (mp.type === "body") {
               if (!bodyPayload) bodyPayload = {};
@@ -2857,13 +3691,14 @@ export class PreviewComponent implements OnInit {
         });
       }
       if (pathAppends.length > 0) {
-         if (!url.includes('?')) {
-            url += (url.endsWith('/') ? '' : '/') + pathAppends.join('/');
-         } else {
-            const urlParts = url.split('?');
-            urlParts[0] += (urlParts[0].endsWith('/') ? '' : '/') + pathAppends.join('/');
-            url = urlParts.join('?');
-         }
+        if (!url.includes("?")) {
+          url += (url.endsWith("/") ? "" : "/") + pathAppends.join("/");
+        } else {
+          const urlParts = url.split("?");
+          urlParts[0] +=
+            (urlParts[0].endsWith("/") ? "" : "/") + pathAppends.join("/");
+          url = urlParts.join("?");
+        }
       }
 
       if (field.payloadMappings && field.payloadMappings.length > 0) {
@@ -2893,7 +3728,7 @@ export class PreviewComponent implements OnInit {
       }
 
       if (!url) {
-        console.warn('Service execution skipped: URL is empty');
+        console.warn("Service execution skipped: URL is empty");
         return;
       }
 
@@ -2921,7 +3756,7 @@ export class PreviewComponent implements OnInit {
             field.actionMappings.forEach((mapping) => {
               if (mapping.sourcePath && mapping.targetFieldId) {
                 const sourceParts = mapping.sourcePath.split(".");
-                 
+
                 let val: any = res;
                 let isValidPath = true;
 
@@ -2936,7 +3771,7 @@ export class PreviewComponent implements OnInit {
 
                 if (isValidPath && val !== undefined) {
                   const targetParts = mapping.targetFieldId.split(".");
-                   
+
                   let currentUpdateLevel: any = updates;
 
                   for (let i = 0; i < targetParts.length - 1; i++) {
@@ -2973,45 +3808,76 @@ export class PreviewComponent implements OnInit {
           }
         },
       });
-    } else if (field.buttonType === "custom_function" && field.customFunctionId) {
-      const funcDef = this.formBuilder.formConfig().global.functions?.find(f => f.id === field.customFunctionId);
+    } else if (
+      field.buttonType === "custom_function" &&
+      field.customFunctionId
+    ) {
+      const funcDef = this.formBuilder
+        .formConfig()
+        .global.functions?.find((f) => f.id === field.customFunctionId);
       if (funcDef) {
-         if (this.activeTab() === 'simulation') {
-            this.logSimulationEvent('CUSTOM_FUNCTION', `Executing function: ${funcDef.name}`);
-         }
-         if (this.liveForm) {
-            const values = this.liveForm.getRawValue();
-            const formState = { ...values };
-            const helpers = {
-               log: (...logs: any[]) => {
-                  console.log(`[Function: ${funcDef.name}]`, ...logs);
-                  if (this.activeTab() === 'simulation') {
-                     this.logSimulationEvent('LOG', `[${funcDef.name}] ${logs.map(l => JSON.stringify(l)).join(' ')}`);
-                  }
-               },
-               setValue: (path: string, val: any) => {
-                  const control = this.liveForm?.get(path);
-                  if (control) {
-                     control.setValue(val, { emitEvent: !!this.formBuilder.formConfig().observability?.valueChanges?.enabled });
-                  }
-               },
-               getValue: (path: string) => this.liveForm?.get(path)?.value,
-               dispatch: (action: any) => console.log('dispatch:', action)
-            };
-            const paramNames = funcDef.isVoid ? [] : funcDef.parameters.map(p => p.name);
-            const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-            const runner = new AsyncFunction('values', 'formState', 'helpers', ...paramNames, funcDef.body);
-            runner(values, formState, helpers).then((res: any) => {
-                if (this.activeTab() === 'simulation') {
-                    this.logSimulationEvent('CUSTOM_FUNCTION_SUCCESS', `Function returned: ${JSON.stringify(res)}`);
-                }
-            }).catch((err: any) => {
-                if (this.activeTab() === 'simulation') {
-                    this.logSimulationEvent('CUSTOM_FUNCTION_ERROR', `Error: ${err.message || err}`, { error: true });
-                }
-                console.error('Custom function error:', err);
+        if (this.activeTab() === "simulation") {
+          this.logSimulationEvent(
+            "CUSTOM_FUNCTION",
+            `Executing function: ${funcDef.name}`,
+          );
+        }
+        if (this.liveForm) {
+          const values = this.liveForm.getRawValue();
+          const formState = { ...values };
+          const helpers = {
+            log: (...logs: any[]) => {
+              console.log(`[Function: ${funcDef.name}]`, ...logs);
+              if (this.activeTab() === "simulation") {
+                this.logSimulationEvent(
+                  "LOG",
+                  `[${funcDef.name}] ${logs.map((l) => JSON.stringify(l)).join(" ")}`,
+                );
+              }
+            },
+            setValue: (path: string, val: any) => {
+              const control = this.liveForm?.get(path);
+              if (control) {
+                control.setValue(val, {
+                  emitEvent:
+                    !!this.formBuilder.formConfig().observability?.valueChanges
+                      ?.enabled,
+                });
+              }
+            },
+            getValue: (path: string) => this.liveForm?.get(path)?.value,
+            dispatch: (action: any) => console.log("dispatch:", action),
+          };
+          const paramNames = funcDef.isVoid
+            ? []
+            : funcDef.parameters.map((p) => p.name);
+          const AsyncFunction = Object.getPrototypeOf(
+            async function () {},
+          ).constructor;
+          const runner = new AsyncFunction(
+            ...paramNames,
+            funcDef.body,
+          );
+          runner()
+            .then((res: any) => {
+              if (this.activeTab() === "simulation") {
+                this.logSimulationEvent(
+                  "CUSTOM_FUNCTION_SUCCESS",
+                  `Function returned: ${JSON.stringify(res)}`,
+                );
+              }
+            })
+            .catch((err: any) => {
+              if (this.activeTab() === "simulation") {
+                this.logSimulationEvent(
+                  "CUSTOM_FUNCTION_ERROR",
+                  `Error: ${err.message || err}`,
+                  { error: true },
+                );
+              }
+              console.error("Custom function error:", err);
             });
-         }
+        }
       }
     } else if (field.buttonType === "button" && field.buttonActionExpression) {
       if (this.liveForm) {
@@ -3124,8 +3990,13 @@ export class PreviewComponent implements OnInit {
         const valFunc = new Function("values", "form", `return (${pv.value});`);
         const parsedVal = valFunc(context.values, context.form);
         if (parsedVal !== undefined && parsedVal !== null) {
-            const strVal = Array.isArray(parsedVal) ? parsedVal.join(",") : String(parsedVal);
-            finalEndpoint = finalEndpoint.replace(`{${pv.key}}`, encodeURIComponent(strVal));
+          const strVal = Array.isArray(parsedVal)
+            ? parsedVal.join(",")
+            : String(parsedVal);
+          finalEndpoint = finalEndpoint.replace(
+            `{${pv.key}}`,
+            encodeURIComponent(strVal),
+          );
         }
       } catch {
         /* ignore */
@@ -3141,11 +4012,13 @@ export class PreviewComponent implements OnInit {
         const valFunc = new Function("values", "form", `return (${qp.value});`);
         const parsedVal = valFunc(context.values, context.form);
         if (parsedVal !== undefined && parsedVal !== null) {
-            if (Array.isArray(parsedVal)) {
-               parsedVal.forEach(v => { params = params.append(qp.key, String(v)); });
-            } else {
-               params = params.set(qp.key, String(parsedVal));
-            }
+          if (Array.isArray(parsedVal)) {
+            parsedVal.forEach((v) => {
+              params = params.append(qp.key, String(v));
+            });
+          } else {
+            params = params.set(qp.key, String(parsedVal));
+          }
         }
       } catch {
         /* ignore */
@@ -3173,7 +4046,7 @@ export class PreviewComponent implements OnInit {
     this.isSubmitting.set(true);
 
     if (!finalUrl) {
-      console.warn('Service execution skipped: URL is empty');
+      console.warn("Service execution skipped: URL is empty");
       this.isSubmitting.set(false);
       return;
     }
@@ -3251,37 +4124,40 @@ export class PreviewComponent implements OnInit {
     return Array.isArray(value) ? value.join(", ") : value;
   }
 
-   
   evaluateExpression(expression: string, values: any): any {
     if (!expression) return null;
     try {
       const configFns = this.formBuilder.formConfig()?.global?.functions || [];
       const functionsMap: Record<string, any> = {};
-      
-      configFns.forEach(fnDef => {
-         const paramNames = fnDef.isVoid ? [] : (fnDef.parameters || []).map(p => p.name);
-         // Inject the function mapping
-         functionsMap[fnDef.name] = (...args: any[]) => {
-            const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-            // The function body has access to values, formState, helpers
-            const formState = { ...values };
-            const helpers = {
-               log: (...logs: any[]) => console.log(`[Function: ${fnDef.name}]`, ...logs),
-               setValue: (path: string, val: any) => console.log('setValue not implemented in sync context'),
-               getValue: (path: string) => undefined,
-               dispatch: (action: any) => console.log('dispatch:', action)
-            };
-            const innerRunner = new AsyncFunction('values', 'formState', 'helpers', ...paramNames, fnDef.body);
-            return innerRunner(values, formState, helpers, ...args);
-         };
+
+      configFns.forEach((fnDef) => {
+        const paramNames = fnDef.isVoid
+          ? []
+          : (fnDef.parameters || []).map((p) => p.name);
+        // Inject the function mapping
+        functionsMap[fnDef.name] = (...args: any[]) => {
+          const AsyncFunction = Object.getPrototypeOf(
+            async function () {},
+          ).constructor;
+          const innerRunner = new AsyncFunction(
+            ...paramNames,
+            fnDef.body,
+          );
+          return innerRunner(...args);
+        };
       });
 
-      const params = ['values', 'functions', 'runFunction', ...Object.keys(functionsMap)];
+      const params = [
+        "values",
+        "functions",
+        "runFunction",
+        ...Object.keys(functionsMap),
+      ];
       const args = [
-         values, 
-         functionsMap, 
-         (name: string, ...funcArgs: any[]) => functionsMap[name]?.(...funcArgs),
-         ...Object.values(functionsMap)
+        values,
+        functionsMap,
+        (name: string, ...funcArgs: any[]) => functionsMap[name]?.(...funcArgs),
+        ...Object.values(functionsMap),
       ];
 
       const fn = new Function(...params, `return ${expression};`);
@@ -3293,15 +4169,21 @@ export class PreviewComponent implements OnInit {
   }
 
   utf8ToBase64(str: string): string {
-    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+    return btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
         return String.fromCharCode(parseInt(p1, 16));
-    }));
+      }),
+    );
   }
 
   base64ToUtf8(str: string): string {
-    return decodeURIComponent(Array.prototype.map.call(atob(str), (c: string) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    return decodeURIComponent(
+      Array.prototype.map
+        .call(atob(str), (c: string) => {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join(""),
+    );
   }
 
   getFormattedData() {
@@ -3600,7 +4482,6 @@ export class PreviewComponent implements OnInit {
         };
       }
       if (f.type === "array") {
-         
         const arrVals = (values[f.name] as any[]) || [];
         // For schema array, the field.fields remains untouched (template).
         // Only its value property stores the user data array.
@@ -3658,14 +4539,22 @@ export class PreviewComponent implements OnInit {
   }
 
   submitForm() {
-    if (this.activeTab() === 'simulation') {
-      this.logSimulationEvent('SUBMIT_ATTEMPT', 'Attempting to submit form', this.liveForm.getRawValue());
+    if (this.activeTab() === "simulation") {
+      this.logSimulationEvent(
+        "SUBMIT_ATTEMPT",
+        "Attempting to submit form",
+        this.liveForm.getRawValue(),
+      );
     }
 
     if (this.liveForm.invalid) {
       this.liveForm.markAllAsTouched();
-      if (this.activeTab() === 'simulation') {
-        this.logSimulationEvent('VALIDATION_ERROR', 'Submit failed due to validation errors', this.formErrors());
+      if (this.activeTab() === "simulation") {
+        this.logSimulationEvent(
+          "VALIDATION_ERROR",
+          "Submit failed due to validation errors",
+          this.formErrors(),
+        );
       }
       return;
     }
@@ -3674,13 +4563,17 @@ export class PreviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        if (this.activeTab() === 'simulation') {
-           this.logSimulationEvent('SUBMIT_CONFIRM', 'User confirmed submission form data', this.liveForm.getRawValue());
+        if (this.activeTab() === "simulation") {
+          this.logSimulationEvent(
+            "SUBMIT_CONFIRM",
+            "User confirmed submission form data",
+            this.liveForm.getRawValue(),
+          );
         }
         this.proceedWithSubmission();
       } else {
-        if (this.activeTab() === 'simulation') {
-           this.logSimulationEvent('SUBMIT_CANCEL', 'User cancelled submission');
+        if (this.activeTab() === "simulation") {
+          this.logSimulationEvent("SUBMIT_CANCEL", "User cancelled submission");
         }
       }
     });

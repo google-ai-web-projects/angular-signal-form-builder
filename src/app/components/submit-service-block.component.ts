@@ -849,12 +849,16 @@ export class SubmitServiceBlockComponent {
 
   deleteMapping(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm("Are you sure you want to delete this mapping?")) {
-      this.submissionMappingService.deleteMapping(id);
-      if (this.selectedMapping()?.id === id) {
-        this.selectedMapping.set(null);
-      }
+    this.submissionMappingService.deleteMapping(id);
+    if (this.selectedMapping()?.id === id) {
+      this.selectedMapping.set(null);
     }
+    
+    // Clean up internal data structures (fields referencing this submission)
+    this.formBuilder.cleanupSubmissionReferences(id);
+    
+    // Save to the server to persist
+    this.formBuilder.saveToServer();
   }
 
   insertVariable(variablePath: string) {

@@ -1,5 +1,5 @@
 {
-  "name": "Angular Signal Form Builder",
+  "name": "Remix: Angular Signal Form Builder",
   "description": "Dynamic drag and drop form builder using Angular Signals, with import/export capabilities.",
   "requestFramePermissions": []
 }
