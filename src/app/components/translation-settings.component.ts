@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
       <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
-        <mat-icon class="text-indigo-600">translate</mat-icon>
+        <mat-icon class="text-primary">translate</mat-icon>
         <h3 class="text-base font-semibold text-gray-800">Translations Configuration</h3>
       </div>
       
@@ -21,7 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
             <div class="flex items-center gap-4">
                <div class="flex gap-2">
                  <input type="file" id="json-upload" accept=".json" class="hidden" (change)="onFileUpload($event)" />
-                 <label for="json-upload" class="cursor-pointer text-xs font-semibold bg-indigo-50 text-indigo-700 py-1.5 px-3 rounded-md hover:bg-indigo-100 transition-colors flex items-center gap-1">
+                 <label for="json-upload" class="cursor-pointer text-xs font-semibold bg-primary/10 text-primary-focus py-1.5 px-3 rounded-md hover:bg-primary/20 transition-colors flex items-center gap-1">
                    <mat-icon class="text-[16px] w-[16px] h-[16px]">upload_file</mat-icon> Upload JSON
                  </label>
                  <button (click)="exportTranslations()" class="text-xs font-semibold bg-gray-100 text-gray-700 py-1.5 px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-1">
@@ -45,7 +45,7 @@ import { MatIconModule } from '@angular/material/icon';
           [ngModel]="jsonContent()" 
           (ngModelChange)="updateJson($event)" 
           [placeholder]="placeholderExample"
-          class="w-full text-sm font-mono px-3 py-3 bg-gray-900 text-gray-100 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all min-h-[200px]"
+          class="w-full text-sm font-mono px-3 py-3 bg-gray-900 text-gray-100 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all min-h-[200px]"
         ></textarea>
         <p class="text-xs text-gray-500 mt-2">Format: {{ formatExample }}</p>
       </div>
@@ -57,7 +57,7 @@ import { MatIconModule } from '@angular/material/icon';
             <select 
               [ngModel]="selectedLang()" 
               (ngModelChange)="selectedLang.set($event)"
-              class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-primary outline-none"
             >
               @for (lang of availableLangs(); track lang) {
                 <option [value]="lang">{{ lang.toUpperCase() }}</option>
@@ -70,7 +70,7 @@ import { MatIconModule } from '@angular/material/icon';
                 [ngModel]="searchQuery()"
                 (ngModelChange)="searchQuery.set($event)"
                 placeholder="Search keys or values by typing..." 
-                class="w-full text-sm border border-gray-200 rounded-lg pl-10 pr-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                class="w-full text-sm border border-gray-200 rounded-lg pl-10 pr-3 py-2 bg-white focus:ring-2 focus:ring-primary outline-none"
               >
             </div>
          </div>
@@ -86,9 +86,9 @@ import { MatIconModule } from '@angular/material/icon';
                <tbody class="divide-y divide-gray-100">
                   @for (item of filteredEntries(); track item.key) {
                      <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-mono text-xs text-indigo-600 break-all">{{ item.key }}</td>
+                        <td class="px-4 py-2 font-mono text-xs text-primary break-all">{{ item.key }}</td>
                         <td class="px-4 py-2 text-gray-700">
-                           <input type="text" [ngModel]="item.value" (ngModelChange)="updateTranslationValue(item.key, $event)" class="w-full bg-transparent border-b border-transparent focus:border-indigo-500 outline-none px-1 py-0.5">
+                           <input type="text" [ngModel]="item.value" (ngModelChange)="updateTranslationValue(item.key, $event)" class="w-full bg-transparent border-b border-transparent focus:border-primary outline-none px-1 py-0.5">
                         </td>
                      </tr>
                   }

@@ -228,7 +228,7 @@ const COUNTRIES: Country[] = [
       <button
         type="button"
         (click)="!disabled && !readonly && toggleDropdown()"
-        class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-700 sm:text-sm hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-700 sm:text-sm hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-primary"
         [class.opacity-50]="disabled"
         [class.cursor-not-allowed]="disabled || readonly"
         [disabled]="disabled"
@@ -242,7 +242,7 @@ const COUNTRIES: Country[] = [
           <div class="px-2 pb-1 pt-1 border-b border-gray-100 sticky top-0 bg-white z-20">
             <input
               type="text"
-              class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
               placeholder="Search country..."
               [(ngModel)]="searchQuery"
               (click)="$event.stopPropagation()"
@@ -251,7 +251,7 @@ const COUNTRIES: Country[] = [
           <div class="overflow-y-auto flex-1 h-full max-h-[200px]">
           @for (country of filteredCountries(); track country.iso2) {
             <li
-              class="text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50 block"
+              class="text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary/10 block"
               (click)="selectCountry(country)"
               (keydown.enter)="selectCountry(country)"
               tabindex="0"
@@ -279,7 +279,7 @@ const COUNTRIES: Country[] = [
         [placeholder]="placeholder"
         [disabled]="disabled"
         [readOnly]="readonly"
-        class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border focus:ring-primary focus:border-primary sm:text-sm"
         [ngClass]="{
           'border-red-300': invalid || (!isValid && phoneNumber.length > 0),
           'border-gray-300': !invalid && (isValid || phoneNumber.length === 0),

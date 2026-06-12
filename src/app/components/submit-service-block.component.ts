@@ -34,7 +34,7 @@ import { EditorService } from "../editor.service";
         class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shrink-0 shadow-sm z-10 relative"
       >
         <div class="flex items-center gap-4 w-full">
-          <mat-icon class="text-indigo-600">publish</mat-icon>
+          <mat-icon class="text-primary">publish</mat-icon>
           <div class="font-bold text-gray-700 whitespace-nowrap">
             Submit Service Configuration
           </div>
@@ -53,7 +53,7 @@ import { EditorService } from "../editor.service";
             </h2>
             <button
               (click)="createNewMapping()"
-              class="text-indigo-600 hover:text-indigo-800 transition-colors"
+              class="text-primary hover:text-primary-focus transition-colors"
               title="Create New Mapping"
             >
               <mat-icon class="text-[18px] w-[18px] h-[18px]">add</mat-icon>
@@ -69,7 +69,7 @@ import { EditorService } from "../editor.service";
                 type="text"
                 [(ngModel)]="searchQuery"
                 placeholder="Search mappings..."
-                class="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded text-xs focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded text-xs focus:ring-primary focus:border-primary"
               />
             </div>
           </div>
@@ -80,9 +80,9 @@ import { EditorService } from "../editor.service";
                 (keydown.enter)="selectMapping(mapping)"
                 tabindex="0"
                 role="button"
-                [class.bg-indigo-50]="selectedMapping()?.id === mapping.id"
-                [class.text-indigo-700]="selectedMapping()?.id === mapping.id"
-                class="w-full flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-100 group transition-colors mb-1 text-left outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset"
+                [class.bg-primary/10]="selectedMapping()?.id === mapping.id"
+                [class.text-primary-focus]="selectedMapping()?.id === mapping.id"
+                class="w-full flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-100 group transition-colors mb-1 text-left outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
               >
                 <div class="flex flex-col overflow-hidden">
                   <span class="text-xs font-medium truncate text-gray-800">{{
@@ -114,7 +114,7 @@ import { EditorService } from "../editor.service";
                 <span>No submission mappings found.</span>
                 <button
                   (click)="createNewMapping()"
-                  class="mt-2 text-indigo-600 hover:underline"
+                  class="mt-2 text-primary hover:underline"
                 >
                   Create One
                 </button>
@@ -144,7 +144,7 @@ import { EditorService } from "../editor.service";
                     </h3>
                     <button
                       (click)="saveCurrentMapping()"
-                      class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+                      class="bg-primary hover:bg-primary-focus text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
                     >
                       Save Mapping
                     </button>
@@ -160,7 +160,7 @@ import { EditorService } from "../editor.service";
                         <input
                           type="text"
                           [(ngModel)]="m.name"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
                           placeholder="e.g. Map User Profile to API"
                         />
                       </div>
@@ -171,7 +171,7 @@ import { EditorService } from "../editor.service";
                         >
                         <select
                           [(ngModel)]="m.serviceId"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-600"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm text-gray-600"
                         >
                           <option value="">
                             -- No base service / Custom Endpoint --
@@ -193,7 +193,7 @@ import { EditorService } from "../editor.service";
                         >
                         <select
                           [(ngModel)]="m.method"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono font-bold text-gray-600"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm font-mono font-bold text-gray-600"
                         >
                           <option value="GET">GET</option>
                           <option value="POST">POST</option>
@@ -216,7 +216,7 @@ import { EditorService } from "../editor.service";
                           <input
                             type="text"
                             [(ngModel)]="m.endpointTemplate"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono text-indigo-700 bg-indigo-50"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm font-mono text-primary-focus bg-primary/10"
                             placeholder="/users/{user_id}/submit"
                           />
                         </div>
@@ -228,7 +228,7 @@ import { EditorService } from "../editor.service";
                         >
                         <select
                           [(ngModel)]="m.contentType"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
                         >
                           <option value="application/json">
                             application/json
@@ -254,36 +254,36 @@ import { EditorService } from "../editor.service";
                   >
                     <button
                       (click)="activeTab.set('path')"
-                      [class.text-indigo-600]="activeTab() === 'path'"
+                      [class.text-primary]="activeTab() === 'path'"
                       [class.border-b-2]="activeTab() === 'path'"
-                      [class.border-indigo-600]="activeTab() === 'path'"
+                      [class.border-primary]="activeTab() === 'path'"
                       class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       Path Variables
                     </button>
                     <button
                       (click)="activeTab.set('query')"
-                      [class.text-indigo-600]="activeTab() === 'query'"
+                      [class.text-primary]="activeTab() === 'query'"
                       [class.border-b-2]="activeTab() === 'query'"
-                      [class.border-indigo-600]="activeTab() === 'query'"
+                      [class.border-primary]="activeTab() === 'query'"
                       class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       Query Params
                     </button>
                     <button
                       (click)="activeTab.set('body')"
-                      [class.text-indigo-600]="activeTab() === 'body'"
+                      [class.text-primary]="activeTab() === 'body'"
                       [class.border-b-2]="activeTab() === 'body'"
-                      [class.border-indigo-600]="activeTab() === 'body'"
+                      [class.border-primary]="activeTab() === 'body'"
                       class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       Request Body
                     </button>
                     <button
                       (click)="activeTab.set('logic')"
-                      [class.text-indigo-600]="activeTab() === 'logic'"
+                      [class.text-primary]="activeTab() === 'logic'"
                       [class.border-b-2]="activeTab() === 'logic'"
-                      [class.border-indigo-600]="activeTab() === 'logic'"
+                      [class.border-primary]="activeTab() === 'logic'"
                       class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       Validation & Logic
@@ -306,7 +306,7 @@ import { EditorService } from "../editor.service";
                               type="text"
                               [(ngModel)]="param.key"
                               placeholder="Variable Name"
-                              class="w-48 px-3 py-1.5 border border-gray-300 rounded text-sm font-mono text-indigo-700 focus:ring-indigo-500"
+                              class="w-48 px-3 py-1.5 border border-gray-300 rounded text-sm font-mono text-primary-focus focus:ring-primary"
                             />
                             <span class="text-gray-400 font-mono text-sm"
                               >&#125;</span
@@ -331,7 +331,7 @@ import { EditorService } from "../editor.service";
                         }
                         <button
                           (click)="m.pathVariables.push({ key: '', value: '' })"
-                          class="text-sm text-indigo-600 font-medium self-start mt-2 px-3 py-1 bg-indigo-50 rounded hover:bg-indigo-100"
+                          class="text-sm text-primary font-medium self-start mt-2 px-3 py-1 bg-primary/10 rounded hover:bg-primary/20"
                         >
                           + Add Path Variable
                         </button>
@@ -348,7 +348,7 @@ import { EditorService } from "../editor.service";
                               type="text"
                               [(ngModel)]="param.key"
                               placeholder="Query Key"
-                              class="w-48 px-3 py-1.5 border border-gray-300 rounded text-sm font-mono text-green-700 focus:ring-indigo-500"
+                              class="w-48 px-3 py-1.5 border border-gray-300 rounded text-sm font-mono text-green-700 focus:ring-primary"
                             />
                             <span class="mx-2 text-gray-400 text-sm">=</span>
                             <div class="flex-1">
@@ -370,7 +370,7 @@ import { EditorService } from "../editor.service";
                         }
                         <button
                           (click)="m.queryParams.push({ key: '', value: '' })"
-                          class="text-sm text-indigo-600 font-medium self-start mt-2 px-3 py-1 bg-indigo-50 rounded hover:bg-indigo-100"
+                          class="text-sm text-primary font-medium self-start mt-2 px-3 py-1 bg-primary/10 rounded hover:bg-primary/20"
                         >
                           + Add Query Parameter
                         </button>
@@ -501,7 +501,7 @@ import { EditorService } from "../editor.service";
                             }
                             <button
                               (click)="m.preExpressions.push('')"
-                              class="text-sm text-indigo-600 font-medium self-start mt-1 px-3 py-1 bg-indigo-50 rounded hover:bg-indigo-100"
+                              class="text-sm text-primary font-medium self-start mt-1 px-3 py-1 bg-primary/10 rounded hover:bg-primary/20"
                             >
                               + Add Pre Expression
                             </button>
@@ -683,11 +683,11 @@ import { EditorService } from "../editor.service";
                     @for (field of formBuilder.fields(); track field.id) {
                       <button
                         (click)="insertVariable('values.' + field.name)"
-                        class="text-left px-2 py-1.5 hover:bg-indigo-50 rounded group flex items-start justify-between"
+                        class="text-left px-2 py-1.5 hover:bg-primary/10 rounded group flex items-start justify-between"
                       >
                         <div class="flex flex-col">
                           <span
-                            class="text-xs font-mono text-indigo-700 group-hover:text-indigo-900 truncate max-w-[150px]"
+                            class="text-xs font-mono text-primary-focus group-hover:text-indigo-900 truncate max-w-[150px]"
                             >values.{{ field.name }}</span
                           >
                           <span
@@ -696,7 +696,7 @@ import { EditorService } from "../editor.service";
                           >
                         </div>
                         <mat-icon
-                          class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-indigo-500 mt-0.5 shrink-0"
+                          class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-primary-focus mt-0.5 shrink-0"
                           >input</mat-icon
                         >
                       </button>
@@ -712,37 +712,37 @@ import { EditorService } from "../editor.service";
                   <div class="flex flex-col gap-1">
                     <button
                       (click)="insertVariable('form.name')"
-                      class="text-left px-2 py-1.5 hover:bg-indigo-50 rounded group flex items-center justify-between"
+                      class="text-left px-2 py-1.5 hover:bg-primary/10 rounded group flex items-center justify-between"
                     >
                       <span class="text-xs font-mono text-purple-700"
                         >form.name</span
                       >
                       <mat-icon
-                        class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-indigo-500 shrink-0"
+                        class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-primary-focus shrink-0"
                         >input</mat-icon
                       >
                     </button>
                     <button
                       (click)="insertVariable('form.fields')"
-                      class="text-left px-2 py-1.5 hover:bg-indigo-50 rounded group flex items-center justify-between"
+                      class="text-left px-2 py-1.5 hover:bg-primary/10 rounded group flex items-center justify-between"
                     >
                       <span class="text-xs font-mono text-purple-700"
                         >form.fields</span
                       >
                       <mat-icon
-                        class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-indigo-500 shrink-0"
+                        class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-primary-focus shrink-0"
                         >input</mat-icon
                       >
                     </button>
                     <button
                       (click)="insertVariable('form.values')"
-                      class="text-left px-2 py-1.5 hover:bg-indigo-50 rounded group flex items-center justify-between"
+                      class="text-left px-2 py-1.5 hover:bg-primary/10 rounded group flex items-center justify-between"
                     >
                       <span class="text-xs font-mono text-purple-700"
                         >form.values</span
                       >
                       <mat-icon
-                        class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-indigo-500 shrink-0"
+                        class="text-[14px] w-[14px] h-[14px] text-gray-400 group-hover:text-primary-focus shrink-0"
                         >input</mat-icon
                       >
                     </button>

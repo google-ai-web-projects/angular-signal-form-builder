@@ -22,7 +22,7 @@ import { SandboxRuntime } from '../sandbox';
                <button (click)="createNewFunction()" class="flex-[1.5] bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs py-1.5 rounded flex items-center justify-center gap-1 transition-colors font-medium">
                   <mat-icon class="text-[16px] w-[16px] h-[16px]">add</mat-icon> Blank
                </button>
-               <button (click)="templatesModalOpen.set(true)" class="flex-[2] bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 text-indigo-700 text-xs py-1.5 rounded flex items-center justify-center gap-1 transition-colors font-medium">
+               <button (click)="templatesModalOpen.set(true)" class="flex-[2] bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary-focus text-xs py-1.5 rounded flex items-center justify-center gap-1 transition-colors font-medium">
                   <mat-icon class="text-[16px] w-[16px] h-[16px]">library_books</mat-icon> Templates
                </button>
             </div>
@@ -37,7 +37,7 @@ import { SandboxRuntime } from '../sandbox';
                  [class.border-l-indigo-500]="selectedFunctionId() === func.id"
                >
                  <div>
-                    <h3 class="text-sm font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">{{ func.name || 'Unnamed Function' }}</h3>
+                    <h3 class="text-sm font-medium text-gray-900 group-hover:text-primary transition-colors">{{ func.name || 'Unnamed Function' }}</h3>
                     <p class="text-xs text-gray-500 mt-0.5 truncate">{{ func.isVoid ? 'void' : (func.parameters.length + ' parameters') }}</p>
                  </div>
                  <button (click)="deleteFunction(func.id); $event.stopPropagation()" class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -58,13 +58,13 @@ import { SandboxRuntime } from '../sandbox';
          @if (selectedFunction()) {
             <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center shadow-sm z-10 shrink-0">
                <div class="flex items-center gap-4">
-                  <input type="text" [ngModel]="selectedFunction()?.name" (ngModelChange)="updateFunction({name: $event})" placeholder="Function Name (e.g. validateTotal)" class="text-lg font-bold text-gray-800 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none px-1 py-0.5">
+                  <input type="text" [ngModel]="selectedFunction()?.name" (ngModelChange)="updateFunction({name: $event})" placeholder="Function Name (e.g. validateTotal)" class="text-lg font-bold text-gray-800 bg-transparent border-b border-transparent focus:border-primary outline-none px-1 py-0.5">
                </div>
                <div class="flex items-center gap-2">
                   <button (click)="openSaveTemplateModal()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 shadow-sm">
                      <mat-icon class="text-[16px] w-[16px] h-[16px]">bookmark_add</mat-icon> Save as Template
                   </button>
-                  <button (click)="saveFunctions()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 shadow-sm">
+                  <button (click)="saveFunctions()" class="bg-primary hover:bg-primary-focus text-white px-4 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 shadow-sm">
                      <mat-icon class="text-[16px] w-[16px] h-[16px]">save</mat-icon> Save Changes
                   </button>
                </div>
@@ -82,11 +82,11 @@ import { SandboxRuntime } from '../sandbox';
                         
                         <div>
                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-widest mb-1.5">Description (Optional)</label>
-                           <input type="text" [ngModel]="selectedFunction()?.description" (ngModelChange)="updateFunction({description: $event})" placeholder="e.g. Calculates the total price including tax" class="w-full text-sm px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                           <input type="text" [ngModel]="selectedFunction()?.description" (ngModelChange)="updateFunction({description: $event})" placeholder="e.g. Calculates the total price including tax" class="w-full text-sm px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all">
                         </div>
 
                         <div class="flex items-center gap-3">
-                           <input type="checkbox" id="isVoid" [ngModel]="selectedFunction()?.isVoid" (ngModelChange)="updateFunction({isVoid: $event})" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                           <input type="checkbox" id="isVoid" [ngModel]="selectedFunction()?.isVoid" (ngModelChange)="updateFunction({isVoid: $event})" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer">
                            <label for="isVoid" class="text-sm text-gray-700 cursor-pointer">Function takes no parameters (void)</label>
                         </div>
                      </div>
@@ -97,7 +97,7 @@ import { SandboxRuntime } from '../sandbox';
                               <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
                                  <mat-icon class="text-[18px] w-[18px] h-[18px] text-gray-500">list</mat-icon> Parameters
                               </h3>
-                              <button (click)="addParameter()" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                              <button (click)="addParameter()" class="text-xs font-medium text-primary hover:text-primary-focus bg-primary/10 px-2 py-1 rounded transition-colors flex items-center gap-1">
                                  <mat-icon class="text-[14px] w-[14px] h-[14px]">add</mat-icon> Add Param
                               </button>
                            </div>
@@ -105,8 +105,8 @@ import { SandboxRuntime } from '../sandbox';
                            @for (param of selectedFunction()?.parameters; track $index) {
                               <div class="flex gap-2 items-start bg-gray-50 p-2 rounded-lg border border-gray-200">
                                  <div class="flex-1 space-y-2">
-                                    <input type="text" [ngModel]="param.name" (ngModelChange)="updateParameter($index, {name: $event})" placeholder="Name" class="w-full text-sm px-2 py-1.5 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <input type="text" [ngModel]="param.type" (ngModelChange)="updateParameter($index, {type: $event})" placeholder="Type (e.g. string, number)" class="w-full text-sm px-2 py-1.5 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none font-mono">
+                                    <input type="text" [ngModel]="param.name" (ngModelChange)="updateParameter($index, {name: $event})" placeholder="Name" class="w-full text-sm px-2 py-1.5 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none">
+                                    <input type="text" [ngModel]="param.type" (ngModelChange)="updateParameter($index, {type: $event})" placeholder="Type (e.g. string, number)" class="w-full text-sm px-2 py-1.5 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none font-mono">
                                  </div>
                                  <div class="flex flex-col items-center gap-1 pt-1.5">
                                     <button (click)="removeParameter($index)" class="text-gray-400 hover:text-red-500 transition-colors p-1">
@@ -128,7 +128,7 @@ import { SandboxRuntime } from '../sandbox';
                         <p class="text-xs text-gray-500">
                            The function is wrapped in a sandbox and will only receive the provided parameters.
                         </p>
-                        <div class="flex-1 flex flex-col relative border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 bg-white">
+                        <div class="flex-1 flex flex-col relative border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-primary bg-white">
                            <div class="bg-gray-800 text-gray-400 text-xs px-3 py-1 font-mono flex items-center gap-2">
                               <span>function {{ selectedFunction()?.name || 'anonymous' }}({{ getParameterString() }}) &#123;</span>
                            </div>
@@ -145,7 +145,7 @@ import { SandboxRuntime } from '../sandbox';
                         <div class="flex gap-4">
                            <div class="w-1/2">
                               <label class="block text-xs font-semibold text-gray-700 uppercase tracking-widest mb-1.5">Return Type</label>
-                              <input type="text" [ngModel]="selectedFunction()?.returnType" (ngModelChange)="updateFunction({returnType: $event})" placeholder="e.g. number, boolean, void" class="w-full text-sm px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono">
+                              <input type="text" [ngModel]="selectedFunction()?.returnType" (ngModelChange)="updateFunction({returnType: $event})" placeholder="e.g. number, boolean, void" class="w-full text-sm px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all font-mono">
                            </div>
                         </div>
                      </div>
@@ -156,7 +156,7 @@ import { SandboxRuntime } from '../sandbox';
                <div class="w-80 lg:w-96 bg-white flex flex-col h-full z-0 overflow-hidden shrink-0 hidden md:flex">
                   <div class="p-4 border-b border-gray-200 bg-gray-50">
                      <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                        <mat-icon class="text-[18px] w-[18px] h-[18px] text-indigo-600">play_circle_filled</mat-icon> Test & Run
+                        <mat-icon class="text-[18px] w-[18px] h-[18px] text-primary">play_circle_filled</mat-icon> Test & Run
                      </h3>
                   </div>
                   <div class="flex-1 overflow-y-auto p-4 space-y-4">
@@ -168,7 +168,7 @@ import { SandboxRuntime } from '../sandbox';
                         @if (!selectedFunction()?.isVoid) {
                            <div>
                               <label class="block text-xs font-medium text-gray-600 mb-1">Function Arguments (JSON Array)</label>
-                              <textarea [ngModel]="testArgs()" (ngModelChange)="testArgs.set($event)" placeholder="e.g. [1, 2, 'three']" class="w-full h-16 font-mono text-xs p-2 bg-gray-50 border border-gray-200 rounded-md outline-none focus:ring-1 focus:ring-indigo-500" spellcheck="false"></textarea>
+                              <textarea [ngModel]="testArgs()" (ngModelChange)="testArgs.set($event)" placeholder="e.g. [1, 2, 'three']" class="w-full h-16 font-mono text-xs p-2 bg-gray-50 border border-gray-200 rounded-md outline-none focus:ring-1 focus:ring-primary" spellcheck="false"></textarea>
                            </div>
                         }
 
@@ -210,7 +210,7 @@ import { SandboxRuntime } from '../sandbox';
                   <h3 class="text-lg font-medium text-gray-700">No Function Selected</h3>
                   <p class="text-sm mt-1">Select a function from the sidebar or create a new one to start writing logic.</p>
                </div>
-               <button (click)="createNewFunction()" class="mt-4 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+               <button (click)="createNewFunction()" class="mt-4 bg-primary/10 text-primary-focus hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
                   <mat-icon class="text-[18px] w-[18px] h-[18px]">add</mat-icon> Create New Function
                </button>
             </div>
@@ -224,7 +224,7 @@ import { SandboxRuntime } from '../sandbox';
            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
               <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                  <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <mat-icon class="text-indigo-600">bookmark_add</mat-icon> Save as Template
+                    <mat-icon class="text-primary">bookmark_add</mat-icon> Save as Template
                  </h2>
                  <button (click)="saveTemplateModalOpen.set(false)" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-200">
                     <mat-icon>close</mat-icon>
@@ -233,20 +233,20 @@ import { SandboxRuntime } from '../sandbox';
               <div class="p-5 flex flex-col gap-4">
                  <div>
                     <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Template Name</label>
-                    <input type="text" [ngModel]="newTemplateForm().name" (ngModelChange)="updateNewTemplateForm('name', $event)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="e.g., Valid User Check">
+                    <input type="text" [ngModel]="newTemplateForm().name" (ngModelChange)="updateNewTemplateForm('name', $event)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="e.g., Valid User Check">
                  </div>
                  <div>
                     <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Category</label>
-                    <input type="text" [ngModel]="newTemplateForm().category" (ngModelChange)="updateNewTemplateForm('category', $event)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="e.g., Validation, Utility">
+                    <input type="text" [ngModel]="newTemplateForm().category" (ngModelChange)="updateNewTemplateForm('category', $event)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="e.g., Validation, Utility">
                  </div>
                  <div>
                     <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Description</label>
-                    <textarea [ngModel]="newTemplateForm().description" (ngModelChange)="updateNewTemplateForm('description', $event)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none resize-none h-20" placeholder="Brief description of what this does..."></textarea>
+                    <textarea [ngModel]="newTemplateForm().description" (ngModelChange)="updateNewTemplateForm('description', $event)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none resize-none h-20" placeholder="Brief description of what this does..."></textarea>
                  </div>
               </div>
               <div class="p-4 border-t border-gray-100 flex justify-end gap-2 bg-gray-50">
                  <button (click)="saveTemplateModalOpen.set(false)" class="text-xs text-gray-600 hover:text-gray-800 px-4 py-2 transition-colors">Cancel</button>
-                 <button (click)="saveUserTemplate()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded transition-colors shadow-sm">Save Template</button>
+                 <button (click)="saveUserTemplate()" class="text-xs bg-primary hover:bg-primary-focus text-white font-semibold px-4 py-2 rounded transition-colors shadow-sm">Save Template</button>
               </div>
            </div>
         </div>
@@ -258,7 +258,7 @@ import { SandboxRuntime } from '../sandbox';
            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
               <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                  <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <mat-icon class="text-indigo-600">library_books</mat-icon> Function Templates
+                    <mat-icon class="text-primary">library_books</mat-icon> Function Templates
                  </h2>
                  <button (click)="templatesModalOpen.set(false)" class="text-gray-400 hover:text-gray-600 transition-colors bg-white p-1 rounded-full hover:bg-gray-200">
                     <mat-icon>close</mat-icon>
@@ -274,12 +274,12 @@ import { SandboxRuntime } from '../sandbox';
                           <div class="bg-white border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-md transition-all group flex flex-col">
                              <div class="flex items-start justify-between mb-2">
                                 <div class="flex items-start gap-3">
-                                   <div class="bg-indigo-50 text-indigo-600 p-2 rounded-lg shrink-0">
+                                   <div class="bg-primary/10 text-primary p-2 rounded-lg shrink-0">
                                       <mat-icon>{{ template.icon }}</mat-icon>
                                    </div>
                                    <div>
                                       <div class="flex items-center gap-2">
-                                         <h3 class="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1" [title]="template.name">{{ template.name }}</h3>
+                                         <h3 class="font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-1" [title]="template.name">{{ template.name }}</h3>
                                       </div>
                                       <span class="text-[10px] uppercase font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{{ template.category }}</span>
                                       <p class="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2" [title]="template.description">{{ template.description }}</p>
@@ -290,7 +290,7 @@ import { SandboxRuntime } from '../sandbox';
                                 </button>
                              </div>
                              <div class="mt-auto pt-3 border-t border-gray-100 flex justify-end gap-2">
-                                <button (click)="createFromTemplate(template)" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors font-medium">
+                                <button (click)="createFromTemplate(template)" class="text-xs bg-primary hover:bg-primary-focus text-white px-3 py-1.5 rounded transition-colors font-medium">
                                    Use Template
                                 </button>
                              </div>
@@ -304,16 +304,16 @@ import { SandboxRuntime } from '../sandbox';
                     @for (template of templates; track template.id) {
                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-md transition-all group flex flex-col">
                           <div class="flex items-start gap-3 mb-2">
-                             <div class="bg-indigo-50 text-indigo-600 p-2 rounded-lg shrink-0">
+                             <div class="bg-primary/10 text-primary p-2 rounded-lg shrink-0">
                                 <mat-icon>{{ template.icon }}</mat-icon>
                              </div>
                              <div>
-                                <h3 class="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1" [title]="template.name">{{ template.name }}</h3>
+                                <h3 class="font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-1" [title]="template.name">{{ template.name }}</h3>
                                 <p class="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2" [title]="template.description">{{ template.description }}</p>
                              </div>
                           </div>
                           <div class="mt-auto pt-3 border-t border-gray-100 flex justify-end gap-2">
-                             <button (click)="createFromTemplate(template)" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors font-medium">
+                             <button (click)="createFromTemplate(template)" class="text-xs bg-primary hover:bg-primary-focus text-white px-3 py-1.5 rounded transition-colors font-medium">
                                 Use Template
                              </button>
                           </div>

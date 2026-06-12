@@ -13,17 +13,17 @@ import { TemplateManagerService } from "../template-manager.service";
       <div class="border-b border-gray-200 flex">
         <button 
           (click)="activeTab = 'elements'"
-          [class.text-indigo-600]="activeTab === 'elements'"
+          [class.text-primary]="activeTab === 'elements'"
           [class.border-b-2]="activeTab === 'elements'"
-          [class.border-indigo-600]="activeTab === 'elements'"
+          [class.border-primary]="activeTab === 'elements'"
           [class.text-gray-500]="activeTab !== 'elements'"
           class="flex-1 py-3 text-sm font-semibold transition-colors focus:outline-none"
         >Elements</button>
         <button 
           (click)="activeTab = 'templates'"
-          [class.text-indigo-600]="activeTab === 'templates'"
+          [class.text-primary]="activeTab === 'templates'"
           [class.border-b-2]="activeTab === 'templates'"
-          [class.border-indigo-600]="activeTab === 'templates'"
+          [class.border-primary]="activeTab === 'templates'"
           [class.text-gray-500]="activeTab !== 'templates'"
           class="flex-1 py-3 text-sm font-semibold transition-colors focus:outline-none"
         >Templates</button>
@@ -43,7 +43,7 @@ import { TemplateManagerService } from "../template-manager.service";
                 [cdkDragData]="field"
                 class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-md cursor-grab hover:bg-gray-100 transition-colors"
               >
-                <div *cdkDragPlaceholder class="border-2 border-dashed border-indigo-400 bg-indigo-50 rounded-lg min-h-[60px] w-full opacity-70 transition-all"></div>
+                <div *cdkDragPlaceholder class="border-2 border-dashed border-primary/50 bg-primary/10 rounded-lg min-h-[60px] w-full opacity-70 transition-all"></div>
                 <mat-icon class="text-gray-500">{{ field.icon }}</mat-icon>
                 <span class="text-sm font-medium text-gray-700">{{
                   field.label
@@ -65,7 +65,7 @@ import { TemplateManagerService } from "../template-manager.service";
                 [cdkDragData]="template"
                 class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-md cursor-grab hover:bg-gray-100 transition-colors relative group"
               >
-                <div *cdkDragPlaceholder class="border-2 border-dashed border-indigo-400 bg-indigo-50 rounded-lg min-h-[60px] w-full opacity-70 transition-all"></div>
+                <div *cdkDragPlaceholder class="border-2 border-dashed border-primary/50 bg-primary/10 rounded-lg min-h-[60px] w-full opacity-70 transition-all"></div>
                 <mat-icon class="text-gray-500">{{ template.icon }}</mat-icon>
                 <span class="text-sm font-medium text-gray-700 flex-1">{{ template.label }}</span>
                 @if (isCustomTemplate(template)) {

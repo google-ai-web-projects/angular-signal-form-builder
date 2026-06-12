@@ -17,7 +17,7 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
     <div class="h-full flex flex-col bg-gray-50 overflow-hidden">
       <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shrink-0 shadow-sm z-10 relative">
         <div class="flex items-center gap-4 w-full">
-          <mat-icon class="text-indigo-600">api</mat-icon>
+          <mat-icon class="text-primary">api</mat-icon>
           <div class="font-bold text-gray-700 whitespace-nowrap">Service Builder</div>
           <div class="w-px h-6 bg-gray-300 mx-2"></div>
         </div>
@@ -28,14 +28,14 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
         <div class="w-64 bg-white border-r border-gray-200 h-full flex flex-col shrink-0">
           <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
             <h2 class="text-sm font-semibold text-gray-700">Saved Services</h2>
-            <button (click)="createNewService()" class="text-indigo-600 hover:text-indigo-800 transition-colors" title="Create New">
+            <button (click)="createNewService()" class="text-primary hover:text-primary-focus transition-colors" title="Create New">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">add</mat-icon>
             </button>
           </div>
           <div class="p-2 border-b border-gray-200 bg-white">
             <div class="relative">
               <mat-icon class="absolute left-2.5 top-2 text-[16px] text-gray-400">search</mat-icon>
-              <input type="text" [(ngModel)]="searchQuery" placeholder="Search services..." class="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded text-xs focus:ring-indigo-500 focus:border-indigo-500" />
+              <input type="text" [(ngModel)]="searchQuery" placeholder="Search services..." class="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded text-xs focus:ring-primary focus:border-primary" />
             </div>
           </div>
           <div class="flex-1 overflow-y-auto p-2">
@@ -48,9 +48,9 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
                     (keydown.enter)="selectService(service)"
                     tabindex="0"
                     role="button"
-                    [class.bg-indigo-50]="selectedService()?.id === service.id"
-                    [class.text-indigo-700]="selectedService()?.id === service.id"
-                    class="w-full flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-100 group transition-colors mb-1 text-left outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset"
+                    [class.bg-primary/10]="selectedService()?.id === service.id"
+                    [class.text-primary-focus]="selectedService()?.id === service.id"
+                    class="w-full flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-100 group transition-colors mb-1 text-left outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
                   >
                     <div class="flex items-center gap-2 overflow-hidden">
                       <span class="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm w-12 text-center" [ngClass]="{
@@ -88,7 +88,7 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
               <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div class="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
                   <h3 class="font-medium text-gray-800">Connection Details</h3>
-                  <button (click)="saveCurrentService()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center gap-1">
+                  <button (click)="saveCurrentService()" class="bg-primary hover:bg-primary-focus text-white px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center gap-1">
                     <mat-icon class="text-[16px] w-[16px] h-[16px]">save</mat-icon> Save Service
                   </button>
                 </div>
@@ -96,18 +96,18 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
                   <div class="flex gap-4">
                     <div class="flex-1">
                       <span class="block text-sm font-medium text-gray-700 mb-1">Service Name</span>
-                      <input type="text" [(ngModel)]="s.name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm shadow-sm transition-all" placeholder="e.g. Get Countries" />
+                      <input type="text" [(ngModel)]="s.name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm shadow-sm transition-all" placeholder="e.g. Get Countries" />
                     </div>
                     <div class="w-64">
                       <span class="block text-sm font-medium text-gray-700 mb-1">Group (Optional)</span>
-                      <input type="text" [(ngModel)]="s.group" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm shadow-sm transition-all" placeholder="e.g. Authentication" />
+                      <input type="text" [(ngModel)]="s.group" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm shadow-sm transition-all" placeholder="e.g. Authentication" />
                     </div>
                   </div>
                   
                   <div class="flex gap-2">
                     <div class="w-32">
                       <span class="block text-sm font-medium text-gray-700 mb-1">Method</span>
-                      <select [(ngModel)]="s.method" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                      <select [(ngModel)]="s.method" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm">
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
                         <option value="PUT">PUT</option>
@@ -116,7 +116,7 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
                     </div>
                     <div class="flex-1">
                       <span class="block text-sm font-medium text-gray-700 mb-1">Endpoint URL</span>
-                      <input type="text" [(ngModel)]="s.url" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono" placeholder="https://api.example.com/v1/resource" />
+                      <input type="text" [(ngModel)]="s.url" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm font-mono" placeholder="https://api.example.com/v1/resource" />
                     </div>
                   </div>
                 </div>
@@ -125,11 +125,11 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
               <!-- Headers & Query Params -->
               <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div class="border-b border-gray-200 flex">
-                  <button (click)="activeTab.set('headers')" [class.text-indigo-600]="activeTab() === 'headers'" [class.border-b-2]="activeTab() === 'headers'" [class.border-indigo-600]="activeTab() === 'headers'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Headers</button>
-                  <button (click)="activeTab.set('params')" [class.text-indigo-600]="activeTab() === 'params'" [class.border-b-2]="activeTab() === 'params'" [class.border-indigo-600]="activeTab() === 'params'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Query Params</button>
-                  <button (click)="activeTab.set('path')" [class.text-indigo-600]="activeTab() === 'path'" [class.border-b-2]="activeTab() === 'path'" [class.border-indigo-600]="activeTab() === 'path'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Path Variables</button>
+                  <button (click)="activeTab.set('headers')" [class.text-primary]="activeTab() === 'headers'" [class.border-b-2]="activeTab() === 'headers'" [class.border-primary]="activeTab() === 'headers'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Headers</button>
+                  <button (click)="activeTab.set('params')" [class.text-primary]="activeTab() === 'params'" [class.border-b-2]="activeTab() === 'params'" [class.border-primary]="activeTab() === 'params'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Query Params</button>
+                  <button (click)="activeTab.set('path')" [class.text-primary]="activeTab() === 'path'" [class.border-b-2]="activeTab() === 'path'" [class.border-primary]="activeTab() === 'path'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Path Variables</button>
                   @if (s.method !== 'GET') {
-                    <button (click)="activeTab.set('body')" [class.text-indigo-600]="activeTab() === 'body'" [class.border-b-2]="activeTab() === 'body'" [class.border-indigo-600]="activeTab() === 'body'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Body</button>
+                    <button (click)="activeTab.set('body')" [class.text-primary]="activeTab() === 'body'" [class.border-b-2]="activeTab() === 'body'" [class.border-primary]="activeTab() === 'body'" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">Body</button>
                   }
                 </div>
                 <div class="p-4">
@@ -147,7 +147,7 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
                           <button (click)="s.headers.splice($index, 1)" class="text-gray-400 hover:text-red-500 px-2"><mat-icon class="text-[18px]">close</mat-icon></button>
                         </div>
                       }
-                      <button (click)="s.headers.push({key: '', value: '', valueSource: 'static'})" class="text-sm text-indigo-600 font-medium self-start mt-2">+ Add Header</button>
+                      <button (click)="s.headers.push({key: '', value: '', valueSource: 'static'})" class="text-sm text-primary font-medium self-start mt-2">+ Add Header</button>
                     </div>
                   } @else if (activeTab() === 'params') {
                     <div class="flex flex-col gap-2">
@@ -163,7 +163,7 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
                           <button (click)="s.queryParams.splice($index, 1)" class="text-gray-400 hover:text-red-500 px-2"><mat-icon class="text-[18px]">close</mat-icon></button>
                         </div>
                       }
-                      <button (click)="s.queryParams.push({key: '', value: '', valueSource: 'static'})" class="text-sm text-indigo-600 font-medium self-start mt-2">+ Add Param</button>
+                      <button (click)="s.queryParams.push({key: '', value: '', valueSource: 'static'})" class="text-sm text-primary font-medium self-start mt-2">+ Add Param</button>
                     </div>
                   } @else if (activeTab() === 'path') {
                     <div class="flex flex-col gap-2">
@@ -180,7 +180,7 @@ import { retry, timeout, takeUntil } from 'rxjs/operators';
                           <button (click)="s.pathParams?.splice($index, 1)" class="text-gray-400 hover:text-red-500 px-2"><mat-icon class="text-[18px]">close</mat-icon></button>
                         </div>
                       }
-                      <button (click)="addPathParam(s)" class="text-sm text-indigo-600 font-medium self-start mt-2">+ Add Path Variable</button>
+                      <button (click)="addPathParam(s)" class="text-sm text-primary font-medium self-start mt-2">+ Add Path Variable</button>
                     </div>
                   } @else if (activeTab() === 'body') {
                     <textarea [(ngModel)]="s.body" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm" placeholder="{&quot;key&quot;: &quot;value&quot;}"></textarea>

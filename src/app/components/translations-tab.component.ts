@@ -31,7 +31,7 @@ import {
           <h3 class="text-sm font-semibold text-gray-800">Translations</h3>
           <button
             (click)="onAdd()"
-            class="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+            class="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-focus transition-colors"
           >
             <mat-icon class="text-[16px] w-[16px] h-[16px]">add</mat-icon> Add
           </button>
@@ -58,7 +58,7 @@ import {
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center gap-2">
                     <span
-                      class="text-[10px] font-bold px-1.5 py-0.5 bg-indigo-100 text-indigo-800 rounded uppercase"
+                      class="text-[10px] font-bold px-1.5 py-0.5 bg-primary/20 text-primary-focus rounded uppercase"
                       >{{ t.language }}</span
                     >
                     <span
@@ -78,7 +78,7 @@ import {
                     <button
                       type="button"
                       (click)="onEdit(t)"
-                      class="p-1 text-gray-400 hover:text-indigo-600 rounded"
+                      class="p-1 text-gray-400 hover:text-primary rounded"
                     >
                       <mat-icon class="text-[14px] w-[14px] h-[14px]"
                         >edit</mat-icon
@@ -161,7 +161,7 @@ import {
                 <select
                   id="languageInput"
                   formControlName="language"
-                  class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+                  class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-white"
                   (change)="onLanguageChange()"
                 >
                   <option value="" disabled selected>Select Language</option>
@@ -184,7 +184,7 @@ import {
               <select
                 id="typeInput"
                 formControlName="type"
-                class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+                class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-white"
               >
                 <option value="label">Label</option>
                 <option value="placeholder">Placeholder</option>
@@ -208,7 +208,7 @@ import {
                   type="radio"
                   formControlName="direction"
                   value="LTR"
-                  class="text-indigo-600"
+                  class="text-primary"
                 />
                 LTR
               </label>
@@ -219,7 +219,7 @@ import {
                   type="radio"
                   formControlName="direction"
                   value="RTL"
-                  class="text-indigo-600"
+                  class="text-primary"
                 />
                 RTL
               </label>
@@ -242,7 +242,7 @@ import {
                   ? 'rtl'
                   : 'ltr'
               "
-              class="w-full text-xs px-2 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y"
+              class="w-full text-xs px-2 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none resize-y"
             ></textarea>
           </div>
 
@@ -277,7 +277,7 @@ import {
             <select
               id="activationTypeInput"
               formControlName="type"
-              class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+              class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-white"
             >
               <option value="Global">Global (Applies on match)</option>
               <option value="InitOnly">
@@ -299,7 +299,7 @@ import {
                   <select
                     id="storageTypeInput"
                     formControlName="storageType"
-                    class="w-full text-xs px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+                    class="w-full text-xs px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-white"
                   >
                     <option value="local">Local Storage</option>
                     <option value="session">Session Storage</option>
@@ -314,7 +314,7 @@ import {
                     type="text"
                     formControlName="key"
                     placeholder="e.g. app_lang"
-                    class="w-full text-xs px-2 py-1 border border-gray-300 rounded outline-none focus:border-indigo-500"
+                    class="w-full text-xs px-2 py-1 border border-gray-300 rounded outline-none focus:border-primary"
                   />
                 </div>
                 <div class="col-span-2">
@@ -326,7 +326,7 @@ import {
                     type="text"
                     formControlName="expectedValue"
                     placeholder="e.g. ar"
-                    class="w-full text-xs px-2 py-1 border border-gray-300 rounded outline-none focus:border-indigo-500"
+                    class="w-full text-xs px-2 py-1 border border-gray-300 rounded outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -343,7 +343,7 @@ import {
                 type="number"
                 formControlName="priority"
                 placeholder="10"
-                class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none"
               />
             </div>
             <div>
@@ -355,7 +355,7 @@ import {
                 type="text"
                 formControlName="fallbackLanguage"
                 placeholder="e.g. en"
-                class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -373,7 +373,7 @@ import {
             <button
               type="submit"
               [disabled]="translationForm.invalid"
-              class="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded hover:bg-primary-focus transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Translation
             </button>

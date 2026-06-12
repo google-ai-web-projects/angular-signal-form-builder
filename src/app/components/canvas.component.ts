@@ -42,7 +42,7 @@ import { FileUploadComponent } from "./file-upload.component";
           </div>
           <button
             (click)="copySchema()"
-            class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
+            class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
           >
             <mat-icon class="text-[18px] w-[18px] h-[18px]"
               >content_copy</mat-icon
@@ -110,11 +110,11 @@ import { FileUploadComponent } from "./file-upload.component";
                   [style.grid-column]="
                     layout ? 'span 1' : 'span ' + (field.colSpan || 12)
                   "
-                  class="border-2 border-dashed border-indigo-400 bg-indigo-50 rounded-lg min-h-[80px] w-full opacity-70 transition-all"
+                  class="border-2 border-dashed border-primary/50 bg-primary/10 rounded-lg min-h-[80px] w-full opacity-70 transition-all"
                 ></div>
 
                 <div
-                  class="absolute right-0 top-0 bottom-0 w-3 cursor-col-resize hover:bg-indigo-100 opacity-0 group-hover:opacity-100 transition-opacity rounded-r-lg z-10"
+                  class="absolute right-0 top-0 bottom-0 w-3 cursor-col-resize hover:bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-r-lg z-10"
                   (mousedown)="startResize($event, field)"
                 ></div>
 
@@ -123,7 +123,7 @@ import { FileUploadComponent } from "./file-upload.component";
                 >
                   <button
                     (click)="duplicateField(field.id, $event)"
-                    class="p-1 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                    class="p-1 text-gray-500 hover:text-primary hover:bg-primary/10 rounded transition-colors"
                     title="Duplicate Field"
                   >
                     <mat-icon class="text-sm">content_copy</mat-icon>
@@ -290,10 +290,10 @@ import { FileUploadComponent } from "./file-upload.component";
                           [type]="field.buttonType || 'button'"
                           class="w-full flex justify-center items-center gap-2 px-4 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 h-[38px]"
                           [ngClass]="{
-                            'bg-indigo-600 text-white hover:bg-indigo-700 border-transparent focus:ring-indigo-500':
+                            'bg-primary text-white hover:bg-primary-focus border-transparent focus:ring-primary':
                               field.buttonType === 'submit' ||
                               !field.buttonType,
-                            'bg-white text-gray-700 hover:bg-gray-50 border-gray-300 focus:ring-indigo-500':
+                            'bg-white text-gray-700 hover:bg-gray-50 border-gray-300 focus:ring-primary':
                               field.buttonType === 'button',
                             'bg-red-600 text-white hover:bg-red-700 border-transparent focus:ring-red-500':
                               field.buttonType === 'reset',
@@ -439,7 +439,7 @@ import { FileUploadComponent } from "./file-upload.component";
                           <input
                             type="text"
                             disabled
-                            class="block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md cursor-not-allowed bg-gray-50 text-gray-500"
+                            class="block w-full focus:ring-primary focus:border-primary sm:text-sm border-gray-300 rounded-md cursor-not-allowed bg-gray-50 text-gray-500"
                             [ngClass]="{ 'pl-10': field.icon }"
                             [placeholder]="field.placeholder || ''"
                             [value]="field.defaultValue || ''"
@@ -636,7 +636,7 @@ import { FileUploadComponent } from "./file-upload.component";
                           <input
                             type="checkbox"
                             disabled
-                            class="rounded border-gray-300 text-indigo-600 cursor-not-allowed"
+                            class="rounded border-gray-300 text-primary cursor-not-allowed"
                           />
                           <span class="text-sm text-gray-600"
                             >Checkbox Label</span
@@ -650,7 +650,7 @@ import { FileUploadComponent } from "./file-upload.component";
                               <input
                                 type="radio"
                                 disabled
-                                class="border-gray-300 text-indigo-600 cursor-not-allowed"
+                                class="border-gray-300 text-primary cursor-not-allowed"
                               />
                               <span class="text-sm text-gray-600">{{
                                 opt.label

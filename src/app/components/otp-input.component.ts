@@ -25,7 +25,7 @@ import { CommonModule } from '@angular/common';
           (keydown)="onKeyDown($event, $index)"
           (focus)="onFocus($event)"
           (blur)="onBlur()"
-          class="w-12 h-12 text-center text-lg font-semibold border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+          class="w-12 h-12 text-center text-lg font-semibold border rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
           [ngClass]="{
             'border-gray-300': !disabled && !invalid,
             'border-red-300': invalid && !disabled,

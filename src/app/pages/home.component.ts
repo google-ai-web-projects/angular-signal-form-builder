@@ -8,102 +8,93 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, RouterModule, MatIconModule],
   template: `
-    <div class="min-h-screen bg-gray-50">
-      <!-- Navigation -->
-      <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between h-16">
-            <div class="flex">
-              <div class="flex-shrink-0 flex items-center gap-2">
-                <mat-icon class="text-indigo-600">view_quilt</mat-icon>
-                <span class="text-xl font-bold text-gray-800 tracking-tight">FormBuilder Pro</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-4">
-              <a routerLink="/builder" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">App Builder</a>
-              <a routerLink="/register" class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">Register</a>
-            </div>
+    <div class="min-h-screen bg-canvas">
+      <!-- Global Navigation -->
+      <nav class="global-nav justify-center">
+        <div class="max-w-7xl w-full flex justify-between items-center">
+          <div class="flex items-center gap-2 text-white">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">view_quilt</mat-icon>
+          </div>
+          <div class="flex items-center gap-6">
+            <a routerLink="/" class="nav-link text-white hover:opacity-80">Store</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">Mac</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">iPad</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">iPhone</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">Watch</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">Vision</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">AirPods</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">TV & Home</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">Entertainment</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">Accessories</a>
+            <a routerLink="/builder" class="nav-link text-white hover:opacity-80">Support</a>
+          </div>
+          <div class="flex items-center gap-4 text-white">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">search</mat-icon>
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">shopping_bag</mat-icon>
           </div>
         </div>
       </nav>
 
+      <!-- Sub Navigation -->
+      <div class="sub-nav-frosted justify-center border-b border-gray-200">
+        <div class="max-w-7xl w-full flex justify-between items-center">
+           <span class="text-xl font-semibold text-ink tracking-tight">FormBuilder Pro</span>
+           <div class="flex items-center gap-4">
+             <span class="text-xs text-ink hover:text-primary cursor-pointer transition-colors">Overview</span>
+             <span class="text-xs text-ink hover:text-primary cursor-pointer transition-colors">Tech Specs</span>
+             <a routerLink="/builder" class="button-primary text-xs px-3 py-1.5 h-auto">Buy</a>
+           </div>
+        </div>
+      </div>
+
       <!-- Hero Section -->
-      <div class="relative bg-white overflow-hidden">
-        <div class="max-w-7xl mx-auto">
-          <div class="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-20">
-            <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div class="sm:text-center lg:text-left">
-                <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span class="block xl:inline">Build forms</span>
-                  <span class="block text-indigo-600 xl:inline"> faster than ever</span>
-                </h1>
-                <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Create powerful, dynamic forms with our intuitive drag-and-drop builder. No coding required. Collect data securely and efficiently.
-                </p>
-                <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div class="rounded-md shadow">
-                    <a routerLink="/builder" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition-colors">
-                      Get started
-                    </a>
-                  </div>
-                  <div class="mt-3 sm:mt-0 sm:ml-3">
-                    <a routerLink="/register" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10 transition-colors">
-                      Sign up
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </main>
+      <div class="product-tile-light text-center relative overflow-hidden">
+        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 mt-12 mb-16">
+          <h2 class="hero-display text-ink mb-2">FormBuilder Pro.</h2>
+          <p class="display-md text-ink font-normal mb-8">Mind-blowing power. <br/> Forms out of this world.</p>
+          <div class="flex justify-center gap-4">
+            <a routerLink="/builder" class="button-primary button-large px-6 py-3">
+              Get started
+            </a>
+            <a routerLink="/register" class="button-secondary-pill button-large px-6 py-3">
+              Sign up >
+            </a>
           </div>
         </div>
-        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-gray-50 flex items-center justify-center p-12">
-          <div class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-            <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-red-400"></div>
-              <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-              <div class="w-3 h-3 rounded-full bg-green-400"></div>
-            </div>
-            <div class="p-6 space-y-4">
-              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div class="h-10 bg-gray-100 border border-gray-200 rounded"></div>
-              <div class="h-4 bg-gray-200 rounded w-1/3 mt-6"></div>
-              <div class="h-10 bg-gray-100 border border-gray-200 rounded"></div>
-              <div class="h-10 bg-indigo-600 rounded mt-6 w-1/3"></div>
-            </div>
+        
+        <!-- Hero Image Mock -->
+        <div class="w-full max-w-5xl mx-auto bg-surface-pearl rounded-t-3xl shadow-2xl border border-gray-100 overflow-hidden relative" style="height: 400px;">
+          <div class="absolute inset-0 flex items-center justify-center text-ink-muted-48">
+            [ Application Screenshot / Visualization ]
           </div>
         </div>
       </div>
 
-      <!-- Features/Dummy Data Section -->
-      <div class="py-12 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="lg:text-center">
-            <h2 class="text-base text-indigo-600 font-semibold tracking-wide uppercase">Features</h2>
-            <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              A better way to collect data
-            </p>
-            <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Everything you need to build, publish, and analyze forms in one place.
-            </p>
-          </div>
+      <!-- Features Section -->
+      <div class="product-tile-dark">
+        <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
+          <h2 class="display-lg text-white mb-4">A better way to collect data.</h2>
+          <p class="lead-airy text-gray-400 max-w-3xl mx-auto">
+            Everything you need to build, publish, and analyze forms in one place. Engineered for maximum performance and efficiency.
+          </p>
+        </div>
 
-          <div class="mt-10">
-            <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-              @for (feature of features; track feature.title) {
-                <div class="relative">
-                  <dt>
-                    <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
-                      <mat-icon>{{ feature.icon }}</mat-icon>
-                    </div>
-                    <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ feature.title }}</p>
-                  </dt>
-                  <dd class="mt-2 ml-16 text-base text-gray-500">
-                    {{ feature.description }}
-                  </dd>
-                </div>
-              }
-            </dl>
-          </div>
+        <div class="max-w-7xl mx-auto px-4">
+          <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-16">
+            @for (feature of features; track feature.title) {
+              <div class="relative text-left">
+                <dt>
+                  <div class="mb-4 text-primary">
+                    <mat-icon style="font-size: 32px; width: 32px; height: 32px;">{{ feature.icon }}</mat-icon>
+                  </div>
+                  <p class="text-2xl font-semibold text-white mb-2">{{ feature.title }}</p>
+                </dt>
+                <dd class="text-lg text-gray-400 font-light">
+                  {{ feature.description }}
+                </dd>
+              </div>
+            }
+          </dl>
         </div>
       </div>
     </div>

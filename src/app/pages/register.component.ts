@@ -8,21 +8,21 @@ import { DynamicFormComponent, DynamicField } from '../components/dynamic-form.c
   standalone: true,
   imports: [CommonModule, RouterModule, DynamicFormComponent],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div class="product-tile-parchment min-h-screen justify-center py-12 sm:px-6 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <h2 class="display-md text-ink">
           Create your account
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
+        <p class="mt-2 text-sm text-ink-muted-48">
           Or
-          <a routerLink="/" class="font-medium text-indigo-600 hover:text-indigo-500">
+          <a routerLink="/" class="font-medium text-primary hover:text-primary-focus">
             return to home
           </a>
         </p>
       </div>
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div class="bg-canvas py-8 px-4 border border-hairline rounded-lg sm:px-10 shadow-sm">
           <app-dynamic-form
             [fields]="registerFields"
             submitLabel="Register"

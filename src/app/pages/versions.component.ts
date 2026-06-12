@@ -26,8 +26,8 @@ interface FormVersion {
            <p class="text-xs text-gray-500 mt-1">Save snapshots of your form to revert later.</p>
         </div>
         <div class="p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0 flex flex-col gap-2">
-           <input type="text" [ngModel]="newVersionName()" (ngModelChange)="newVersionName.set($event)" placeholder="Version Name (e.g., Initial Release)" class="w-full text-sm px-3 py-1.5 border border-gray-300 rounded font-medium focus:ring-1 focus:ring-indigo-500 outline-none">
-           <button (click)="saveCurrentVersion()" [disabled]="!newVersionName().trim()" class="bg-indigo-600 hover:bg-indigo-700 text-white disabled:bg-indigo-300 px-3 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-colors">
+           <input type="text" [ngModel]="newVersionName()" (ngModelChange)="newVersionName.set($event)" placeholder="Version Name (e.g., Initial Release)" class="w-full text-sm px-3 py-1.5 border border-gray-300 rounded font-medium focus:ring-1 focus:ring-primary outline-none">
+           <button (click)="saveCurrentVersion()" [disabled]="!newVersionName().trim()" class="bg-primary hover:bg-primary-focus text-white disabled:bg-indigo-300 px-3 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-colors">
               <mat-icon class="text-[16px] w-[16px] h-[16px]">save</mat-icon> Save Current State
            </button>
         </div>
@@ -42,8 +42,8 @@ interface FormVersion {
             <ul class="divide-y divide-gray-100">
               @for (version of versions(); track version.id) {
                 <li>
-                  <button (click)="selectVersion(version)" [class.bg-indigo-50]="selectedVersion()?.id === version.id" class="w-full text-left p-4 hover:bg-gray-50 transition-colors focus:outline-none flex flex-col items-start gap-1">
-                    <span class="text-sm font-semibold" [class.text-indigo-700]="selectedVersion()?.id === version.id" [class.text-gray-800]="selectedVersion()?.id !== version.id">
+                  <button (click)="selectVersion(version)" [class.bg-primary/10]="selectedVersion()?.id === version.id" class="w-full text-left p-4 hover:bg-gray-50 transition-colors focus:outline-none flex flex-col items-start gap-1">
+                    <span class="text-sm font-semibold" [class.text-primary-focus]="selectedVersion()?.id === version.id" [class.text-gray-800]="selectedVersion()?.id !== version.id">
                       {{ version.name }}
                     </span>
                     <span class="text-xs text-gray-400 font-mono">{{ formatDate(version.timestamp) }}</span>
@@ -66,7 +66,7 @@ interface FormVersion {
                 <button (click)="deleteSelectedVersion()" class="bg-white border border-gray-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-gray-700 px-3 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-colors shadow-sm">
                    <mat-icon class="text-[16px] w-[16px] h-[16px]">delete</mat-icon> Delete
                 </button>
-                <button (click)="revertToSelectedVersion()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-colors shadow-sm">
+                <button (click)="revertToSelectedVersion()" class="bg-primary hover:bg-primary-focus text-white px-3 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-colors shadow-sm">
                    <mat-icon class="text-[16px] w-[16px] h-[16px]">restore</mat-icon> Revert to Version
                 </button>
              </div>

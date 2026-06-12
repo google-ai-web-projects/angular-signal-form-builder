@@ -97,24 +97,24 @@ export class ConfirmDialogComponent {}
           <div class="flex">
             <button
               (click)="activeTab.set('form')"
-              [class.border-indigo-500]="activeTab() === 'form'"
-              [class.text-indigo-600]="activeTab() === 'form'"
+              [class.border-primary]="activeTab() === 'form'"
+              [class.text-primary]="activeTab() === 'form'"
               class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
               Live Form
             </button>
             <button
               (click)="activeTab.set('json')"
-              [class.border-indigo-500]="activeTab() === 'json'"
-              [class.text-indigo-600]="activeTab() === 'json'"
+              [class.border-primary]="activeTab() === 'json'"
+              [class.text-primary]="activeTab() === 'json'"
               class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
               JSON & Export
             </button>
             <button
               (click)="activeTab.set('simulation')"
-              [class.border-indigo-500]="activeTab() === 'simulation'"
-              [class.text-indigo-600]="activeTab() === 'simulation'"
+              [class.border-primary]="activeTab() === 'simulation'"
+              [class.text-primary]="activeTab() === 'simulation'"
               class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
               Simulation
@@ -139,7 +139,7 @@ export class ConfirmDialogComponent {}
                 id="previewLangSelect"
                 [ngModel]="i18n.currentLanguage()"
                 (ngModelChange)="i18n.setLanguage($event)"
-                class="text-sm border border-gray-200 bg-white font-medium text-gray-700 py-1 pl-2 pr-6 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer outline-none"
+                class="text-sm border border-gray-200 bg-white font-medium text-gray-700 py-1 pl-2 pr-6 rounded-md focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer outline-none"
               >
                 @for (
                   lang of formBuilder.formConfig().global.i18n.languages;
@@ -165,7 +165,7 @@ export class ConfirmDialogComponent {}
               [class.mx-auto]="activeTab() === 'form'"
             >
               <div
-                class="bg-indigo-50/50 px-8 py-6 border-b border-gray-100 flex items-center justify-between"
+                class="bg-primary/10/50 px-8 py-6 border-b border-gray-100 flex items-center justify-between"
               >
                 <div>
                   <h2 class="text-xl font-bold text-gray-800">Live Preview</h2>
@@ -191,7 +191,7 @@ export class ConfirmDialogComponent {}
                     class="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-b-xl border-t border-gray-100"
                   >
                     <mat-icon
-                      class="text-indigo-600 animate-spin mb-4"
+                      class="text-primary animate-spin mb-4"
                       style="font-size: 32px; width: 32px; height: 32px;"
                       >refresh</mat-icon
                     >
@@ -430,7 +430,7 @@ export class ConfirmDialogComponent {}
                                           field.fields || []
                                         )
                                       "
-                                      class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-md hover:bg-indigo-100 transition-colors"
+                                      class="text-sm font-medium text-primary hover:text-primary-focus flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-md hover:bg-primary/20 transition-colors"
                                     >
                                       <mat-icon
                                         class="text-[18px] w-[18px] h-[18px]"
@@ -618,7 +618,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
+                                        'border-gray-300 focus:ring-primary focus:border-primary':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -699,7 +699,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
+                                        'border-gray-300 focus:ring-primary focus:border-primary':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -749,7 +749,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
+                                        'border-gray-300 focus:ring-primary focus:border-primary':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -810,7 +810,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
+                                        'border-gray-300 focus:ring-primary focus:border-primary':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -999,7 +999,7 @@ export class ConfirmDialogComponent {}
                                         formGroup.get(field.name)?.invalid &&
                                         (formGroup.get(field.name)?.dirty ||
                                           formGroup.get(field.name)?.touched),
-                                      'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
+                                      'border-gray-300 focus:ring-primary focus:border-primary':
                                         !(
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
@@ -1058,7 +1058,7 @@ export class ConfirmDialogComponent {}
                                       [id]="'live-' + field.id"
                                       type="checkbox"
                                       [formControlName]="field.name"
-                                      class="rounded text-indigo-600 focus:ring-indigo-500"
+                                      class="rounded text-primary focus:ring-primary"
                                       [ngClass]="{
                                         'border-red-300':
                                           formGroup.get(field.name)?.invalid &&
@@ -1097,7 +1097,7 @@ export class ConfirmDialogComponent {}
                                           [id]="
                                             'live-' + field.id + '-' + opt.value
                                           "
-                                          class="text-indigo-600 focus:ring-indigo-500"
+                                          class="text-primary focus:ring-primary"
                                           [ngClass]="{
                                             'border-red-300':
                                               formGroup.get(field.name)
@@ -1178,10 +1178,10 @@ export class ConfirmDialogComponent {}
                                     [disabled]="disabledFields()[field.id]"
                                     class="w-full flex justify-center items-center gap-2 px-4 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px]"
                                     [ngClass]="{
-                                      'bg-indigo-600 text-white hover:bg-indigo-700 border-transparent focus:ring-indigo-500':
+                                      'bg-primary text-white hover:bg-primary-focus border-transparent focus:ring-primary':
                                         field.buttonType === 'submit' ||
                                         !field.buttonType,
-                                      'bg-white text-gray-700 hover:bg-gray-50 border-gray-300 focus:ring-indigo-500':
+                                      'bg-white text-gray-700 hover:bg-gray-50 border-gray-300 focus:ring-primary':
                                         field.buttonType === 'button',
                                       'bg-red-600 text-white hover:bg-red-700 border-transparent focus:ring-red-500':
                                         field.buttonType === 'reset',
@@ -1382,7 +1382,7 @@ export class ConfirmDialogComponent {}
                                     @if (field.multiSelect) {
                                       <!-- Multi-select chips area inside input lookalike -->
                                       <div
-                                        class="flex flex-wrap items-center gap-1 w-full border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow min-h-[38px] py-1"
+                                        class="flex flex-wrap items-center gap-1 w-full border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-primary transition-shadow min-h-[38px] py-1"
                                         [ngClass]="{
                                           'pl-10': field.icon,
                                           'opacity-50 cursor-not-allowed bg-gray-50':
@@ -1405,12 +1405,12 @@ export class ConfirmDialogComponent {}
                                           track $index
                                         ) {
                                           <span
-                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
+                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary-focus"
                                           >
                                             {{ getDisplayLabel(item, field) }}
                                             <button
                                               type="button"
-                                              class="text-indigo-600 hover:text-indigo-900 focus:outline-none"
+                                              class="text-primary hover:text-indigo-900 focus:outline-none"
                                               (click)="
                                                 removeSelectedItem(
                                                   field,
@@ -1460,7 +1460,7 @@ export class ConfirmDialogComponent {}
                                     } @else {
                                       <input
                                         type="text"
-                                        class="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-[38px]"
+                                        class="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-primary focus:border-primary h-[38px]"
                                         [ngClass]="{
                                           'pl-10': field.icon,
                                           'bg-gray-50 text-gray-500 cursor-not-allowed opacity-70':
@@ -1543,7 +1543,7 @@ export class ConfirmDialogComponent {}
                                             track option
                                           ) {
                                             <div
-                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50 hover:text-indigo-900"
+                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary/10 hover:text-indigo-900"
                                               (click)="
                                                 selectAutocompleteOption(
                                                   field,
@@ -1595,7 +1595,7 @@ export class ConfirmDialogComponent {}
                                                 isOptionSelected(field, option)
                                               ) {
                                                 <span
-                                                  class="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600"
+                                                  class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary"
                                                 >
                                                   <mat-icon
                                                     class="w-5 h-5 text-[20px]"
@@ -1731,7 +1731,7 @@ export class ConfirmDialogComponent {}
                       </div>
                       @if (log.payload) {
                         <pre
-                          class="mt-2 pl-2 border-l-2 border-indigo-500/50 text-indigo-300 overflow-x-auto bg-gray-950 p-2 rounded"
+                          class="mt-2 pl-2 border-l-2 border-primary/50 text-indigo-300 overflow-x-auto bg-gray-950 p-2 rounded"
                           >{{ log.payload | json }}</pre
                         >
                       }
@@ -1772,16 +1772,16 @@ export class ConfirmDialogComponent {}
                 <div class="flex items-center gap-2 mb-4">
                   <button
                     (click)="format.set('object')"
-                    [class.bg-indigo-100]="format() === 'object'"
-                    [class.text-indigo-700]="format() === 'object'"
+                    [class.bg-primary/20]="format() === 'object'"
+                    [class.text-primary-focus]="format() === 'object'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Object
                   </button>
                   <button
                     (click)="format.set('base64')"
-                    [class.bg-indigo-100]="format() === 'base64'"
-                    [class.text-indigo-700]="format() === 'base64'"
+                    [class.bg-primary/20]="format() === 'base64'"
+                    [class.text-primary-focus]="format() === 'base64'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Base64
@@ -1789,7 +1789,7 @@ export class ConfirmDialogComponent {}
                   <div class="flex-1"></div>
                   <button
                     (click)="copyToClipboard()"
-                    class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
+                    class="flex items-center gap-1 text-primary hover:text-primary-focus text-sm font-medium transition-colors"
                   >
                     <mat-icon class="text-[18px] w-[18px] h-[18px]"
                       >content_copy</mat-icon
@@ -1807,16 +1807,16 @@ export class ConfirmDialogComponent {}
                   <pre
                     class="bg-gray-800 text-green-400 p-4 rounded-md overflow-auto text-xs font-mono h-[300px] border-2 transition-colors"
                     [class.border-transparent]="!isDraggingFile()"
-                    [class.border-indigo-500]="isDraggingFile()"
+                    [class.border-primary]="isDraggingFile()"
                     >{{ getFormattedData() }}</pre
                   >
 
                   @if (isDraggingFile()) {
                     <div
-                      class="absolute inset-0 bg-indigo-500/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
+                      class="absolute inset-0 bg-primary/100/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
                     >
                       <div
-                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-indigo-700 font-medium"
+                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-primary-focus font-medium"
                       >
                         <mat-icon>upload_file</mat-icon> Drop Schema JSON to
                         import
@@ -1877,16 +1877,16 @@ export class ConfirmDialogComponent {}
                 <div class="flex items-center gap-2 mb-4">
                   <button
                     (click)="dataFormat.set('object')"
-                    [class.bg-indigo-100]="dataFormat() === 'object'"
-                    [class.text-indigo-700]="dataFormat() === 'object'"
+                    [class.bg-primary/20]="dataFormat() === 'object'"
+                    [class.text-primary-focus]="dataFormat() === 'object'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Object
                   </button>
                   <button
                     (click)="dataFormat.set('base64')"
-                    [class.bg-indigo-100]="dataFormat() === 'base64'"
-                    [class.text-indigo-700]="dataFormat() === 'base64'"
+                    [class.bg-primary/20]="dataFormat() === 'base64'"
+                    [class.text-primary-focus]="dataFormat() === 'base64'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Base64
@@ -1894,7 +1894,7 @@ export class ConfirmDialogComponent {}
                   <div class="flex-1"></div>
                   <button
                     (click)="copyDataToClipboard()"
-                    class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
+                    class="flex items-center gap-1 text-primary hover:text-primary-focus text-sm font-medium transition-colors"
                   >
                     <mat-icon class="text-[18px] w-[18px] h-[18px]"
                       >content_copy</mat-icon
@@ -1912,16 +1912,16 @@ export class ConfirmDialogComponent {}
                   <pre
                     class="bg-gray-800 text-green-400 p-4 rounded-md overflow-auto text-xs font-mono h-[300px] border-2 transition-colors"
                     [class.border-transparent]="!isDraggingDataFile()"
-                    [class.border-indigo-500]="isDraggingDataFile()"
+                    [class.border-primary]="isDraggingDataFile()"
                     >{{ getFormattedDataValues() }}</pre
                   >
 
                   @if (isDraggingDataFile()) {
                     <div
-                      class="absolute inset-0 bg-indigo-500/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
+                      class="absolute inset-0 bg-primary/100/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
                     >
                       <div
-                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-indigo-700 font-medium"
+                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-primary-focus font-medium"
                       >
                         <mat-icon>upload_file</mat-icon> Drop Data JSON to
                         import
@@ -2029,7 +2029,7 @@ export class ConfirmDialogComponent {}
             </p>
             <textarea
               [formControl]="fillJsonControl"
-              class="w-full h-64 border border-gray-300 rounded-md p-3 font-mono text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full h-64 border border-gray-300 rounded-md p-3 font-mono text-sm focus:ring-primary focus:border-primary"
               placeholder='{ "firstName": "John", "lastName": "Doe" }'
             ></textarea>
             @if (fillJsonError()) {
@@ -2047,7 +2047,7 @@ export class ConfirmDialogComponent {}
             </button>
             <button
               (click)="applyJsonValues()"
-              class="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-md text-sm font-medium transition-colors"
+              class="px-4 py-2 bg-primary text-white hover:bg-primary-focus rounded-md text-sm font-medium transition-colors"
             >
               Apply Values
             </button>

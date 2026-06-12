@@ -27,8 +27,8 @@ export interface FileData {
     <div class="file-upload-container">
       <div 
         class="border-2 border-dashed rounded-lg p-6 text-center transition-colors relative"
-        [class.border-indigo-500]="isDragging()"
-        [class.bg-indigo-50]="isDragging()"
+        [class.border-primary]="isDragging()"
+        [class.bg-primary/10]="isDragging()"
         [class.border-gray-300]="!isDragging() && !disabled()"
         [class.bg-gray-50]="disabled()"
         [class.cursor-not-allowed]="disabled()"
@@ -49,7 +49,7 @@ export interface FileData {
         
         <mat-icon class="text-4xl text-gray-400 mb-2">cloud_upload</mat-icon>
         <p class="text-sm text-gray-600 mb-1">
-          <span class="font-medium text-indigo-600">Click to upload</span> or drag and drop
+          <span class="font-medium text-primary">Click to upload</span> or drag and drop
         </p>
         <p class="text-xs text-gray-500">
           {{ allowedFileTypes() || 'Any file' }} 
@@ -83,7 +83,7 @@ export interface FileData {
               
               <div class="flex items-center space-x-2">
                 @if (file.previewUrl) {
-                  <button type="button" (click)="viewFile(file)" class="p-1 text-gray-400 hover:text-indigo-600 transition-colors" title="View">
+                  <button type="button" (click)="viewFile(file)" class="p-1 text-gray-400 hover:text-primary transition-colors" title="View">
                     <mat-icon class="text-[18px] w-[18px] h-[18px]">visibility</mat-icon>
                   </button>
                 }

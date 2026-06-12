@@ -25,10 +25,10 @@ import { VersionsComponent } from './versions.component';
   imports: [CommonModule, FormsModule, SidebarComponent, CanvasComponent, PropertiesComponent, PreviewComponent, BlockBuilderComponent, ServiceBuilderComponent, SubmitServiceBlockComponent, SettingsComponent, FunctionBuilderComponent, VersionsComponent, MatIconModule, DragDropModule, RouterModule],
   template: `
     <div class="h-screen flex flex-col bg-gray-100 overflow-hidden font-sans" cdkDropListGroup>
-      <header class="bg-white border-b border-gray-200 px-4 md:px-6 py-2.5 flex items-center justify-between shrink-0 gap-4">
+      <header class="sub-nav-frosted border-b border-gray-200">
         <div class="flex items-center gap-2 flex-shrink-0 lg:w-1/4">
           <a routerLink="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div class="bg-indigo-600 text-white p-1.5 rounded-lg flex items-center justify-center">
+            <div class="bg-primary text-white p-1.5 rounded-lg flex items-center justify-center">
               <mat-icon class="text-[20px] w-[20px] h-[20px]">view_quilt</mat-icon>
             </div>
             <h1 class="text-lg font-bold text-gray-800 tracking-tight hidden lg:block">{{ formBuilder.formConfig().global.formDefinition.name || 'Signal Builder' }}</h1>
@@ -36,28 +36,28 @@ import { VersionsComponent } from './versions.component';
         </div>
         
         <div class="flex items-center bg-gray-100/80 backdrop-blur-sm p-1 rounded-xl flex-shrink-0 overflow-x-auto no-scrollbar max-w-full">
-          <button (click)="viewMode.set('editor')" [class.bg-white]="viewMode() === 'editor'" [class.shadow-sm]="viewMode() === 'editor'" [class.text-indigo-600]="viewMode() === 'editor'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('editor')" [class.bg-white]="viewMode() === 'editor'" [class.shadow-sm]="viewMode() === 'editor'" [class.text-primary]="viewMode() === 'editor'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">edit</mat-icon> <span class="hidden md:inline">Editor</span>
           </button>
-          <button (click)="viewMode.set('block-builder')" [class.bg-white]="viewMode() === 'block-builder'" [class.shadow-sm]="viewMode() === 'block-builder'" [class.text-indigo-600]="viewMode() === 'block-builder'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('block-builder')" [class.bg-white]="viewMode() === 'block-builder'" [class.shadow-sm]="viewMode() === 'block-builder'" [class.text-primary]="viewMode() === 'block-builder'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">extension</mat-icon> <span class="hidden md:inline">Blocks</span>
           </button>
-          <button (click)="viewMode.set('service-builder')" [class.bg-white]="viewMode() === 'service-builder'" [class.shadow-sm]="viewMode() === 'service-builder'" [class.text-indigo-600]="viewMode() === 'service-builder'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('service-builder')" [class.bg-white]="viewMode() === 'service-builder'" [class.shadow-sm]="viewMode() === 'service-builder'" [class.text-primary]="viewMode() === 'service-builder'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">api</mat-icon> <span class="hidden md:inline">Services</span>
           </button>
-          <button (click)="viewMode.set('function-builder')" [class.bg-white]="viewMode() === 'function-builder'" [class.shadow-sm]="viewMode() === 'function-builder'" [class.text-indigo-600]="viewMode() === 'function-builder'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('function-builder')" [class.bg-white]="viewMode() === 'function-builder'" [class.shadow-sm]="viewMode() === 'function-builder'" [class.text-primary]="viewMode() === 'function-builder'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">functions</mat-icon> <span class="hidden md:inline">Functions</span>
           </button>
-          <button (click)="viewMode.set('submit-service-block')" [class.bg-white]="viewMode() === 'submit-service-block'" [class.shadow-sm]="viewMode() === 'submit-service-block'" [class.text-indigo-600]="viewMode() === 'submit-service-block'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('submit-service-block')" [class.bg-white]="viewMode() === 'submit-service-block'" [class.shadow-sm]="viewMode() === 'submit-service-block'" [class.text-primary]="viewMode() === 'submit-service-block'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">publish</mat-icon> <span class="hidden md:inline">Submissions</span>
           </button>
-          <button (click)="viewMode.set('settings')" [class.bg-white]="viewMode() === 'settings'" [class.shadow-sm]="viewMode() === 'settings'" [class.text-indigo-600]="viewMode() === 'settings'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('settings')" [class.bg-white]="viewMode() === 'settings'" [class.shadow-sm]="viewMode() === 'settings'" [class.text-primary]="viewMode() === 'settings'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">settings</mat-icon> <span class="hidden md:inline">Settings</span>
           </button>
-          <button (click)="viewMode.set('versions')" [class.bg-white]="viewMode() === 'versions'" [class.shadow-sm]="viewMode() === 'versions'" [class.text-indigo-600]="viewMode() === 'versions'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('versions')" [class.bg-white]="viewMode() === 'versions'" [class.shadow-sm]="viewMode() === 'versions'" [class.text-primary]="viewMode() === 'versions'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">history</mat-icon> <span class="hidden md:inline">Versions</span>
           </button>
-          <button (click)="viewMode.set('preview')" [class.bg-white]="viewMode() === 'preview'" [class.shadow-sm]="viewMode() === 'preview'" [class.text-indigo-600]="viewMode() === 'preview'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button (click)="viewMode.set('preview')" [class.bg-white]="viewMode() === 'preview'" [class.shadow-sm]="viewMode() === 'preview'" [class.text-primary]="viewMode() === 'preview'" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2 whitespace-nowrap">
             <mat-icon class="text-[18px] w-[18px] h-[18px]">visibility</mat-icon> <span class="hidden md:inline">Preview</span>
           </button>
         </div>
@@ -91,17 +91,17 @@ import { VersionsComponent } from './versions.component';
             <div class="w-px h-6 bg-gray-200 hidden sm:block mx-1"></div>
             
             <div class="flex items-center gap-1">
-              <button (click)="formBuilder.saveToServer()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-indigo-600 transition-all flex items-center justify-center" title="Save to Server">
+              <button (click)="formBuilder.saveToServer()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary transition-all flex items-center justify-center" title="Save to Server">
                 <mat-icon class="text-[20px] w-[20px] h-[20px]">save</mat-icon>
               </button>
-              <button (click)="formBuilder.loadFromServer()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-indigo-600 transition-all flex items-center justify-center" title="Load from Server">
+              <button (click)="formBuilder.loadFromServer()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary transition-all flex items-center justify-center" title="Load from Server">
                 <mat-icon class="text-[20px] w-[20px] h-[20px]">cloud_download</mat-icon>
               </button>
               <div class="w-px h-6 bg-gray-200 hidden sm:block mx-1"></div>
-              <button (click)="exportConfig()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-indigo-600 transition-all flex items-center justify-center" [title]="'Export ' + (formBuilder.formConfig().global.formDefinition.name || 'Configuration')">
+              <button (click)="exportConfig()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary transition-all flex items-center justify-center" [title]="'Export ' + (formBuilder.formConfig().global.formDefinition.name || 'Configuration')">
                 <mat-icon class="text-[20px] w-[20px] h-[20px]">download</mat-icon>
               </button>
-              <button (click)="triggerImport()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-indigo-600 transition-all flex items-center justify-center" title="Import Configuration">
+              <button (click)="triggerImport()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary transition-all flex items-center justify-center" title="Import Configuration">
                 <mat-icon class="text-[20px] w-[20px] h-[20px]">upload</mat-icon>
               </button>
             </div>
@@ -109,7 +109,7 @@ import { VersionsComponent } from './versions.component';
             <div class="w-px h-6 bg-gray-200 hidden sm:block mx-1"></div>
 
             @if (viewMode() === 'editor') {
-              <button (click)="showProperties.set(!showProperties())" class="p-2 rounded-lg transition-all flex items-center justify-center ml-1" [class.bg-indigo-100]="showProperties()" [class.text-indigo-700]="showProperties()" [class.text-gray-600]="!showProperties()" [class.hover:bg-gray-100]="!showProperties()" title="Toggle Properties Panel">
+              <button (click)="showProperties.set(!showProperties())" class="p-2 rounded-lg transition-all flex items-center justify-center ml-1" [class.bg-primary/20]="showProperties()" [class.text-primary-focus]="showProperties()" [class.text-gray-600]="!showProperties()" [class.hover:bg-gray-100]="!showProperties()" title="Toggle Properties Panel">
                 <mat-icon class="text-[20px] w-[20px] h-[20px]">tune</mat-icon>
               </button>
             }

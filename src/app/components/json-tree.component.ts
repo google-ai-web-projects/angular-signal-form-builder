@@ -32,7 +32,7 @@ interface JsonNode {
           [class.hover:bg-opacity-50]="!pickerMode()"
           [class.border]="pickerMode()"
           [class.border-transparent]="pickerMode()"
-          [class.hover:border-indigo-500]="pickerMode()"
+          [class.hover:border-primary]="pickerMode()"
           (click)="handleNodeClick(node, $event)"
           (keydown.enter)="handleNodeClick(node, $event)"
           tabindex="0"

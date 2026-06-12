@@ -39,7 +39,7 @@ import { EditorService, CodeEditorInstance } from "../editor.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
-      class="border border-gray-300 rounded-md bg-white text-sm font-mono focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 overflow-hidden"
+      class="border border-gray-300 rounded-md bg-white text-sm font-mono focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-primary overflow-hidden"
       [class.border-red-300]="syntaxError"
       [class.focus-within:ring-red-500]="syntaxError"
       [class.focus-within:border-red-500]="syntaxError"
