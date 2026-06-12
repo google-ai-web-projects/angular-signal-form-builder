@@ -35,7 +35,7 @@ import { FileUploadComponent } from "./file-upload.component";
           class="mb-6 border-b border-gray-100 pb-4 flex justify-between items-start"
         >
           <div>
-            <h1 class="text-2xl font-bold text-gray-800">Form Canvas</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Form Builder</h1>
             <p class="text-gray-500 text-sm mt-1">
               Drag and drop elements here to build your form.
             </p>
@@ -781,12 +781,12 @@ export class CanvasComponent {
           placeholder: "",
           options:
             fieldData.type === "select" ||
-            fieldData.type === "radio" ||
-            fieldData.type === "multiselect"
+              fieldData.type === "radio" ||
+              fieldData.type === "multiselect"
               ? [
-                  { label: "Option 1", value: "opt1" },
-                  { label: "Option 2", value: "opt2" },
-                ]
+                { label: "Option 1", value: "opt1" },
+                { label: "Option 2", value: "opt2" },
+              ]
               : [],
           ...(fieldData.type === "slider" ? { min: 0, max: 100, step: 1 } : {}),
           ...(fieldData.type === "rating"
@@ -797,29 +797,29 @@ export class CanvasComponent {
             : {}),
           ...(fieldData.type === "alert"
             ? {
-                severity: "info" as const,
-                alertTitle: "Alert Title",
-                alertMessage: "This is an alert message.",
-              }
+              severity: "info" as const,
+              alertTitle: "Alert Title",
+              alertMessage: "This is an alert message.",
+            }
             : {}),
           ...(fieldData.type === "autocomplete"
             ? {
-                minChars: 1,
-                debounceTime: 300,
-                freeText: false,
-                multiSelect: false,
-                emptyMessage: "No results found",
-                dataSourceType: "static" as const,
-                options: [{ label: "Option 1", value: "opt1" }],
-              }
+              minChars: 1,
+              debounceTime: 300,
+              freeText: false,
+              multiSelect: false,
+              emptyMessage: "No results found",
+              dataSourceType: "static" as const,
+              options: [{ label: "Option 1", value: "opt1" }],
+            }
             : {}),
           ...(fieldData.type === "file"
             ? {
-                maxFiles: 1,
-                maxFileSizeMB: 5,
-                allowedFileTypes: "",
-                convertToBase64: false,
-              }
+              maxFiles: 1,
+              maxFileSizeMB: 5,
+              allowedFileTypes: "",
+              convertToBase64: false,
+            }
             : {}),
         };
       }
