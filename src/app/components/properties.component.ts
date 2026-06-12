@@ -2580,7 +2580,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
         class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[1000] flex items-center justify-center p-4"
       >
         <div
-          class="bg-white rounded-xl shadow-2xl w-full w-16 overflow-hidden flex flex-col"
+          class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col"
         >
           <div
             class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50"
