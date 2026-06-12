@@ -3,15 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormBuilderService, CustomFunction, CustomFunctionParam } from '../form-builder.service';
 import { MatIconModule } from '@angular/material/icon';
-import { ExpressionEditorComponent } from '../components/expression-editor.component';
 import { MonacoEditorComponent } from '../components/monaco-editor.component';
 import { SandboxRuntime } from '../sandbox';
 
 @Component({
-  selector: 'app-function-builder',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, ExpressionEditorComponent, MonacoEditorComponent],
-  template: `
+   selector: 'app-function-builder',
+   standalone: true,
+   imports: [CommonModule, FormsModule, MatIconModule, MonacoEditorComponent],
+   template: `
     <div class="flex-1 bg-white flex h-full overflow-hidden">
       <!-- Sidebar List -->
       <div class="w-64 border-r border-gray-200 bg-gray-50 flex flex-col h-full shrink-0">
@@ -328,315 +327,315 @@ import { SandboxRuntime } from '../sandbox';
   `
 })
 export class FunctionBuilderComponent {
-  formBuilder = inject(FormBuilderService);
-  
-  selectedFunctionId = signal<string | null>(null);
-  
-  templatesModalOpen = signal(false);
-  saveTemplateModalOpen = signal(false);
+   formBuilder = inject(FormBuilderService);
 
-  userTemplates = signal<any[]>(this.loadUserTemplates());
+   selectedFunctionId = signal<string | null>(null);
 
-  newTemplateForm = signal({
-     name: '',
-     category: 'Custom',
-     description: ''
-  });
+   templatesModalOpen = signal(false);
+   saveTemplateModalOpen = signal(false);
 
-  templates = [
-    {
-      id: 'emailValidator',
-      name: 'Email Validator',
-      description: 'Checks if an email string is formatted correctly.',
-      icon: 'email',
-      isVoid: false,
-      parameters: [{ name: 'email', type: 'string' }],
-      returnType: 'boolean',
-      body: `if (!email) return false;\nconst pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;\nreturn pattern.test(email);`
-    },
-    {
-      id: 'currencyFormatter',
-      name: 'Currency Formatter',
-      description: 'Formats a number into a USD currency string.',
-      icon: 'attach_money',
-      isVoid: false,
-      parameters: [{ name: 'amount', type: 'number' }],
-      returnType: 'string',
-      body: `if (typeof amount !== 'number') return '';\nreturn new Intl.NumberFormat('en-US', {\n  style: 'currency',\n  currency: 'USD'\n}).format(amount);`
-    },
-    {
-      id: 'conditionalShow',
-      name: 'Conditional Show',
-      description: 'Returns true if dependent field has a specific value.',
-      icon: 'visibility',
-      isVoid: true,
-      parameters: [],
-      returnType: 'boolean',
-      body: `// Specify the field to watch and the required value\nconst dependentValue = context.form.getValue('category');\nreturn dependentValue === 'other';`
-    },
-    {
-      id: 'calculateTotal',
-      name: 'Calculate Total',
-      description: 'Calculates price times quantity with optional tax.',
-      icon: 'calculate',
-      isVoid: false,
-      parameters: [{ name: 'price', type: 'number' }, { name: 'quantity', type: 'number' }, { name: 'taxRate', type: 'number' }],
-      returnType: 'number',
-      body: `const p = typeof price === 'number' ? price : 0;\nconst q = typeof quantity === 'number' ? quantity : 0;\nconst t = typeof taxRate === 'number' ? taxRate : 0;\nreturn (p * q) * (1 + t);`
-    },
-    {
-      id: 'phoneFormatter',
-      name: 'Phone Formatter',
-      description: 'Transforms numbers into a US phone format (555) 555-5555.',
-      icon: 'phone',
-      isVoid: false,
-      parameters: [{ name: 'phone', type: 'string' }],
-      returnType: 'string',
-      body: `if (!phone) return '';\nconst cleaned = ('' + phone).replace(/\\D/g, '');\nconst match = cleaned.match(/^(\\d{3})(\\d{3})(\\d{4})$/);\nif (match) {\n  return '(' + match[1] + ') ' + match[2] + '-' + match[3];\n}\nreturn phone;`
-    },
-    {
-       id: 'ageValidation',
-       name: 'Age Validation (18+)',
-       description: 'Checks if a given date of birth indicates the user is 18 or older.',
-       icon: 'cake',
-       isVoid: false,
-       parameters: [{ name: 'dob', type: 'string' }],
-       returnType: 'boolean',
-       body: `if (!dob) return false;\nconst dateOfBirth = new Date(dob);\nconst today = new Date();\nlet age = today.getFullYear() - dateOfBirth.getFullYear();\nconst m = today.getMonth() - dateOfBirth.getMonth();\nif (m < 0 || (m === 0 && today.getDate() < dateOfBirth.getDate())) {\n    age--;\n}\nreturn age >= 18;`
-    }
-  ];
+   userTemplates = signal<any[]>(this.loadUserTemplates());
 
-  testValues = signal<string>('{}');
-  testArgs = signal<string>('[]');
-  runResult = signal<any>(null);
-  runError = signal<string | null>(null);
-  runLogs = signal<{time: string, message: string}[]>([]);
+   newTemplateForm = signal({
+      name: '',
+      category: 'Custom',
+      description: ''
+   });
 
-  functions = computed(() => {
-     return this.formBuilder.formConfig()?.global?.functions || [];
-  });
-
-  selectedFunction = computed(() => {
-     const id = this.selectedFunctionId();
-     if (!id) return null;
-     return this.functions().find(f => f.id === id) || null;
-  });
-
-  createNewFunction() {
-    const newFunc: CustomFunction = {
-      id: 'func_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
-      name: 'newFunction',
-      isVoid: false,
-      parameters: [{ name: 'arg1', type: 'any' }],
-      returnType: 'any',
-      body: 'return context.form.getValue("total") * 1.2;'
-    };
-    
-    const currentConfig = this.formBuilder.formConfig();
-    const fns = [...(currentConfig.global.functions || []), newFunc];
-    
-    this.formBuilder.updateFormConfig({
-      ...currentConfig,
-      global: {
-         ...currentConfig.global,
-         functions: fns
+   templates = [
+      {
+         id: 'emailValidator',
+         name: 'Email Validator',
+         description: 'Checks if an email string is formatted correctly.',
+         icon: 'email',
+         isVoid: false,
+         parameters: [{ name: 'email', type: 'string' }],
+         returnType: 'boolean',
+         body: `if (!email) return false;\nconst pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;\nreturn pattern.test(email);`
+      },
+      {
+         id: 'currencyFormatter',
+         name: 'Currency Formatter',
+         description: 'Formats a number into a USD currency string.',
+         icon: 'attach_money',
+         isVoid: false,
+         parameters: [{ name: 'amount', type: 'number' }],
+         returnType: 'string',
+         body: `if (typeof amount !== 'number') return '';\nreturn new Intl.NumberFormat('en-US', {\n  style: 'currency',\n  currency: 'USD'\n}).format(amount);`
+      },
+      {
+         id: 'conditionalShow',
+         name: 'Conditional Show',
+         description: 'Returns true if dependent field has a specific value.',
+         icon: 'visibility',
+         isVoid: true,
+         parameters: [],
+         returnType: 'boolean',
+         body: `// Specify the field to watch and the required value\nconst dependentValue = context.form.getValue('category');\nreturn dependentValue === 'other';`
+      },
+      {
+         id: 'calculateTotal',
+         name: 'Calculate Total',
+         description: 'Calculates price times quantity with optional tax.',
+         icon: 'calculate',
+         isVoid: false,
+         parameters: [{ name: 'price', type: 'number' }, { name: 'quantity', type: 'number' }, { name: 'taxRate', type: 'number' }],
+         returnType: 'number',
+         body: `const p = typeof price === 'number' ? price : 0;\nconst q = typeof quantity === 'number' ? quantity : 0;\nconst t = typeof taxRate === 'number' ? taxRate : 0;\nreturn (p * q) * (1 + t);`
+      },
+      {
+         id: 'phoneFormatter',
+         name: 'Phone Formatter',
+         description: 'Transforms numbers into a US phone format (555) 555-5555.',
+         icon: 'phone',
+         isVoid: false,
+         parameters: [{ name: 'phone', type: 'string' }],
+         returnType: 'string',
+         body: `if (!phone) return '';\nconst cleaned = ('' + phone).replace(/\\D/g, '');\nconst match = cleaned.match(/^(\\d{3})(\\d{3})(\\d{4})$/);\nif (match) {\n  return '(' + match[1] + ') ' + match[2] + '-' + match[3];\n}\nreturn phone;`
+      },
+      {
+         id: 'ageValidation',
+         name: 'Age Validation (18+)',
+         description: 'Checks if a given date of birth indicates the user is 18 or older.',
+         icon: 'cake',
+         isVoid: false,
+         parameters: [{ name: 'dob', type: 'string' }],
+         returnType: 'boolean',
+         body: `if (!dob) return false;\nconst dateOfBirth = new Date(dob);\nconst today = new Date();\nlet age = today.getFullYear() - dateOfBirth.getFullYear();\nconst m = today.getMonth() - dateOfBirth.getMonth();\nif (m < 0 || (m === 0 && today.getDate() < dateOfBirth.getDate())) {\n    age--;\n}\nreturn age >= 18;`
       }
-    });
+   ];
 
-    this.selectedFunctionId.set(newFunc.id);
-    this.resetTestState();
-  }
+   testValues = signal<string>('{}');
+   testArgs = signal<string>('[]');
+   runResult = signal<any>(null);
+   runError = signal<string | null>(null);
+   runLogs = signal<{ time: string, message: string }[]>([]);
 
-  loadUserTemplates() {
-    try {
-      const stored = localStorage.getItem('user_function_templates');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  }
+   functions = computed(() => {
+      return this.formBuilder.formConfig()?.global?.functions || [];
+   });
 
-  saveUserTemplatesToStorage() {
-    localStorage.setItem('user_function_templates', JSON.stringify(this.userTemplates()));
-  }
+   selectedFunction = computed(() => {
+      const id = this.selectedFunctionId();
+      if (!id) return null;
+      return this.functions().find(f => f.id === id) || null;
+   });
 
-  openSaveTemplateModal() {
-     const fn = this.selectedFunction();
-     if (!fn) return;
-     this.newTemplateForm.set({
-        name: fn.name ? fn.name + ' Template' : 'New Template',
-        category: 'Custom',
-        description: fn.description || ''
-     });
-     this.saveTemplateModalOpen.set(true);
-  }
+   createNewFunction() {
+      const newFunc: CustomFunction = {
+         id: 'func_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
+         name: 'newFunction',
+         isVoid: false,
+         parameters: [{ name: 'arg1', type: 'any' }],
+         returnType: 'any',
+         body: 'return context.form.getValue("total") * 1.2;'
+      };
 
-  updateNewTemplateForm(key: string, value: string) {
-    const current = this.newTemplateForm();
-    this.newTemplateForm.set({ ...current, [key]: value });
-  }
+      const currentConfig = this.formBuilder.formConfig();
+      const fns = [...(currentConfig.global.functions || []), newFunc];
 
-  saveUserTemplate() {
-     const fn = this.selectedFunction();
-     if (!fn) return;
-     const form = this.newTemplateForm();
-     
-     const newTpl = {
-        id: 'user_tpl_' + Date.now().toString(36),
-        name: form.name || 'Untitled Template',
-        category: form.category || 'Custom',
-        description: form.description || '',
-        icon: 'extension',
-        isVoid: fn.isVoid,
-        parameters: [...fn.parameters],
-        returnType: fn.returnType,
-        body: fn.body
-     };
-     
-     this.userTemplates.update(ts => [...ts, newTpl]);
-     this.saveUserTemplatesToStorage();
-     this.saveTemplateModalOpen.set(false);
-  }
+      this.formBuilder.updateFormConfig({
+         ...currentConfig,
+         global: {
+            ...currentConfig.global,
+            functions: fns
+         }
+      });
 
-  deleteUserTemplate(template: any) {
-     this.userTemplates.update(ts => ts.filter(t => t.id !== template.id));
-     this.saveUserTemplatesToStorage();
-  }
+      this.selectedFunctionId.set(newFunc.id);
+      this.resetTestState();
+   }
 
-  createFromTemplate(template: any) {
-    const newFunc: CustomFunction = {
-      id: 'func_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
-      name: template.id,
-      description: template.description,
-      isVoid: template.isVoid,
-      parameters: [...template.parameters],
-      returnType: template.returnType,
-      body: template.body
-    };
-    
-    const currentConfig = this.formBuilder.formConfig();
-    const fns = [...(currentConfig.global.functions || []), newFunc];
-    
-    this.formBuilder.updateFormConfig({
-      ...currentConfig,
-      global: {
-         ...currentConfig.global,
-         functions: fns
+   loadUserTemplates() {
+      try {
+         const stored = localStorage.getItem('user_function_templates');
+         return stored ? JSON.parse(stored) : [];
+      } catch {
+         return [];
       }
-    });
+   }
 
-    this.selectedFunctionId.set(newFunc.id);
-    this.resetTestState();
-    this.templatesModalOpen.set(false);
-  }
+   saveUserTemplatesToStorage() {
+      localStorage.setItem('user_function_templates', JSON.stringify(this.userTemplates()));
+   }
 
-  selectFunction(func: CustomFunction) {
-    this.selectedFunctionId.set(func.id);
-    this.resetTestState();
-  }
+   openSaveTemplateModal() {
+      const fn = this.selectedFunction();
+      if (!fn) return;
+      this.newTemplateForm.set({
+         name: fn.name ? fn.name + ' Template' : 'New Template',
+         category: 'Custom',
+         description: fn.description || ''
+      });
+      this.saveTemplateModalOpen.set(true);
+   }
 
-  deleteFunction(id: string) {
-    const currentConfig = this.formBuilder.formConfig();
-    const fns = (currentConfig.global.functions || []).filter(f => f.id !== id);
-    
-    this.formBuilder.updateFormConfig({
-      ...currentConfig,
-      global: { ...currentConfig.global, functions: fns }
-    });
+   updateNewTemplateForm(key: string, value: string) {
+      const current = this.newTemplateForm();
+      this.newTemplateForm.set({ ...current, [key]: value });
+   }
 
-    if (this.selectedFunctionId() === id) {
-      this.selectedFunctionId.set(null);
-    }
+   saveUserTemplate() {
+      const fn = this.selectedFunction();
+      if (!fn) return;
+      const form = this.newTemplateForm();
 
-    // Clean up internal data structures (fields referencing this function)
-    this.formBuilder.cleanupFunctionReferences(id);
+      const newTpl = {
+         id: 'user_tpl_' + Date.now().toString(36),
+         name: form.name || 'Untitled Template',
+         category: form.category || 'Custom',
+         description: form.description || '',
+         icon: 'extension',
+         isVoid: fn.isVoid,
+         parameters: [...fn.parameters],
+         returnType: fn.returnType,
+         body: fn.body
+      };
 
-    // Save to the server to persist
-    this.formBuilder.saveToServer();
-  }
+      this.userTemplates.update(ts => [...ts, newTpl]);
+      this.saveUserTemplatesToStorage();
+      this.saveTemplateModalOpen.set(false);
+   }
 
-  updateFunction(updates: Partial<CustomFunction>) {
-    const id = this.selectedFunctionId();
-    if (!id) return;
+   deleteUserTemplate(template: any) {
+      this.userTemplates.update(ts => ts.filter(t => t.id !== template.id));
+      this.saveUserTemplatesToStorage();
+   }
 
-    const currentConfig = this.formBuilder.formConfig();
-    const fns = (currentConfig.global.functions || []).map(f => {
-       if (f.id === id) {
-          return { ...f, ...updates };
-       }
-       return f;
-    });
+   createFromTemplate(template: any) {
+      const newFunc: CustomFunction = {
+         id: 'func_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
+         name: template.id,
+         description: template.description,
+         isVoid: template.isVoid,
+         parameters: [...template.parameters],
+         returnType: template.returnType,
+         body: template.body
+      };
 
-    this.formBuilder.updateFormConfig({
-      ...currentConfig,
-      global: { ...currentConfig.global, functions: fns }
-    });
-  }
+      const currentConfig = this.formBuilder.formConfig();
+      const fns = [...(currentConfig.global.functions || []), newFunc];
 
-  addParameter() {
-     const func = this.selectedFunction();
-     if (!func) return;
-     const newParams = [...(func.parameters || []), { name: 'newArg', type: 'any' }];
-     this.updateFunction({ parameters: newParams });
-  }
+      this.formBuilder.updateFormConfig({
+         ...currentConfig,
+         global: {
+            ...currentConfig.global,
+            functions: fns
+         }
+      });
 
-  updateParameter(index: number, updates: Partial<CustomFunctionParam>) {
-     const func = this.selectedFunction();
-     if (!func) return;
-     const newParams = [...(func.parameters || [])];
-     newParams[index] = { ...newParams[index], ...updates };
-     this.updateFunction({ parameters: newParams });
-  }
+      this.selectedFunctionId.set(newFunc.id);
+      this.resetTestState();
+      this.templatesModalOpen.set(false);
+   }
 
-  removeParameter(index: number) {
-     const func = this.selectedFunction();
-     if (!func) return;
-     const newParams = [...(func.parameters || [])];
-     newParams.splice(index, 1);
-     this.updateFunction({ parameters: newParams });
-  }
+   selectFunction(func: CustomFunction) {
+      this.selectedFunctionId.set(func.id);
+      this.resetTestState();
+   }
 
-  getParameterString(): string {
-     const func = this.selectedFunction();
-     if (!func || func.isVoid || !func.parameters) return '';
-     return func.parameters.map(p => p.name).join(', ');
-  }
+   deleteFunction(id: string) {
+      const currentConfig = this.formBuilder.formConfig();
+      const fns = (currentConfig.global.functions || []).filter(f => f.id !== id);
 
-  saveFunctions() {
-     this.formBuilder.saveToServer();
-  }
+      this.formBuilder.updateFormConfig({
+         ...currentConfig,
+         global: { ...currentConfig.global, functions: fns }
+      });
 
-  resetTestState() {
-     this.runResult.set(null);
-     this.runError.set(null);
-     this.runLogs.set([]);
-  }
+      if (this.selectedFunctionId() === id) {
+         this.selectedFunctionId.set(null);
+      }
 
-  async runTest() {
-     const func = this.selectedFunction();
-     if (!func) return;
+      // Clean up internal data structures (fields referencing this function)
+      this.formBuilder.cleanupFunctionReferences(id);
 
-     this.resetTestState();
-     const logs: {time: string, message: string}[] = [];
-     
-     let parsedArgs: any[] = [];
+      // Save to the server to persist
+      this.formBuilder.saveToServer();
+   }
 
-     if (!func.isVoid) {
-        try {
-           parsedArgs = JSON.parse(this.testArgs() || '[]');
-           if (!Array.isArray(parsedArgs)) throw new Error('Arguments must be a JSON array');
-        } catch (e: any) {
-           this.runError.set(e.message || 'Invalid JSON in arguments input.');
-           return;
-        }
-     }
-     
-     try {
+   updateFunction(updates: Partial<CustomFunction>) {
+      const id = this.selectedFunctionId();
+      if (!id) return;
+
+      const currentConfig = this.formBuilder.formConfig();
+      const fns = (currentConfig.global.functions || []).map(f => {
+         if (f.id === id) {
+            return { ...f, ...updates };
+         }
+         return f;
+      });
+
+      this.formBuilder.updateFormConfig({
+         ...currentConfig,
+         global: { ...currentConfig.global, functions: fns }
+      });
+   }
+
+   addParameter() {
+      const func = this.selectedFunction();
+      if (!func) return;
+      const newParams = [...(func.parameters || []), { name: 'newArg', type: 'any' }];
+      this.updateFunction({ parameters: newParams });
+   }
+
+   updateParameter(index: number, updates: Partial<CustomFunctionParam>) {
+      const func = this.selectedFunction();
+      if (!func) return;
+      const newParams = [...(func.parameters || [])];
+      newParams[index] = { ...newParams[index], ...updates };
+      this.updateFunction({ parameters: newParams });
+   }
+
+   removeParameter(index: number) {
+      const func = this.selectedFunction();
+      if (!func) return;
+      const newParams = [...(func.parameters || [])];
+      newParams.splice(index, 1);
+      this.updateFunction({ parameters: newParams });
+   }
+
+   getParameterString(): string {
+      const func = this.selectedFunction();
+      if (!func || func.isVoid || !func.parameters) return '';
+      return func.parameters.map(p => p.name).join(', ');
+   }
+
+   saveFunctions() {
+      this.formBuilder.saveToServer();
+   }
+
+   resetTestState() {
+      this.runResult.set(null);
+      this.runError.set(null);
+      this.runLogs.set([]);
+   }
+
+   async runTest() {
+      const func = this.selectedFunction();
+      if (!func) return;
+
+      this.resetTestState();
+      const logs: { time: string, message: string }[] = [];
+
+      let parsedArgs: any[] = [];
+
+      if (!func.isVoid) {
+         try {
+            parsedArgs = JSON.parse(this.testArgs() || '[]');
+            if (!Array.isArray(parsedArgs)) throw new Error('Arguments must be a JSON array');
+         } catch (e: any) {
+            this.runError.set(e.message || 'Invalid JSON in arguments input.');
+            return;
+         }
+      }
+
+      try {
          const paramNames = func.isVoid ? [] : func.parameters.map(p => p.name);
          const result = await SandboxRuntime.execute(func.body, parsedArgs, paramNames);
          this.runResult.set(result ?? null);
-     } catch (err: any) {
+      } catch (err: any) {
          this.runError.set(err.message || String(err));
-     }
-  }
+      }
+   }
 }
