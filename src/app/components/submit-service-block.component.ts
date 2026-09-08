@@ -14,6 +14,7 @@ import {
   SubmissionMappingService,
   ServiceMapping,
 } from "../submission-mapping.service";
+import { FormToBodyMapperService } from "../form-to-body-mapper.service";
 import { ExpressionEditorComponent } from "./expression-editor.component";
 import { HttpClient } from "@angular/common/http";
 import { EditorService } from "../editor.service";
@@ -379,9 +380,9 @@ import { EditorService } from "../editor.service";
                       <div class="flex flex-col gap-3 h-full">
                         <div class="flex items-center justify-between">
                           <p class="text-xs text-gray-500">
-                            Define the JSON body mapping using expressions. Use
-                            <code>values.fieldname</code> to access form values,
-                            or <code>form</code> to access form metadata.
+                            Define the JSON body mapping using expressions or placeholder syntax. Supports
+                            <code>values.fieldName</code>, <code>&#123;values.fieldName&#125;</code>, and nested
+                            paths like <code>&#123;values.address.city&#125;</code> with type preservation.
                           </p>
                           <button
                             (click)="
@@ -398,9 +399,10 @@ import { EditorService } from "../editor.service";
                           [asJson]="true"
                           [availableFields]="formBuilder.fields()"
                           placeholder='{
-  "username": values.username,
+  "username": "{values.username}",
+  "age": "values.age",
   "metadata": {
-    "age": values.details.age
+    "city": "{values.details.city}"
   }
 }'
                           class="flex-1 w-full"
@@ -759,6 +761,7 @@ import { EditorService } from "../editor.service";
 export class SubmitServiceBlockComponent {
   serviceManager = inject(ServiceManagerService);
   submissionMappingService = inject(SubmissionMappingService);
+  formToBodyMapper = inject(FormToBodyMapperService);
   http = inject(HttpClient);
   formBuilder = inject(FormBuilderService);
   editorService = inject(EditorService);
@@ -814,8 +817,34 @@ export class SubmitServiceBlockComponent {
     preview += `Accept: application/json\n`;
 
     if (m.method !== "GET") {
-      preview += "\nBody Payload:\n";
-      preview += m.bodyMapping || "(empty body)";
+      preview += "\nBody Payload (Resolved Preview):\n";
+      if (m.bodyMapping) {
+        const sampleValues: Record<string, any> = {};
+        const extractSample = (f: any) => {
+          if (f.id) {
+            sampleValues[f.id] =
+              f.value ??
+              f.defaultValue ??
+              (f.type === "number"
+                ? 25
+                : f.type === "checkbox"
+                  ? true
+                  : `sample_${f.id}`);
+          }
+          if (f.fields) {
+            f.fields.forEach(extractSample);
+          }
+        };
+        this.formBuilder.fields().forEach(extractSample);
+
+        const res = this.formToBodyMapper.mapBody(m.bodyMapping, sampleValues);
+        preview += JSON.stringify(res.payload, null, 2);
+        if (res.warnings.length > 0) {
+          preview += "\n\n// Mapping Warnings:\n// " + res.warnings.join("\n// ");
+        }
+      } else {
+        preview += "(empty body)";
+      }
     }
 
     return preview;
@@ -891,12 +920,34 @@ export class SubmitServiceBlockComponent {
         return;
       }
 
+      const sampleValues: Record<string, any> = {};
+      const extractSample = (f: any) => {
+        if (f.id) {
+          sampleValues[f.id] =
+            f.value ??
+            f.defaultValue ??
+            (f.type === "number"
+              ? 25
+              : f.type === "checkbox"
+                ? true
+                : `sample_${f.id}`);
+        }
+        if (f.fields) {
+          f.fields.forEach(extractSample);
+        }
+      };
+      this.formBuilder.fields().forEach(extractSample);
+      const mapRes = m.bodyMapping
+        ? this.formToBodyMapper.mapBody(m.bodyMapping, sampleValues)
+        : { payload: null, warnings: [], errors: [] };
+
       const res = {
         statusCode: 200,
         statusText: "OK",
         message:
           "Successfully executed pre-submission logic, routed payload, and fired post-submission events.",
-        compiledPayload: this.compiledPreview(),
+        compiledPayload: mapRes.payload,
+        mappingWarnings: mapRes.warnings,
         responseBody: {
           success: true,
           timestamp: new Date().toISOString(),

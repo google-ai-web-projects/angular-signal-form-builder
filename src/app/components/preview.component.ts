@@ -39,6 +39,7 @@ import { Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, timeout } from "rxjs/operators";
 import { ServiceManagerService } from "../service-manager.service";
 import { SubmissionMappingService } from "../submission-mapping.service";
+import { FormToBodyMapperService } from "../form-to-body-mapper.service";
 import { z } from "zod";
 
 import { MatButtonModule } from "@angular/material/button";
@@ -2276,6 +2277,7 @@ export class PreviewComponent implements OnInit {
   httpClient = inject(HttpClient);
   serviceManager = inject(ServiceManagerService);
   submissionMappingService = inject(SubmissionMappingService);
+  formToBodyMapper = inject(FormToBodyMapperService);
   http = inject(MockHttpService);
   fb = inject(FormBuilder);
 
@@ -2651,21 +2653,21 @@ export class PreviewComponent implements OnInit {
             if (p.key && p.value) params = params.set(p.key, p.value);
           });
 
-          const formVals = this.liveForm?.value || {};
+          const formVals = this.liveForm?.getRawValue() || {};
 
           let bodyPayload: any = null;
           if (srv.body) {
-            try {
-              bodyPayload = JSON.parse(srv.body);
-            } catch (e) {
-              console.warn("Failed to parse service body as JSON", e);
-            }
+            bodyPayload = this.formToBodyMapper.mapBody(srv.body, formVals).payload;
           }
 
           if (field.serviceParams) {
+            bodyPayload = this.formToBodyMapper.applyServiceParams(bodyPayload, field.serviceParams, formVals);
             field.serviceParams.forEach((mp) => {
+              if (mp.type === "body") return;
               const val =
-                mp.valueSource === "static" ? mp.value : formVals[mp.value];
+                mp.valueSource === "static"
+                  ? this.formToBodyMapper.substituteValue(mp.value, formVals)
+                  : this.formToBodyMapper.resolveValue(formVals, mp.value);
               if (val !== undefined && val !== null && val !== "") {
                 if (mp.type === "query") {
                   params = params.set(mp.key, String(val));
@@ -2695,15 +2697,6 @@ export class PreviewComponent implements OnInit {
                       url = urlParts.join("?");
                     }
                   }
-                } else if (mp.type === "body") {
-                  if (!bodyPayload) bodyPayload = {};
-                  const parts = mp.key.split(".");
-                  let curr = bodyPayload;
-                  for (let i = 0; i < parts.length - 1; i++) {
-                    curr[parts[i]] = curr[parts[i]] || {};
-                    curr = curr[parts[i]];
-                  }
-                  curr[parts[parts.length - 1]] = val;
                 }
               }
             });
@@ -3572,16 +3565,8 @@ export class PreviewComponent implements OnInit {
       .find((s) => s.id === field.serviceId);
     if (!srv || !srv.url) return;
 
-    const formVals = this.liveForm?.value || {};
-    const getFieldVal = (path: string) => {
-      const parts = path.split(".");
-      let curr = formVals;
-      for (const part of parts) {
-        if (curr === undefined || curr === null) return undefined;
-        curr = curr[part];
-      }
-      return curr;
-    };
+    const formVals = this.liveForm?.getRawValue() || {};
+    const getFieldVal = (path: string) => this.formToBodyMapper.resolveValue(formVals, path);
 
     let url = srv.url;
     if (srv.pathParams) {
@@ -3635,18 +3620,18 @@ export class PreviewComponent implements OnInit {
 
     let bodyPayload: any = null;
     if (srv.body) {
-      try {
-        bodyPayload = JSON.parse(srv.body);
-      } catch (e) {
-        console.warn("Failed to parse service body as JSON", e);
-      }
+      bodyPayload = this.formToBodyMapper.mapBody(srv.body, formVals).payload;
     }
 
     const pathAppends: string[] = [];
     if (field.serviceParams) {
+      bodyPayload = this.formToBodyMapper.applyServiceParams(bodyPayload, field.serviceParams, formVals);
       field.serviceParams.forEach((mp) => {
+        if (mp.type === "body") return;
         const val =
-          mp.valueSource === "static" ? mp.value : getFieldVal(mp.value);
+          mp.valueSource === "static"
+            ? this.formToBodyMapper.substituteValue(mp.value, formVals)
+            : getFieldVal(mp.value);
         if (val !== undefined && val !== null && val !== "") {
           if (mp.type === "query") {
             if (Array.isArray(val)) {
@@ -3668,15 +3653,6 @@ export class PreviewComponent implements OnInit {
             } else {
               pathAppends.push(encodeURIComponent(strVal));
             }
-          } else if (mp.type === "body") {
-            if (!bodyPayload) bodyPayload = {};
-            const parts = mp.key.split(".");
-            let curr = bodyPayload;
-            for (let i = 0; i < parts.length - 1; i++) {
-              curr[parts[i]] = curr[parts[i]] || {};
-              curr = curr[parts[i]];
-            }
-            curr[parts[parts.length - 1]] = val;
           }
         }
       });
@@ -3910,7 +3886,7 @@ export class PreviewComponent implements OnInit {
         action.serviceParams.forEach(p => {
           let val = p.value;
           if (p.valueSource === 'field' && this.liveForm) {
-            val = this.liveForm.get(p.value)?.value;
+            val = this.formToBodyMapper.resolveValue(this.liveForm.getRawValue(), p.value);
           } else if (p.valueSource === 'row') {
             val = row[p.value];
           }
@@ -3922,7 +3898,7 @@ export class PreviewComponent implements OnInit {
           } else if (p.type === 'header') {
              headers[p.key] = val;
           } else if (p.type === 'body') {
-             body[p.key] = val;
+             this.formToBodyMapper.setDeepValue(body, p.key, val);
           }
         });
       }
@@ -4358,22 +4334,16 @@ export class PreviewComponent implements OnInit {
       if (!srv || !srv.url) return;
 
       const formVals = this.liveForm.getRawValue();
-      const getFieldVal = (path: string) => {
-        const parts = path.split(".");
-        let curr = formVals;
-        for (const part of parts) {
-          if (curr === undefined || curr === null) return undefined;
-          curr = curr[part];
-        }
-        return curr;
-      };
+      const getFieldVal = (path: string) => this.formToBodyMapper.resolveValue(formVals, path);
 
       let url = srv.url;
       if (srv.pathParams) {
         srv.pathParams.forEach((p) => {
           if (p.key && p.value) {
             const resolvedValue =
-              p.valueSource === "field" ? getFieldVal(p.value) : p.value;
+              p.valueSource === "field"
+                ? getFieldVal(p.value)
+                : this.formToBodyMapper.substituteValue(p.value, formVals);
             if (resolvedValue !== undefined && resolvedValue !== null) {
               const strVal = Array.isArray(resolvedValue)
                 ? resolvedValue.join(",")
@@ -4391,7 +4361,9 @@ export class PreviewComponent implements OnInit {
       srv.headers.forEach((h) => {
         if (h.key && h.value) {
           const resolvedValue =
-            h.valueSource === "field" ? getFieldVal(h.value) : h.value;
+            h.valueSource === "field"
+              ? getFieldVal(h.value)
+              : this.formToBodyMapper.substituteValue(h.value, formVals);
           if (resolvedValue !== undefined && resolvedValue !== null) {
             const strVal = Array.isArray(resolvedValue)
               ? resolvedValue.join(",")
@@ -4403,7 +4375,9 @@ export class PreviewComponent implements OnInit {
       srv.queryParams.forEach((p) => {
         if (p.key && p.value) {
           const resolvedValue =
-            p.valueSource === "field" ? getFieldVal(p.value) : p.value;
+            p.valueSource === "field"
+              ? getFieldVal(p.value)
+              : this.formToBodyMapper.substituteValue(p.value, formVals);
           if (resolvedValue !== undefined && resolvedValue !== null) {
             if (Array.isArray(resolvedValue)) {
               resolvedValue.forEach((v) => {
@@ -4418,18 +4392,31 @@ export class PreviewComponent implements OnInit {
 
       let bodyPayload: any = null;
       if (srv.body) {
-        try {
-          bodyPayload = JSON.parse(srv.body);
-        } catch (e) {
-          console.warn("Failed to parse service body as JSON", e);
+        const mapResult = this.formToBodyMapper.mapBody(srv.body, formVals);
+        bodyPayload = mapResult.payload;
+        if (this.activeTab() === "simulation") {
+          mapResult.warnings.forEach((w) =>
+            this.logSimulationEvent("PAYLOAD_MAPPING_WARNING", w)
+          );
+          mapResult.errors.forEach((e) =>
+            this.logSimulationEvent("PAYLOAD_MAPPING_ERROR", e, { error: true })
+          );
         }
       }
 
       const pathAppends: string[] = [];
       if (field.serviceParams) {
+        bodyPayload = this.formToBodyMapper.applyServiceParams(
+          bodyPayload,
+          field.serviceParams,
+          formVals
+        );
         field.serviceParams.forEach((mp) => {
+          if (mp.type === "body") return;
           const val =
-            mp.valueSource === "static" ? mp.value : formVals[mp.value];
+            mp.valueSource === "static"
+              ? this.formToBodyMapper.substituteValue(mp.value, formVals)
+              : getFieldVal(mp.value);
           if (val !== undefined && val !== null && val !== "") {
             if (mp.type === "query") {
               params = params.set(mp.key, String(val));
@@ -4444,15 +4431,6 @@ export class PreviewComponent implements OnInit {
               } else {
                 pathAppends.push(encodeURIComponent(strVal));
               }
-            } else if (mp.type === "body") {
-              if (!bodyPayload) bodyPayload = {};
-              const parts = mp.key.split(".");
-              let curr = bodyPayload;
-              for (let i = 0; i < parts.length - 1; i++) {
-                curr[parts[i]] = curr[parts[i]] || {};
-                curr = curr[parts[i]];
-              }
-              curr[parts[parts.length - 1]] = val;
             }
           }
         });
@@ -4469,29 +4447,19 @@ export class PreviewComponent implements OnInit {
       }
 
       if (field.payloadMappings && field.payloadMappings.length > 0) {
-        if (!bodyPayload) bodyPayload = {};
-        field.payloadMappings.forEach((pm) => {
-          if (!pm.targetPayloadPath || !pm.formFieldId) return;
+        bodyPayload = this.formToBodyMapper.applyPayloadMappings(
+          bodyPayload,
+          field.payloadMappings,
+          formVals
+        );
+      }
 
-          let sourceVal = undefined;
-          const sourceParts = pm.formFieldId.split(".");
-          let sCurr = formVals;
-          for (const part of sourceParts) {
-            if (sCurr === undefined || sCurr === null) break;
-            sCurr = sCurr[part];
-          }
-          sourceVal = sCurr;
-
-          if (sourceVal !== undefined) {
-            const parts = pm.targetPayloadPath.split(".");
-            let curr = bodyPayload;
-            for (let i = 0; i < parts.length - 1; i++) {
-              curr[parts[i]] = curr[parts[i]] || {};
-              curr = curr[parts[i]];
-            }
-            curr[parts[parts.length - 1]] = sourceVal;
-          }
-        });
+      if (this.activeTab() === "simulation") {
+        this.logSimulationEvent(
+          "API_PAYLOAD_COMPILED",
+          `Compiled payload for ${srv.name || srv.id}:\n${JSON.stringify(bodyPayload, null, 2)}`,
+          bodyPayload
+        );
       }
 
       if (!url) {
@@ -4756,11 +4724,20 @@ export class PreviewComponent implements OnInit {
 
     let bodyPayload = null;
     if (m.method !== "GET" && m.bodyMapping && m.bodyMapping.trim()) {
-      try {
-        bodyPayload = this.expressionEvaluator.evaluate(m.bodyMapping, context);
-      } catch (e) {
-        console.error("Body mapping error", e);
-        bodyPayload = context.values;
+      const mapResult = this.formToBodyMapper.mapBody(m.bodyMapping, formRaw);
+      bodyPayload = mapResult.payload;
+      if (this.activeTab() === "simulation") {
+        mapResult.warnings.forEach((w) =>
+          this.logSimulationEvent("PAYLOAD_MAPPING_WARNING", w)
+        );
+        mapResult.errors.forEach((e) =>
+          this.logSimulationEvent("PAYLOAD_MAPPING_ERROR", e, { error: true })
+        );
+        this.logSimulationEvent(
+          "API_SUBMIT_PAYLOAD",
+          `Compiled submit payload for ${m.name}:\n${JSON.stringify(bodyPayload, null, 2)}`,
+          bodyPayload
+        );
       }
     }
 

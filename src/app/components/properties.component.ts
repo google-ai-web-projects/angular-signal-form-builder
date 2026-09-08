@@ -13,6 +13,7 @@ import {
 } from "../form-builder.service";
 import { ServiceManagerService } from "../service-manager.service";
 import { SubmissionMappingService } from "../submission-mapping.service";
+import { FormToBodyMapperService } from "../form-to-body-mapper.service";
 import {
   ReactiveFormsModule,
   FormsModule,
@@ -154,7 +155,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
             >
               Validation
             </button>
-            @if (formBuilder.selectedField()?.type === 'table') {
+            @if (isTableField()) {
               <button
                 type="button"
                 (click)="activeTab.set('table')"
@@ -1967,11 +1968,11 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         "
                         [class.bg-white]="
                           propertiesForm.get('dataSourceType')?.value ===
-                          'service' || field.type === 'table'
+                          'service'
                         "
                         [class.shadow-sm]="
                           propertiesForm.get('dataSourceType')?.value ===
-                          'service' || field.type === 'table'
+                          'service'
                         "
                         class="flex-1 py-1.5 text-xs font-medium rounded text-gray-700 transition-all"
                       >
@@ -3083,8 +3084,10 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
 export class PropertiesComponent {
   activeTab = signal<"general" | "validation" | "table">("general");
   formBuilder = inject(FormBuilderService);
+  isTableField = computed(() => this.formBuilder.selectedField()?.type === "table");
   serviceManager = inject(ServiceManagerService);
   submissionMappingService = inject(SubmissionMappingService);
+  formToBodyMapper = inject(FormToBodyMapperService);
   fb = inject(FormBuilder);
 
   totalBlocksCount = computed(() => {
@@ -3368,6 +3371,9 @@ export class PropertiesComponent {
     effect(() => {
       const field = this.formBuilder.selectedField();
       if (field) {
+        if (this.activeTab() === "table" && field.type !== "table") {
+          this.activeTab.set("general");
+        }
         // Always update if ID changed. If ID is same, we might be undoing/redoing.
         // We avoid updating if the change originated from the form itself (isUpdatingForm).
         if (field.id !== this.currentFieldId || !this.isUpdatingForm) {
@@ -3377,6 +3383,9 @@ export class PropertiesComponent {
           this.isUpdatingForm = false;
         }
       } else if (!field) {
+        if (this.activeTab() === "table") {
+          this.activeTab.set("general");
+        }
         this.currentFieldId = null;
         this.isUpdatingForm = true;
         this.propertiesForm.reset({}, { emitEvent: false });
@@ -3522,7 +3531,9 @@ export class PropertiesComponent {
         validationExpression: field.validationExpression || "",
         validationMessage: field.validationMessage || "",
         validationPlacement: field.validationPlacement || "bottom",
-        dataSourceType: field.dataSourceType || "static",
+        dataSourceType:
+          field.dataSourceType ||
+          (field.type === "table" ? "service" : "static"),
         serviceId: field.serviceId || "",
         dataPath: field.dataPath || "",
         labelPath: field.labelPath || "",
@@ -3818,6 +3829,13 @@ export class PropertiesComponent {
     setTimeout(() => {
       this.isTestingPayload.set(false);
 
+      let previewPayload: any = {};
+      try {
+        previewPayload = JSON.parse(this.getPayloadPreview());
+      } catch {
+        previewPayload = {};
+      }
+
       const res = {
         statusCode: 200,
         statusText: "OK",
@@ -3825,7 +3843,8 @@ export class PropertiesComponent {
           "content-type": "application/json; charset=utf-8",
           "x-mock-status": "success",
         },
-        message: "Mock request successful.",
+        sentPayload: previewPayload,
+        message: "Mock request successful. Payload mapped correctly.",
       };
 
       this.testPayloadResult.set(JSON.stringify(res, null, 2));
@@ -3834,23 +3853,54 @@ export class PropertiesComponent {
 
   getPayloadPreview(): string {
     const mappings = this.propertiesForm.get("payloadMappings")?.value || [];
-    if (mappings.length === 0) return "{}";
+    const serviceParams = this.propertiesForm.get("serviceParams")?.value || [];
+    const serviceId = this.propertiesForm.get("actionServiceId")?.value;
+    const srv = serviceId
+      ? this.serviceManager.services().find((s) => s.id === serviceId)
+      : null;
 
-    const payload: any = {};
-    mappings.forEach(
-      (m: { formFieldId: string; targetPayloadPath: string }) => {
-        if (!m.targetPayloadPath || !m.formFieldId) return;
-        const parts = m.targetPayloadPath.split(".");
-        let curr = payload;
-        for (let i = 0; i < parts.length - 1; i++) {
-          curr[parts[i]] = curr[parts[i]] || {};
-          curr = curr[parts[i]];
-        }
-        curr[parts[parts.length - 1]] = `<Field: ${m.formFieldId}>`;
-      },
-    );
+    // Collect sample values from form fields
+    const sampleValues: Record<string, any> = {};
+    const extractSample = (f: FormField) => {
+      if (f.id) {
+        sampleValues[f.id] =
+          f.value ??
+          f.defaultValue ??
+          (f.type === "number"
+            ? 25
+            : f.type === "checkbox"
+              ? true
+              : `sample_${f.id}`);
+      }
+      if (f.fields) {
+        f.fields.forEach(extractSample);
+      }
+    };
+    this.formBuilder.fields().forEach(extractSample);
 
-    return JSON.stringify(payload, null, 2);
+    let basePayload: any = {};
+    if (srv && srv.body) {
+      const mapped = this.formToBodyMapper.mapBody(srv.body, sampleValues);
+      basePayload = mapped.payload || {};
+    }
+
+    if (serviceParams.length > 0) {
+      basePayload = this.formToBodyMapper.applyServiceParams(
+        basePayload,
+        serviceParams,
+        sampleValues
+      );
+    }
+
+    if (mappings.length > 0) {
+      basePayload = this.formToBodyMapper.applyPayloadMappings(
+        basePayload,
+        mappings,
+        sampleValues
+      );
+    }
+
+    return JSON.stringify(basePayload, null, 2);
   }
 
   getMappingResult(sampleJson: string): string {
