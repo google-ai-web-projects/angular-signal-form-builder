@@ -4,19 +4,74 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Notion Design System Theme Tokens */
+:root {
+  --notion-canvas: #ffffff;
+  --notion-surface: #f7f6f5;
+  --notion-surface-soft: #fafaf9;
+  --notion-surface-hover: rgba(55, 53, 47, 0.08);
+  --notion-surface-active: rgba(55, 53, 47, 0.16);
+  --notion-hairline: #edece9;
+  --notion-hairline-soft: #f1f0ee;
+  --notion-hairline-strong: #d3d1cb;
+  --notion-charcoal: #37352f;
+  --notion-slate: #5d5b54;
+  --notion-steel: #787671;
+  --notion-muted: #9b9a97;
+  --notion-primary: #5645d4;
+  --notion-primary-hover: #4534b3;
+  --notion-primary-light: #f0eeff;
+  --notion-blue: #0075de;
+  --notion-pill-bg: #edece9;
+  --notion-card-peach: #ffe8d4;
+  --notion-card-rose: #fde0ec;
+  --notion-card-mint: #d9f3e1;
+  --notion-card-lavender: #e6e0f5;
+  --notion-card-sky: #dcecfa;
+  --notion-card-yellow: #fef7d6;
+}
+
+.dark {
+  --notion-canvas: #191919;
+  --notion-surface: #202020;
+  --notion-surface-soft: #262626;
+  --notion-surface-hover: rgba(255, 255, 255, 0.08);
+  --notion-surface-active: rgba(255, 255, 255, 0.14);
+  --notion-hairline: #2e2e2e;
+  --notion-hairline-soft: #272727;
+  --notion-hairline-strong: #444444;
+  --notion-charcoal: #ebebeb;
+  --notion-slate: #b0b0b0;
+  --notion-steel: #888888;
+  --notion-muted: #666666;
+  --notion-primary: #7b68ee;
+  --notion-primary-hover: #6a5acd;
+  --notion-primary-light: rgba(123, 104, 238, 0.2);
+  --notion-blue: #45a0ff;
+  --notion-pill-bg: #2b2b2b;
+  --notion-card-peach: #382414;
+  --notion-card-rose: #381827;
+  --notion-card-mint: #152d1d;
+  --notion-card-lavender: #231b38;
+  --notion-card-sky: #15293d;
+  --notion-card-yellow: #383115;
+}
+
 /* Drag and Drop Animations & Visual Feedback */
 .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 8px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 28px -4px rgba(55, 53, 47, 0.12), 0 8px 12px -6px rgba(55, 53, 47, 0.08);
   opacity: 0.95;
   cursor: grabbing !important;
-  background-color: white;
+  background-color: var(--notion-canvas);
+  border: 1px solid var(--notion-hairline-strong);
   z-index: 1000;
 }
 
 .cdk-drag-placeholder {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  border-radius: 8px;
 }
 
 .cdk-drag-animating {
@@ -28,11 +83,38 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Highlight drop targets */
+/* Highlight drop targets with Notion primary accent */
 .cdk-drop-list-receiving {
-  background-color: #eef2ff !important; /* Tailwind indigo-50 */
-  border-color: #c7d2fe !important; /* Tailwind indigo-200 */
+  background-color: #f4f2ff !important;
+  border-color: #5645d4 !important;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dark .cdk-drop-list-receiving {
+  background-color: rgba(123, 104, 238, 0.1) !important;
+  border-color: #7b68ee !important;
+}
+
+/* Notion-style subtle scrollbar */
+.notion-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.notion-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.notion-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(55, 53, 47, 0.15);
+  border-radius: 9999px;
+}
+.notion-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(55, 53, 47, 0.28);
+}
+.dark .notion-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+.dark .notion-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -41,6 +123,7 @@
 }
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+

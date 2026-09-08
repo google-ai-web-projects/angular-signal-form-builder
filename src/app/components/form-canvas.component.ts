@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from "@angular/core";
+import { Component, inject, signal, computed, input } from "@angular/core";
 import { CdkDragDrop, DragDropModule } from "@angular/cdk/drag-drop";
 import { FormBuilderService, FormField } from "../form-builder.service";
 import { MatIconModule } from "@angular/material/icon";
@@ -27,22 +27,24 @@ import { FileUploadComponent } from "./file-upload.component";
     FileUploadComponent,
   ],
   template: `
-    <div class="flex-1 bg-gray-50 p-8 overflow-y-auto h-full transition-colors duration-300" [class.bg-gray-900]="isDarkMode()">
+    <div class="flex-1 bg-[#f7f6f5] dark:bg-[#191919] p-4 sm:p-8 overflow-y-auto h-full transition-colors duration-300 notion-scrollbar" [class.bg-[#191919]]="isDarkMode()">
       <div
-        class="max-w-3xl mx-auto rounded-xl shadow-sm border border-gray-200 min-h-[500px] p-6 transition-colors duration-300"
-        [class.bg-white]="!isDarkMode()"
-        [class.bg-gray-800]="isDarkMode()"
-        [class.border-gray-700]="isDarkMode()"
+        class="mx-auto rounded-xl shadow-xs border border-[#edece9] dark:border-[#2e2e2e] min-h-[500px] p-6 sm:p-8 transition-all duration-300 bg-white dark:bg-[#202020]"
+        [class.max-w-4xl]="deviceMode() === 'desktop'"
+        [class.max-w-2xl]="deviceMode() === 'tablet'"
+        [class.max-w-sm]="deviceMode() === 'mobile'"
+        [class.shadow-md]="deviceMode() !== 'desktop'"
       >
         <div
-          class="mb-6 border-b pb-4 flex justify-between items-start"
-          [class.border-gray-100]="!isDarkMode()"
-          [class.border-gray-700]="isDarkMode()"
+          class="mb-6 border-b pb-4 flex justify-between items-start border-[#edece9] dark:border-[#2e2e2e]"
         >
           <div>
-            <h1 class="text-2xl font-bold transition-colors duration-300" [class.text-gray-800]="!isDarkMode()" [class.text-white]="isDarkMode()">Form Canvas</h1>
-            <p class="text-sm mt-1 transition-colors duration-300" [class.text-gray-500]="!isDarkMode()" [class.text-gray-400]="isDarkMode()">
-              Drag and drop elements here to build your form.
+            <div class="flex items-center gap-2">
+              <span class="text-xl">📄</span>
+              <h1 class="text-xl font-bold tracking-tight text-[#37352f] dark:text-[#ebebeb] transition-colors duration-200">{{ formBuilder.formConfig().global.formDefinition.name || 'Form Canvas' }}</h1>
+            </div>
+            <p class="text-xs mt-1 text-[#787671] dark:text-[#888888] transition-colors duration-200">
+              {{ formBuilder.formConfig().global.formDefinition.description || 'Drag and drop blocks here or click elements from the sidebar to assemble your form.' }}
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -99,18 +101,19 @@ import { FileUploadComponent } from "./file-upload.component";
           >
             @if (fields.length === 0 && containerId === "form-canvas") {
               <div
-                class="col-span-full flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12 transition-colors duration-300"
-                [class.border-gray-300]="!isDarkMode()"
-                [class.text-gray-400]="!isDarkMode()"
-                [class.border-gray-700]="isDarkMode()"
-                [class.text-gray-500]="isDarkMode()"
+                class="col-span-full flex flex-col items-center justify-center border-2 border-dashed border-[#edece9] dark:border-[#2e2e2e] bg-[#fbfbfa] dark:bg-[#262626] rounded-xl p-12 text-center transition-colors duration-200"
               >
-                <mat-icon class="text-4xl mb-2">drag_indicator</mat-icon>
-                <p>Drag elements from the sidebar</p>
+                <div class="w-12 h-12 rounded-xl bg-[#f0eeff] dark:bg-[#2b244d] text-[#5645d4] flex items-center justify-center mb-3">
+                  <mat-icon class="text-2xl">post_add</mat-icon>
+                </div>
+                <h3 class="text-sm font-semibold text-[#37352f] dark:text-[#ebebeb] mb-1">Canvas is empty</h3>
+                <p class="text-xs text-[#787671] dark:text-[#888888] max-w-sm">
+                  Drag and drop blocks from the left sidebar, or click a template to kickstart your form design.
+                </p>
               </div>
             }
             @if (fields.length === 0 && containerId !== "form-canvas") {
-              <div class="col-span-full text-center text-sm py-4 transition-colors duration-300" [class.text-gray-400]="!isDarkMode()" [class.text-gray-500]="isDarkMode()">
+              <div class="col-span-full text-center text-xs py-4 text-[#9b9a97] dark:text-[#666666] border border-dashed border-[#edece9] dark:border-[#2e2e2e] rounded-lg">
                 Drag elements here
               </div>
             }
@@ -126,14 +129,13 @@ import { FileUploadComponent } from "./file-upload.component";
                   layout ? 'span 1' : 'span ' + (field.colSpan || 12)
                 "
                 [class.ring-2]="formBuilder.selectedFieldId() === field.id"
-                [class.ring-indigo-500]="
-                  formBuilder.selectedFieldId() === field.id
-                "
-                class="relative group p-4 border rounded-lg hover:shadow-md transition-all cursor-pointer duration-300"
-                [class.border-gray-200]="!isDarkMode()"
+                [class.ring-[#5645d4]]="formBuilder.selectedFieldId() === field.id"
+                [class.border-[#5645d4]]="formBuilder.selectedFieldId() === field.id"
+                class="relative group p-4 border rounded-lg hover:shadow-xs transition-all cursor-pointer duration-200"
+                [class.border-[#edece9]]="!isDarkMode() && formBuilder.selectedFieldId() !== field.id"
                 [class.bg-white]="!isDarkMode()"
-                [class.border-gray-700]="isDarkMode()"
-                [class.bg-gray-800]="isDarkMode()"
+                [class.border-[#2e2e2e]]="isDarkMode() && formBuilder.selectedFieldId() !== field.id"
+                [class.bg-[#202020]]="isDarkMode()"
               >
                 <div
                   *cdkDragPlaceholder
@@ -833,6 +835,7 @@ import { FileUploadComponent } from "./file-upload.component";
 })
 export class FormCanvasComponent {
   formBuilder = inject(FormBuilderService);
+  deviceMode = input<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   isDarkMode = signal(false);
 

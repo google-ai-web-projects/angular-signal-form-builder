@@ -62,78 +62,119 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
     MatInputModule,
   ],
   template: `
-    <div class="w-80 bg-white border-l border-gray-200 h-full flex flex-col">
+    <div class="w-80 lg:w-84 bg-[#fbfbfa] dark:bg-[#202020] border-l border-[#edece9] dark:border-[#2e2e2e] h-full flex flex-col transition-colors select-none">
+      <!-- Notion Properties Header -->
       <div
-        class="p-4 border-b border-gray-200 flex items-center justify-between"
+        class="px-4 py-3 border-b border-[#edece9] dark:border-[#2e2e2e] flex items-center justify-between shrink-0"
       >
-        <h2 class="text-lg font-semibold text-gray-800">Properties</h2>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-2 min-w-0">
+          @if (formBuilder.selectedField(); as field) {
+            <div class="w-6 h-6 rounded-md bg-[#f0eeff] dark:bg-[#2b244d] text-[#5645d4] dark:text-[#bc8cff] flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-[14px] w-[14px] h-[14px]">tune</mat-icon>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-[#37352f] dark:text-[#ebebeb] truncate max-w-[150px]">
+                {{ field.label || field.name || 'Block' }}
+              </div>
+              <div class="text-[10px] text-[#787671] dark:text-[#888888] flex items-center gap-1 font-mono uppercase">
+                <span>{{ field.type }}</span>
+              </div>
+            </div>
+          } @else {
+            <div class="w-6 h-6 rounded-md bg-[#edece9] dark:bg-[#2a2a2a] flex items-center justify-center flex-shrink-0 text-sm">
+              📄
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-[#37352f] dark:text-[#ebebeb]">Document Overview</div>
+              <div class="text-[10px] text-[#787671] dark:text-[#888888]">Form Properties</div>
+            </div>
+          }
+        </div>
+
+        <div class="flex items-center gap-0.5">
           <button
+            type="button"
             (click)="formBuilder.undo()"
             [disabled]="!formBuilder.canUndo()"
-            class="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            class="p-1 rounded text-[#787671] dark:text-[#888888] hover:bg-[#edece9] dark:hover:bg-[#2c2c2c] hover:text-[#37352f] dark:hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors cursor-pointer"
             title="Undo (Ctrl+Z)"
           >
-            <mat-icon class="text-[20px] w-[20px] h-[20px]">undo</mat-icon>
+            <mat-icon class="text-[16px] w-[16px] h-[16px]">undo</mat-icon>
           </button>
           <button
+            type="button"
             (click)="formBuilder.redo()"
             [disabled]="!formBuilder.canRedo()"
-            class="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            class="p-1 rounded text-[#787671] dark:text-[#888888] hover:bg-[#edece9] dark:hover:bg-[#2c2c2c] hover:text-[#37352f] dark:hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors cursor-pointer"
             title="Redo (Ctrl+Y)"
           >
-            <mat-icon class="text-[20px] w-[20px] h-[20px]">redo</mat-icon>
+            <mat-icon class="text-[16px] w-[16px] h-[16px]">redo</mat-icon>
           </button>
-          <div class="w-px h-4 bg-gray-300 mx-1"></div>
+          <div class="w-px h-3.5 bg-[#edece9] dark:bg-[#2e2e2e] mx-1"></div>
           <button
+            type="button"
             (click)="closePanel.emit()"
-            class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-            title="Close Properties"
+            class="p-1 rounded text-[#787671] dark:text-[#888888] hover:bg-[#edece9] dark:hover:bg-[#2c2c2c] hover:text-[#37352f] dark:hover:text-white transition-colors cursor-pointer"
+            title="Close Panel"
           >
-            <mat-icon class="text-[20px] w-[20px] h-[20px]">close</mat-icon>
+            <mat-icon class="text-[16px] w-[16px] h-[16px]">close</mat-icon>
           </button>
         </div>
       </div>
 
-      <div class="px-4 flex border-b border-gray-200">
-        <button
-          type="button"
-          (click)="activeTab.set('general')"
-          class="flex-1 py-3 text-xs font-medium transition-colors"
-          [class.text-indigo-600]="activeTab() === 'general'"
-          [class.border-b-2]="activeTab() === 'general'"
-          [class.border-indigo-600]="activeTab() === 'general'"
-          [class.text-gray-500]="activeTab() !== 'general'"
-        >
-          General
-        </button>
-        <button
-          type="button"
-          (click)="activeTab.set('validation')"
-          class="flex-1 py-3 text-xs font-medium transition-colors"
-          [class.text-indigo-600]="activeTab() === 'validation'"
-          [class.border-b-2]="activeTab() === 'validation'"
-          [class.border-indigo-600]="activeTab() === 'validation'"
-          [class.text-gray-500]="activeTab() !== 'validation'"
-        >
-          Validation
-        </button>
-        @if (formBuilder.selectedField()?.type === 'table') {
-          <button
-            type="button"
-            (click)="activeTab.set('table')"
-            class="flex-1 py-3 text-xs font-medium transition-colors"
-            [class.text-indigo-600]="activeTab() === 'table'"
-            [class.border-b-2]="activeTab() === 'table'"
-            [class.border-indigo-600]="activeTab() === 'table'"
-            [class.text-gray-500]="activeTab() !== 'table'"
-          >
-            Table
-          </button>
-        }
-      </div>
+      <!-- Notion Segmented Tabs (Shown when field selected) -->
+      @if (formBuilder.selectedField()) {
+        <div class="px-3 pt-2 pb-1 border-b border-[#edece9] dark:border-[#2e2e2e]">
+          <div class="flex items-center bg-[#edece9] dark:bg-[#2c2c2c] p-0.5 rounded-lg">
+            <button
+              type="button"
+              (click)="activeTab.set('general')"
+              class="flex-1 py-1 text-xs font-medium rounded-md transition-all text-center cursor-pointer"
+              [class.bg-white]="activeTab() === 'general'"
+              [class.dark:bg-[#191919]]="activeTab() === 'general'"
+              [class.text-[#37352f]]="activeTab() === 'general'"
+              [class.dark:text-white]="activeTab() === 'general'"
+              [class.shadow-xs]="activeTab() === 'general'"
+              [class.text-[#787671]]="activeTab() !== 'general'"
+              [class.dark:text-[#888888]]="activeTab() !== 'general'"
+            >
+              General
+            </button>
+            <button
+              type="button"
+              (click)="activeTab.set('validation')"
+              class="flex-1 py-1 text-xs font-medium rounded-md transition-all text-center cursor-pointer"
+              [class.bg-white]="activeTab() === 'validation'"
+              [class.dark:bg-[#191919]]="activeTab() === 'validation'"
+              [class.text-[#37352f]]="activeTab() === 'validation'"
+              [class.dark:text-white]="activeTab() === 'validation'"
+              [class.shadow-xs]="activeTab() === 'validation'"
+              [class.text-[#787671]]="activeTab() !== 'validation'"
+              [class.dark:text-[#888888]]="activeTab() !== 'validation'"
+            >
+              Validation
+            </button>
+            @if (formBuilder.selectedField()?.type === 'table') {
+              <button
+                type="button"
+                (click)="activeTab.set('table')"
+                class="flex-1 py-1 text-xs font-medium rounded-md transition-all text-center cursor-pointer"
+                [class.bg-white]="activeTab() === 'table'"
+                [class.dark:bg-[#191919]]="activeTab() === 'table'"
+                [class.text-[#37352f]]="activeTab() === 'table'"
+                [class.dark:text-white]="activeTab() === 'table'"
+                [class.shadow-xs]="activeTab() === 'table'"
+                [class.text-[#787671]]="activeTab() !== 'table'"
+                [class.dark:text-[#888888]]="activeTab() !== 'table'"
+              >
+                Table
+              </button>
+            }
+          </div>
+        </div>
+      }
 
-      <div class="p-4 flex-1 overflow-y-auto w-full overflow-x-hidden">
+      <div class="p-4 flex-1 overflow-y-auto w-full overflow-x-hidden notion-scrollbar">
         @if (formBuilder.selectedField(); as field) {
           <form [formGroup]="propertiesForm" class="flex flex-col gap-4">
             @if (activeTab() === "general") {
@@ -2797,13 +2838,53 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
             }
           </form>
         } @else {
-          <div
-            class="flex flex-col items-center justify-center h-full text-gray-400"
-          >
-            <mat-icon class="text-4xl mb-2">tune</mat-icon>
-            <p class="text-sm text-center">
-              Select a field on the canvas to edit its properties.
-            </p>
+          <!-- Rich Notion Document Overview Card (When No Field Selected) -->
+          <div class="flex flex-col gap-3 py-2 select-none">
+            <!-- Form Title Banner Card -->
+            <div class="p-3.5 bg-white dark:bg-[#1e1e1e] border border-[#edece9] dark:border-[#2e2e2e] rounded-xl shadow-xs flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-[#9b9a97] dark:text-[#777]">Document</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#d9f3e1] text-[#1aae39] dark:bg-[#152d1d] dark:text-[#3fb950]">Active Form</span>
+              </div>
+              <div class="text-sm font-bold text-[#37352f] dark:text-[#ebebeb]">
+                {{ formBuilder.formConfig().global.formDefinition.name || 'Untitled Form' }}
+              </div>
+              @if (formBuilder.formConfig().global.formDefinition.description) {
+                <div class="text-xs text-[#787671] dark:text-[#888888] leading-relaxed">
+                  {{ formBuilder.formConfig().global.formDefinition.description }}
+                </div>
+              }
+            </div>
+
+            <!-- Form Statistics Grid -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="p-3 bg-white dark:bg-[#1e1e1e] border border-[#edece9] dark:border-[#2e2e2e] rounded-xl shadow-xs">
+                <div class="text-[10px] uppercase font-semibold text-[#9b9a97] dark:text-[#777] mb-1">Total Blocks</div>
+                <div class="text-base font-bold text-[#37352f] dark:text-[#ebebeb]">{{ totalBlocksCount() }}</div>
+              </div>
+              <div class="p-3 bg-white dark:bg-[#1e1e1e] border border-[#edece9] dark:border-[#2e2e2e] rounded-xl shadow-xs">
+                <div class="text-[10px] uppercase font-semibold text-[#9b9a97] dark:text-[#777] mb-1">Required</div>
+                <div class="text-base font-bold text-[#5645d4] dark:text-[#bc8cff]">{{ countRequiredFields() }}</div>
+              </div>
+            </div>
+
+            <!-- Notion Callout Tip -->
+            <div class="p-3 bg-[#f0eeff]/70 dark:bg-[#2b244d]/30 border border-[#5645d4]/25 rounded-xl flex gap-2.5 items-start">
+              <span class="text-base leading-none mt-0.5">💡</span>
+              <div class="text-xs leading-relaxed text-[#5d5b54] dark:text-[#b0b0b0]">
+                <strong class="font-medium text-[#37352f] dark:text-[#ebebeb]">Notion Tip:</strong> Click any block on the canvas to configure labels, validation rules, and layout column widths.
+              </div>
+            </div>
+
+            <!-- Quick Action Button -->
+            <button 
+              type="button"
+              (click)="quickAddDefaultField()"
+              class="w-full py-2 px-3 bg-white dark:bg-[#1e1e1e] hover:bg-[#edece9]/50 dark:hover:bg-[#2c2c2c] border border-[#edece9] dark:border-[#2e2e2e] rounded-xl text-xs font-medium text-[#37352f] dark:text-[#ebebeb] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            >
+              <mat-icon class="text-[16px] text-[#5645d4]">add_circle_outline</mat-icon>
+              <span>Quick Add Text Input</span>
+            </button>
           </div>
         }
       </div>
@@ -3005,6 +3086,40 @@ export class PropertiesComponent {
   serviceManager = inject(ServiceManagerService);
   submissionMappingService = inject(SubmissionMappingService);
   fb = inject(FormBuilder);
+
+  totalBlocksCount = computed(() => {
+    let count = 0;
+    const countBlocks = (fields: FormField[]) => {
+      for (const f of fields) {
+        count++;
+        if (f.fields && f.fields.length > 0) countBlocks(f.fields);
+      }
+    };
+    countBlocks(this.formBuilder.fields());
+    return count;
+  });
+
+  countRequiredFields = computed(() => {
+    let count = 0;
+    const countReq = (fields: FormField[]) => {
+      for (const f of fields) {
+        if (f.required) count++;
+        if (f.fields && f.fields.length > 0) countReq(f.fields);
+      }
+    };
+    countReq(this.formBuilder.fields());
+    return count;
+  });
+
+  quickAddDefaultField() {
+    this.formBuilder.addField({
+      type: "text",
+      label: "New Field",
+      name: "field_" + Math.random().toString(36).substring(2, 7),
+      required: false,
+      colSpan: 12,
+    });
+  }
 
   editingValidationRule = signal<
     (FieldValidationRule & { isNew?: boolean }) | null
