@@ -5,13 +5,52 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
-import { dirname, join } from 'node:path';
+import os from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const browserDistFolder = join(__dirname, '../browser');
+
+// Target save path in source public folder
+const PUBLIC_SAVE_PATH = resolve(process.cwd(), 'public', 'saved-form.json');
+// Browser distribution location (served statically in production SSR)
+const BROWSER_SAVE_PATH = join(browserDistFolder, 'saved-form.json');
+// Fallback temp path (for container environments like Cloud Run)
+const TEMP_SAVE_PATH = join(os.tmpdir(), 'saved-form.json');
+
+/**
+ * Ensures saved-form.json exists and contains valid JSON.
+ * Recreates it with default `[]` if missing or empty.
+ */
+async function ensureSavedFormFile(): Promise<string> {
+  const targetPath = PUBLIC_SAVE_PATH;
+  try {
+    const stats = await fs.stat(targetPath);
+    if (stats.size === 0) {
+      await fs.writeFile(targetPath, '[]\n', 'utf-8');
+    }
+    return targetPath;
+  } catch {
+    // File or directory not found - recreate it
+    try {
+      await fs.mkdir(dirname(targetPath), { recursive: true });
+      await fs.writeFile(targetPath, '[]\n', 'utf-8');
+      return targetPath;
+    } catch (e) {
+      console.warn('Could not write to public/saved-form.json, falling back to temp dir:', e);
+      try {
+        await fs.mkdir(dirname(TEMP_SAVE_PATH), { recursive: true });
+        await fs.writeFile(TEMP_SAVE_PATH, '[]\n', 'utf-8');
+        return TEMP_SAVE_PATH;
+      } catch {
+        return targetPath;
+      }
+    }
+  }
+}
 
 process.env['NG_ALLOWED_HOSTS'] = 'localhost,127.0.0.1,*.run.app,*.webai.com,*.google.com';
 
@@ -25,9 +64,33 @@ const angularApp = new AngularNodeAppEngine();
 app.post('/api/save', async (req, res) => {
   try {
     const data = req.body;
-    // Save to /tmp folder so it's accessible and writeable in Cloud Run
-    const filePath = '/tmp/saved-form.json';
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+    const formatted = JSON.stringify(data, null, 2);
+    let saved = false;
+
+    // 1. Primary: Save to public/saved-form.json
+    try {
+      await fs.mkdir(dirname(PUBLIC_SAVE_PATH), { recursive: true });
+      await fs.writeFile(PUBLIC_SAVE_PATH, formatted, 'utf-8');
+      saved = true;
+    } catch (err) {
+      console.warn('Warning: Could not save to public/saved-form.json:', err);
+    }
+
+    // 2. Synchronize to dist/browser/saved-form.json so running SSR server serves updated file immediately
+    try {
+      await fs.mkdir(dirname(BROWSER_SAVE_PATH), { recursive: true });
+      await fs.writeFile(BROWSER_SAVE_PATH, formatted, 'utf-8');
+      saved = true;
+    } catch {
+      // dist/browser may not exist if not yet built
+    }
+
+    // 3. Fallback to temp directory if primary locations failed
+    if (!saved) {
+      await fs.mkdir(dirname(TEMP_SAVE_PATH), { recursive: true });
+      await fs.writeFile(TEMP_SAVE_PATH, formatted, 'utf-8');
+    }
+
     res.json({ success: true, message: 'Saved successfully' });
   } catch (error) {
     console.error('Error saving form:', error);
@@ -37,10 +100,10 @@ app.post('/api/save', async (req, res) => {
 
 app.get('/saved-form.json', async (req, res) => {
   try {
-    const filePath = '/tmp/saved-form.json';
-    await fs.access(filePath);
-    res.sendFile(filePath);
-  } catch {
+    const activePath = await ensureSavedFormFile();
+    res.sendFile(activePath);
+  } catch (error) {
+    console.error('Error reading saved-form.json:', error);
     res.json([]);
   }
 });
