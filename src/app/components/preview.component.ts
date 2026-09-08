@@ -1,3 +1,4 @@
+import { ExpressionEvaluatorService } from '../expression-evaluator.service';
 import {
   Component,
   inject,
@@ -5,6 +6,7 @@ import {
   OnInit,
   effect,
   HostListener,
+  input,
 } from "@angular/core";
 import {
   FormBuilderService,
@@ -12,6 +14,7 @@ import {
   TranslationEntry,
 } from "../form-builder.service";
 import { I18nService } from "../i18n.service";
+import { FormContextService } from "../form-context.service";
 import { MockHttpService } from "../mock-http.service";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
@@ -36,6 +39,7 @@ import { Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, timeout } from "rxjs/operators";
 import { ServiceManagerService } from "../service-manager.service";
 import { SubmissionMappingService } from "../submission-mapping.service";
+import { z } from "zod";
 
 import { MatButtonModule } from "@angular/material/button";
 import { MatDialogModule, MatDialog } from "@angular/material/dialog";
@@ -95,30 +99,32 @@ export class ConfirmDialogComponent {}
       >
         <div class="flex items-center justify-between border-b border-gray-200">
           <div class="flex">
-            <button
-              (click)="activeTab.set('form')"
-              [class.border-primary]="activeTab() === 'form'"
-              [class.text-primary]="activeTab() === 'form'"
-              class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Live Form
-            </button>
-            <button
-              (click)="activeTab.set('json')"
-              [class.border-primary]="activeTab() === 'json'"
-              [class.text-primary]="activeTab() === 'json'"
-              class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              JSON & Export
-            </button>
-            <button
-              (click)="activeTab.set('simulation')"
-              [class.border-primary]="activeTab() === 'simulation'"
-              [class.text-primary]="activeTab() === 'simulation'"
-              class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Simulation
-            </button>
+            @if (!standaloneMode()) {
+              <button
+                (click)="activeTab.set('form')"
+                [class.border-indigo-500]="activeTab() === 'form'"
+                [class.text-indigo-600]="activeTab() === 'form'"
+                class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Live Form
+              </button>
+              <button
+                (click)="activeTab.set('json')"
+                [class.border-indigo-500]="activeTab() === 'json'"
+                [class.text-indigo-600]="activeTab() === 'json'"
+                class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                JSON & Export
+              </button>
+              <button
+                (click)="activeTab.set('simulation')"
+                [class.border-indigo-500]="activeTab() === 'simulation'"
+                [class.text-indigo-600]="activeTab() === 'simulation'"
+                class="px-4 py-2 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Simulation
+              </button>
+            }
           </div>
 
           @if (
@@ -139,7 +145,7 @@ export class ConfirmDialogComponent {}
                 id="previewLangSelect"
                 [ngModel]="i18n.currentLanguage()"
                 (ngModelChange)="i18n.setLanguage($event)"
-                class="text-sm border border-gray-200 bg-white font-medium text-gray-700 py-1 pl-2 pr-6 rounded-md focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer outline-none"
+                class="text-sm border border-gray-200 bg-white font-medium text-gray-700 py-1 pl-2 pr-6 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer outline-none"
               >
                 @for (
                   lang of formBuilder.formConfig().global.i18n.languages;
@@ -165,24 +171,33 @@ export class ConfirmDialogComponent {}
               [class.mx-auto]="activeTab() === 'form'"
             >
               <div
-                class="bg-primary/10/50 px-8 py-6 border-b border-gray-100 flex items-center justify-between"
+                class="bg-indigo-50/50 px-8 py-6 border-b border-gray-100 flex items-center justify-between"
               >
                 <div>
-                  <h2 class="text-xl font-bold text-gray-800">Live Preview</h2>
-                  <p class="text-sm text-gray-500 mt-1">
-                    Test your form interactions and validation logic
-                  </p>
+                  @if (standaloneMode()) {
+                    <h2 class="text-xl font-bold text-gray-800">{{ formBuilder.formConfig().global.formDefinition.name || 'Untitled Page' }}</h2>
+                    <p class="text-sm text-gray-500 mt-1">
+                      {{ formBuilder.formConfig().global.formDefinition.description || '' }}
+                    </p>
+                  } @else {
+                    <h2 class="text-xl font-bold text-gray-800">Live Preview</h2>
+                    <p class="text-sm text-gray-500 mt-1">
+                      Test your form interactions and validation logic
+                    </p>
+                  }
                 </div>
                 <div class="hidden sm:flex items-center gap-2">
-                  <div
-                    class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium"
-                    [class.text-red-600]="liveForm.invalid"
-                    [class.border-red-200]="liveForm.invalid"
-                    [class.text-green-600]="liveForm.valid"
-                    [class.border-green-200]="liveForm.valid"
-                  >
-                    {{ liveForm.valid ? "Valid Form" : "Contains Errors" }}
-                  </div>
+                  @if (!standaloneMode()) {
+                    <div
+                      class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium"
+                      [class.text-red-600]="liveForm.invalid"
+                      [class.border-red-200]="liveForm.invalid"
+                      [class.text-green-600]="liveForm.valid"
+                      [class.border-green-200]="liveForm.valid"
+                    >
+                      {{ liveForm.valid ? "Valid Form" : "Contains Errors" }}
+                    </div>
+                  }
                 </div>
               </div>
               <div class="p-8 bg-white min-h-[400px]">
@@ -191,7 +206,7 @@ export class ConfirmDialogComponent {}
                     class="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-b-xl border-t border-gray-100"
                   >
                     <mat-icon
-                      class="text-primary animate-spin mb-4"
+                      class="text-indigo-600 animate-spin mb-4"
                       style="font-size: 32px; width: 32px; height: 32px;"
                       >refresh</mat-icon
                     >
@@ -374,6 +389,31 @@ export class ConfirmDialogComponent {}
                                   ></ng-container>
                                 </div>
                               </div>
+                            } @else if (field.type === "container") {
+                              <div
+                                class="w-full mt-2"
+                              >
+                                <div
+                                  class="grid gap-5"
+                                  [ngClass]="{
+                                    'grid-cols-1': field.groupLayout === '1',
+                                    'grid-cols-2': field.groupLayout === '2',
+                                    'grid-cols-3': field.groupLayout === '3',
+                                    'grid-cols-12': !field.groupLayout,
+                                  }"
+                                >
+                                  <ng-container
+                                    *ngTemplateOutlet="
+                                      fieldRenderer;
+                                      context: {
+                                        fields: field.fields || [],
+                                        formGroup: formGroup,
+                                        layout: field.groupLayout || '1',
+                                      }
+                                    "
+                                  ></ng-container>
+                                </div>
+                              </div>
                             } @else if (field.type === "array") {
                               <div
                                 class="border border-gray-200 rounded-lg p-4 bg-gray-50 mt-2 relative"
@@ -430,7 +470,7 @@ export class ConfirmDialogComponent {}
                                           field.fields || []
                                         )
                                       "
-                                      class="text-sm font-medium text-primary hover:text-primary-focus flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-md hover:bg-primary/20 transition-colors"
+                                      class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-md hover:bg-indigo-100 transition-colors"
                                     >
                                       <mat-icon
                                         class="text-[18px] w-[18px] h-[18px]"
@@ -526,7 +566,7 @@ export class ConfirmDialogComponent {}
                               </div>
                             } @else {
                               @if (
-                                field.type !== "divider" &&
+                                field.type !== "divider" && !["table","form_embed"].includes(field.type) &&
                                 field.type !== "button"
                               ) {
                                 <div
@@ -601,6 +641,143 @@ export class ConfirmDialogComponent {}
                               }
 
                               @switch (field.type) {
+
+                                @case ("table") {
+                                  <div class="mt-2 flex flex-col gap-3">
+                                    <div class="flex justify-between items-center gap-2 flex-wrap">
+                                      <div class="flex items-center gap-2">
+                                        <label class="inline-flex items-center gap-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer">
+                                          <mat-icon class="text-[18px]">upload</mat-icon> Import CSV
+                                          <input type="file" accept=".csv" class="hidden" (change)="importTableFromCSV(field, $event)" />
+                                        </label>
+                                        @if (tableData()[field.id] && tableData()[field.id].length > 0) {
+                                          <button type="button" (click)="exportTableToCSV(field)" class="inline-flex items-center gap-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                            <mat-icon class="text-[18px]">download</mat-icon> Export CSV
+                                          </button>
+                                        }
+                                      </div>
+                                      @if (field.tableConfig?.search?.enabled) {
+                                        <div class="flex justify-end flex-grow">
+                                          <div class="relative w-full max-w-sm">
+                                            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</mat-icon>
+                                            <input type="text" placeholder="Search..." (input)="searchTable(field, $event)" [value]="tableStates()[field.id]?.search || ''" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+                                          </div>
+                                        </div>
+                                      }
+                                    </div>
+                                    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                                      <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                          <tr>
+                                            @for (col of getTableColumns(field); track col.key) {
+                                              <th 
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative group select-none"
+                                                [class.cursor-pointer]="col.sortable"
+                                                [class.hover:bg-gray-100]="col.sortable || true"
+                                                (click)="col.sortable ? sortColumn(field, col.key) : null"
+                                                draggable="true"
+                                                (dragstart)="onColumnDragStart($event, field.id, col.key)"
+                                                (dragover)="onColumnDragOver($event, field.id, col.key)"
+                                                (drop)="onColumnDrop($event, field, col.key)"
+                                                (dragend)="onColumnDragEnd()"
+                                                [class.opacity-50]="draggedColumn()?.fieldId === field.id && draggedColumn()?.colKey === col.key"
+                                              >
+                                                <div class="flex items-center gap-1">
+                                                  <mat-icon class="text-[14px] cursor-grab text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">drag_indicator</mat-icon>
+                                                  {{ col.label }}
+                                                  @if (col.sortable && tableStates()[field.id]?.sortKey === col.key) {
+                                                    <mat-icon class="text-[14px]">{{ tableStates()[field.id]?.sortAsc ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                                                  }
+                                                </div>
+                                              </th>
+                                            }
+
+                                            @if (field.tableConfig?.rowActions?.length) {
+                                              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1">
+                                                Actions
+                                              </th>
+                                            }
+                                            @if (getTableColumns(field).length === 0) {
+                                              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No columns defined</th>
+                                            }
+                                          </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                          @for (row of getProcessedTableData(field); track $index) {
+                                            @if (evalRowExpression(field, row) !== false) {
+                                              <tr [ngClass]="evalRowExpression(field, row) || ''">
+                                                @for (col of getTableColumns(field); track col.key) {
+                                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ row[col.key] }}</td>
+                                                }
+
+                                                @if (field.tableConfig?.rowActions?.length) {
+                                                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-1 space-x-2">
+                                                    @for (action of field.tableConfig.rowActions; track action.id) {
+                                                      <button type="button" (click)="onRowActionClick(field, action, row)" class="inline-flex items-center gap-1 hover:opacity-80 transition-opacity" [ngClass]="action.color || 'text-indigo-600 hover:text-indigo-900'">
+                                                        @if (action.icon) {
+                                                          <mat-icon class="text-[18px]">{{ action.icon }}</mat-icon>
+                                                        }
+                                                        {{ action.label }}
+                                                      </button>
+                                                    }
+                                                  </td>
+                                                }
+                                              </tr>
+                                            }
+                                          }
+                                          @if (getProcessedTableData(field).length === 0) {
+                                            <tr>
+                                              <td [colSpan]="Math.max(1, getTableColumns(field).length + (field.tableConfig?.rowActions?.length ? 1 : 0))" class="px-6 py-8 text-center text-sm text-gray-500 italic">No data available</td>
+                                            </tr>
+                                          }
+                                        </tbody>
+                                        @if (hasTableSummary(field)) {
+                                          <tfoot class="bg-gray-50 border-t border-gray-200">
+                                            <tr>
+                                              @for (col of getTableColumns(field); track col.key) {
+                                                <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 border-r border-gray-200 last:border-r-0">
+                                                  @if (col.summaryType && col.summaryType !== 'none') {
+                                                    {{ calculateColumnSummary(field, col) }}
+                                                  }
+                                                </td>
+                                              }
+                                              @if (field.tableConfig?.rowActions?.length) {
+                                                <td class="px-6 py-3 whitespace-nowrap text-sm font-medium"></td>
+                                              }
+                                            </tr>
+                                          </tfoot>
+                                        }
+                                      </table>
+                                    </div>
+                                    @if (field.tableConfig?.pagination?.enabled || (tableData()[field.id] && tableData()[field.id].length > 10)) {
+                                      <div class="flex items-center justify-between py-2 flex-wrap gap-2">
+                                        <div class="flex items-center gap-2">
+                                          <span class="text-sm text-gray-600">Rows per page:</span>
+                                          <select class="border border-gray-300 rounded text-sm p-1 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                  (change)="setTablePageSize(field, $event)">
+                                            <option [value]="5" [selected]="(tableStates()[field.id]?.pageSize || $any(field.tableConfig)?.pagination?.pageSize || 10) === 5">5</option>
+                                            <option [value]="10" [selected]="(tableStates()[field.id]?.pageSize || $any(field.tableConfig)?.pagination?.pageSize || 10) === 10">10</option>
+                                            <option [value]="25" [selected]="(tableStates()[field.id]?.pageSize || $any(field.tableConfig)?.pagination?.pageSize || 10) === 25">25</option>
+                                            <option [value]="50" [selected]="(tableStates()[field.id]?.pageSize || $any(field.tableConfig)?.pagination?.pageSize || 10) === 50">50</option>
+                                            <option [value]="tableData()[field.id]?.length || 100" [selected]="(tableStates()[field.id]?.pageSize || $any(field.tableConfig)?.pagination?.pageSize || 10) === (tableData()[field.id]?.length || 100)">All</option>
+                                          </select>
+                                        </div>
+                                        <span class="text-sm text-gray-600">
+                                          Page {{ (tableStates()[field.id]?.page || 0) + 1 }} of {{ getTableTotalPages(field) }} ({{ getFilteredTableDataLength(field) }} items)
+                                        </span>
+                                        <div class="flex gap-2">
+                                          <button type="button" (click)="setTablePage(field, -1)" [disabled]="(tableStates()[field.id]?.page || 0) === 0" class="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-50 text-gray-700">Previous</button>
+                                          <button type="button" (click)="setTablePage(field, 1)" [disabled]="(tableStates()[field.id]?.page || 0) >= getTableTotalPages(field) - 1" class="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-50 text-gray-700">Next</button>
+                                        </div>
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                                @case ("form_embed") {
+                                  <div class="mt-2 p-4 border border-dashed border-indigo-300 bg-indigo-50 text-indigo-700 rounded text-center">
+                                    <mat-icon class="align-middle mr-2">dynamic_form</mat-icon> Embedded Form Area
+                                  </div>
+                                }
                                 @case ("divider") {
                                   <div class="py-4">
                                     <hr class="border-t-2 border-gray-300" />
@@ -618,7 +795,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-primary focus:border-primary':
+                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -699,7 +876,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-primary focus:border-primary':
+                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -749,7 +926,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-primary focus:border-primary':
+                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -803,6 +980,7 @@ export class ConfirmDialogComponent {}
                                       type="number"
                                       [formControlName]="field.name"
                                       [placeholder]="field.placeholder || ''"
+                                      [mask]="field.mask || ''"
                                       [readonly]="readOnlyFields()[field.id]"
                                       class="w-full px-3 py-2 border rounded-md sm:text-sm transition-colors"
                                       [ngClass]="{
@@ -810,7 +988,7 @@ export class ConfirmDialogComponent {}
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
                                             formGroup.get(field.name)?.touched),
-                                        'border-gray-300 focus:ring-primary focus:border-primary':
+                                        'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
                                           !(
                                             formGroup.get(field.name)
                                               ?.invalid &&
@@ -999,7 +1177,7 @@ export class ConfirmDialogComponent {}
                                         formGroup.get(field.name)?.invalid &&
                                         (formGroup.get(field.name)?.dirty ||
                                           formGroup.get(field.name)?.touched),
-                                      'border-gray-300 focus:ring-primary focus:border-primary':
+                                      'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500':
                                         !(
                                           formGroup.get(field.name)?.invalid &&
                                           (formGroup.get(field.name)?.dirty ||
@@ -1058,7 +1236,7 @@ export class ConfirmDialogComponent {}
                                       [id]="'live-' + field.id"
                                       type="checkbox"
                                       [formControlName]="field.name"
-                                      class="rounded text-primary focus:ring-primary"
+                                      class="rounded text-indigo-600 focus:ring-indigo-500"
                                       [ngClass]="{
                                         'border-red-300':
                                           formGroup.get(field.name)?.invalid &&
@@ -1073,6 +1251,39 @@ export class ConfirmDialogComponent {}
                                           readOnlyFields()[field.id],
                                       }"
                                     />
+                                    <span class="text-sm text-gray-600">{{
+                                      getTranslatedText(
+                                        field,
+                                        "label",
+                                        field.label
+                                      )
+                                    }}</span>
+                                  </div>
+                                }
+                                @case ("switch") {
+                                  <div class="flex items-center gap-3">
+                                    <button
+                                      [id]="'live-' + field.id"
+                                      type="button"
+                                      role="switch"
+                                      [attr.aria-checked]="formGroup.get(field.name)?.value"
+                                      (click)="!readOnlyFields()[field.id] && formGroup.get(field.name)?.setValue(!formGroup.get(field.name)?.value); formGroup.get(field.name)?.markAsTouched()"
+                                      [disabled]="readOnlyFields()[field.id]"
+                                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                                      [ngClass]="{
+                                        'bg-indigo-600': formGroup.get(field.name)?.value,
+                                        'bg-gray-200': !formGroup.get(field.name)?.value,
+                                        'opacity-60 cursor-not-allowed': readOnlyFields()[field.id]
+                                      }"
+                                    >
+                                      <span
+                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                        [ngClass]="{
+                                          'translate-x-5': formGroup.get(field.name)?.value,
+                                          'translate-x-0': !formGroup.get(field.name)?.value
+                                        }"
+                                      ></span>
+                                    </button>
                                     <span class="text-sm text-gray-600">{{
                                       getTranslatedText(
                                         field,
@@ -1097,7 +1308,7 @@ export class ConfirmDialogComponent {}
                                           [id]="
                                             'live-' + field.id + '-' + opt.value
                                           "
-                                          class="text-primary focus:ring-primary"
+                                          class="text-indigo-600 focus:ring-indigo-500"
                                           [ngClass]="{
                                             'border-red-300':
                                               formGroup.get(field.name)
@@ -1178,10 +1389,10 @@ export class ConfirmDialogComponent {}
                                     [disabled]="disabledFields()[field.id]"
                                     class="w-full flex justify-center items-center gap-2 px-4 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px]"
                                     [ngClass]="{
-                                      'bg-primary text-white hover:bg-primary-focus border-transparent focus:ring-primary':
+                                      'bg-indigo-600 text-white hover:bg-indigo-700 border-transparent focus:ring-indigo-500':
                                         field.buttonType === 'submit' ||
                                         !field.buttonType,
-                                      'bg-white text-gray-700 hover:bg-gray-50 border-gray-300 focus:ring-primary':
+                                      'bg-white text-gray-700 hover:bg-gray-50 border-gray-300 focus:ring-indigo-500':
                                         field.buttonType === 'button',
                                       'bg-red-600 text-white hover:bg-red-700 border-transparent focus:ring-red-500':
                                         field.buttonType === 'reset',
@@ -1382,7 +1593,7 @@ export class ConfirmDialogComponent {}
                                     @if (field.multiSelect) {
                                       <!-- Multi-select chips area inside input lookalike -->
                                       <div
-                                        class="flex flex-wrap items-center gap-1 w-full border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-primary transition-shadow min-h-[38px] py-1"
+                                        class="flex flex-wrap items-center gap-1 w-full border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow min-h-[38px] py-1"
                                         [ngClass]="{
                                           'pl-10': field.icon,
                                           'opacity-50 cursor-not-allowed bg-gray-50':
@@ -1405,12 +1616,12 @@ export class ConfirmDialogComponent {}
                                           track $index
                                         ) {
                                           <span
-                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary-focus"
+                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
                                           >
                                             {{ getDisplayLabel(item, field) }}
                                             <button
                                               type="button"
-                                              class="text-primary hover:text-indigo-900 focus:outline-none"
+                                              class="text-indigo-600 hover:text-indigo-900 focus:outline-none"
                                               (click)="
                                                 removeSelectedItem(
                                                   field,
@@ -1460,7 +1671,7 @@ export class ConfirmDialogComponent {}
                                     } @else {
                                       <input
                                         type="text"
-                                        class="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-primary focus:border-primary h-[38px]"
+                                        class="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-[38px]"
                                         [ngClass]="{
                                           'pl-10': field.icon,
                                           'bg-gray-50 text-gray-500 cursor-not-allowed opacity-70':
@@ -1543,7 +1754,7 @@ export class ConfirmDialogComponent {}
                                             track option
                                           ) {
                                             <div
-                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary/10 hover:text-indigo-900"
+                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50 hover:text-indigo-900"
                                               (click)="
                                                 selectAutocompleteOption(
                                                   field,
@@ -1595,7 +1806,7 @@ export class ConfirmDialogComponent {}
                                                 isOptionSelected(field, option)
                                               ) {
                                                 <span
-                                                  class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary"
+                                                  class="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600"
                                                 >
                                                   <mat-icon
                                                     class="w-5 h-5 text-[20px]"
@@ -1613,7 +1824,7 @@ export class ConfirmDialogComponent {}
                               }
                               @if (
                                 field.validationPlacement !== "top" &&
-                                field.type !== "divider" &&
+                                field.type !== "divider" && !["table","form_embed"].includes(field.type) &&
                                 field.type !== "button"
                               ) {
                                 <ng-container
@@ -1731,7 +1942,7 @@ export class ConfirmDialogComponent {}
                       </div>
                       @if (log.payload) {
                         <pre
-                          class="mt-2 pl-2 border-l-2 border-primary/50 text-indigo-300 overflow-x-auto bg-gray-950 p-2 rounded"
+                          class="mt-2 pl-2 border-l-2 border-indigo-500/50 text-indigo-300 overflow-x-auto bg-gray-950 p-2 rounded"
                           >{{ log.payload | json }}</pre
                         >
                       }
@@ -1772,16 +1983,16 @@ export class ConfirmDialogComponent {}
                 <div class="flex items-center gap-2 mb-4">
                   <button
                     (click)="format.set('object')"
-                    [class.bg-primary/20]="format() === 'object'"
-                    [class.text-primary-focus]="format() === 'object'"
+                    [class.bg-indigo-100]="format() === 'object'"
+                    [class.text-indigo-700]="format() === 'object'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Object
                   </button>
                   <button
                     (click)="format.set('base64')"
-                    [class.bg-primary/20]="format() === 'base64'"
-                    [class.text-primary-focus]="format() === 'base64'"
+                    [class.bg-indigo-100]="format() === 'base64'"
+                    [class.text-indigo-700]="format() === 'base64'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Base64
@@ -1789,7 +2000,7 @@ export class ConfirmDialogComponent {}
                   <div class="flex-1"></div>
                   <button
                     (click)="copyToClipboard()"
-                    class="flex items-center gap-1 text-primary hover:text-primary-focus text-sm font-medium transition-colors"
+                    class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
                   >
                     <mat-icon class="text-[18px] w-[18px] h-[18px]"
                       >content_copy</mat-icon
@@ -1807,16 +2018,16 @@ export class ConfirmDialogComponent {}
                   <pre
                     class="bg-gray-800 text-green-400 p-4 rounded-md overflow-auto text-xs font-mono h-[300px] border-2 transition-colors"
                     [class.border-transparent]="!isDraggingFile()"
-                    [class.border-primary]="isDraggingFile()"
+                    [class.border-indigo-500]="isDraggingFile()"
                     >{{ getFormattedData() }}</pre
                   >
 
                   @if (isDraggingFile()) {
                     <div
-                      class="absolute inset-0 bg-primary/100/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
+                      class="absolute inset-0 bg-indigo-500/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
                     >
                       <div
-                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-primary-focus font-medium"
+                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-indigo-700 font-medium"
                       >
                         <mat-icon>upload_file</mat-icon> Drop Schema JSON to
                         import
@@ -1877,16 +2088,16 @@ export class ConfirmDialogComponent {}
                 <div class="flex items-center gap-2 mb-4">
                   <button
                     (click)="dataFormat.set('object')"
-                    [class.bg-primary/20]="dataFormat() === 'object'"
-                    [class.text-primary-focus]="dataFormat() === 'object'"
+                    [class.bg-indigo-100]="dataFormat() === 'object'"
+                    [class.text-indigo-700]="dataFormat() === 'object'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Object
                   </button>
                   <button
                     (click)="dataFormat.set('base64')"
-                    [class.bg-primary/20]="dataFormat() === 'base64'"
-                    [class.text-primary-focus]="dataFormat() === 'base64'"
+                    [class.bg-indigo-100]="dataFormat() === 'base64'"
+                    [class.text-indigo-700]="dataFormat() === 'base64'"
                     class="px-3 py-1 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Base64
@@ -1894,7 +2105,7 @@ export class ConfirmDialogComponent {}
                   <div class="flex-1"></div>
                   <button
                     (click)="copyDataToClipboard()"
-                    class="flex items-center gap-1 text-primary hover:text-primary-focus text-sm font-medium transition-colors"
+                    class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
                   >
                     <mat-icon class="text-[18px] w-[18px] h-[18px]"
                       >content_copy</mat-icon
@@ -1912,16 +2123,16 @@ export class ConfirmDialogComponent {}
                   <pre
                     class="bg-gray-800 text-green-400 p-4 rounded-md overflow-auto text-xs font-mono h-[300px] border-2 transition-colors"
                     [class.border-transparent]="!isDraggingDataFile()"
-                    [class.border-primary]="isDraggingDataFile()"
+                    [class.border-indigo-500]="isDraggingDataFile()"
                     >{{ getFormattedDataValues() }}</pre
                   >
 
                   @if (isDraggingDataFile()) {
                     <div
-                      class="absolute inset-0 bg-primary/100/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
+                      class="absolute inset-0 bg-indigo-500/20 backdrop-blur-sm rounded-md flex items-center justify-center pointer-events-none"
                     >
                       <div
-                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-primary-focus font-medium"
+                        class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-indigo-700 font-medium"
                       >
                         <mat-icon>upload_file</mat-icon> Drop Data JSON to
                         import
@@ -2029,7 +2240,7 @@ export class ConfirmDialogComponent {}
             </p>
             <textarea
               [formControl]="fillJsonControl"
-              class="w-full h-64 border border-gray-300 rounded-md p-3 font-mono text-sm focus:ring-primary focus:border-primary"
+              class="w-full h-64 border border-gray-300 rounded-md p-3 font-mono text-sm focus:ring-indigo-500 focus:border-indigo-500"
               placeholder='{ "firstName": "John", "lastName": "Doe" }'
             ></textarea>
             @if (fillJsonError()) {
@@ -2047,7 +2258,7 @@ export class ConfirmDialogComponent {}
             </button>
             <button
               (click)="applyJsonValues()"
-              class="px-4 py-2 bg-primary text-white hover:bg-primary-focus rounded-md text-sm font-medium transition-colors"
+              class="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-md text-sm font-medium transition-colors"
             >
               Apply Values
             </button>
@@ -2058,7 +2269,10 @@ export class ConfirmDialogComponent {}
   `,
 })
 export class PreviewComponent implements OnInit {
+  formContext = inject(FormContextService, { optional: true });
+  standaloneMode = input<boolean>(false);
   formBuilder = inject(FormBuilderService);
+  expressionEvaluator = inject(ExpressionEvaluatorService);
   httpClient = inject(HttpClient);
   serviceManager = inject(ServiceManagerService);
   submissionMappingService = inject(SubmissionMappingService);
@@ -2075,9 +2289,7 @@ export class PreviewComponent implements OnInit {
     defaultLabel: string,
   ): string {
     const valString = String(optValue);
-    const key = field.translationKey
-      ? `${field.translationKey}.options.${valString}`
-      : `${field.id}.options.${valString}`;
+    const key = `${field.id}.options.${valString}`;
 
     if (this.i18n.hasTranslation(key)) {
       return this.i18n.translate(key);
@@ -2090,9 +2302,7 @@ export class PreviewComponent implements OnInit {
     type: string,
     defaultValue: string,
   ): string {
-    const key = field.translationKey
-      ? `${field.translationKey}`
-      : `${field.id}.${type}`;
+    const key = `${field.id}.${type}`;
 
     if (this.i18n.hasTranslation(key)) {
       return this.i18n.translate(key);
@@ -2112,9 +2322,7 @@ export class PreviewComponent implements OnInit {
   }
 
   isTranslationMissing(field: FormField, type: string): boolean {
-    const key = field.translationKey
-      ? `${field.translationKey}`
-      : `${field.id}.${type}`;
+    const key = `${field.id}.${type}`;
     if (
       this.i18n.hasTranslation(key) ||
       this.i18n.hasTranslation(`${key}.${type}`)
@@ -2193,7 +2401,54 @@ export class PreviewComponent implements OnInit {
   dynamicOptions = signal<Record<string, { label: string; value: unknown }[]>>(
     {},
   );
+  tableData = signal<Record<string, any[]>>({});
+  tableStates = signal<Record<string, { page: number; search: string; sortKey: string; sortAsc: boolean; pageSize?: number; columnOrder?: string[] }>>({});
   dynamicSubscriptions: Subscription[] = [];
+  draggedColumn = signal<{ fieldId: string, colKey: string } | null>(null);
+
+  onColumnDragStart(event: DragEvent, fieldId: string, colKey: string) {
+    this.draggedColumn.set({ fieldId, colKey });
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onColumnDragOver(event: DragEvent, fieldId: string, colKey: string) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onColumnDrop(event: DragEvent, field: FormField, targetColKey: string) {
+    event.preventDefault();
+    const dragged = this.draggedColumn();
+    if (!dragged || dragged.fieldId !== field.id || dragged.colKey === targetColKey) {
+      this.draggedColumn.set(null);
+      return;
+    }
+
+    const currentCols = this.getTableColumns(field).map((c: any) => c.key);
+    const fromIndex = currentCols.indexOf(dragged.colKey);
+    const toIndex = currentCols.indexOf(targetColKey);
+
+    if (fromIndex !== -1 && toIndex !== -1) {
+      const newOrder = [...currentCols];
+      const [removed] = newOrder.splice(fromIndex, 1);
+      newOrder.splice(toIndex, 0, removed);
+      
+      this.tableStates.update(s => {
+        const curr = s[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+        return { ...s, [field.id]: { ...curr, columnOrder: newOrder } };
+      });
+    }
+    
+    this.draggedColumn.set(null);
+  }
+
+  onColumnDragEnd() {
+    this.draggedColumn.set(null);
+  }
 
   activeTab = signal<"form" | "json" | "simulation">("form");
   simulationLogs = signal<
@@ -2302,29 +2557,10 @@ export class PreviewComponent implements OnInit {
       const values = this.liveForm.getRawValue();
       try {
         const expression = field.onCloseActionExpression.trim();
-        // Check if it's an arrow function
-        if (expression.startsWith("(") || expression.includes("=>")) {
-          const func = new Function("return (" + expression + ")")();
-          if (typeof func === "function") {
-            func(values, field, this.liveForm);
-            return;
+        const result = this.expressionEvaluator.evaluate(expression, { values, field, form: this.liveForm });
+          if (typeof result === 'function') {
+            result(values, field, this.liveForm);
           }
-        }
-
-        // Provide context for the expression
-        const executeAction = new Function(
-          "values",
-          "field",
-          "form",
-          `
-          try {
-            ${expression}
-          } catch (e) {
-            console.error('Error executing close action:', e);
-          }
-        `,
-        );
-        executeAction(values, field, this.liveForm);
       } catch (e) {
         console.error("Error creating close action:", e);
       }
@@ -2687,10 +2923,98 @@ export class PreviewComponent implements OnInit {
     }
   }
 
+  
+  private attachOnChangeSubscriptions(fields: FormField[], formGroup: FormGroup) {
+    fields.forEach((field) => {
+      if (field.type === "divider" || field.type === "button" || field.type === "table") return;
+
+      if (field.type === "section") {
+        if (field.fields) this.attachOnChangeSubscriptions(field.fields, formGroup);
+        return;
+      }
+
+      if (field.type === "group") {
+        const nestedGroup = formGroup.get(field.name) as FormGroup;
+        if (nestedGroup && field.fields) {
+          this.attachOnChangeSubscriptions(field.fields, nestedGroup);
+        }
+        return;
+      }
+      
+      if (field.type === "array") {
+        // Arrays are harder, we'd need to attach to each array item. 
+        // Skip for now or just attach to the whole array control.
+        const arrayControl = formGroup.get(field.name);
+        if (arrayControl && field.onChangeExpression) {
+          arrayControl.valueChanges.subscribe(val => {
+            this.executeFieldOnChange(field, val);
+          });
+        }
+        return;
+      }
+
+      const control = formGroup.get(field.name);
+      if (control && field.onChangeExpression) {
+        control.valueChanges.pipe(debounceTime(300)).subscribe(val => {
+          this.executeFieldOnChange(field, val);
+        });
+      }
+    });
+  }
+  
+  private async executeFieldOnChange(field: FormField, newValue: any) {
+    if (!field.onChangeExpression || !this.liveForm) return;
+    try {
+      const values = this.liveForm.getRawValue();
+      
+      const configFns = this.formBuilder.formConfig().global.functions || [];
+      const functionsMap: Record<string, (...args: any[]) => any> = {};
+      
+      const formWrapper = {
+        getValue: (path: string) => this.liveForm?.get(path)?.value,
+        setValue: (path: string, val: any) => {
+          const control = this.liveForm?.get(path);
+          if (control) {
+            control.setValue(val, { emitEvent: true });
+          }
+        }
+      };
+
+      configFns.forEach((fnDef) => {
+        const paramNames = fnDef.isVoid
+          ? []
+          : (fnDef.parameters || []).map((p) => p.name);
+        
+        functionsMap[fnDef.name] = (...args: any[]) => {
+          return this.expressionEvaluator.evaluateAsync(fnDef.body, args, paramNames, { values, form: formWrapper });
+        };
+      });
+
+      const context = {
+        values,
+        functions: functionsMap,
+        fns: functionsMap,
+        form: formWrapper,
+        ...functionsMap
+      };
+
+      await this.expressionEvaluator.evaluateAsync(field.onChangeExpression, [newValue], ['newValue'], context);
+      
+      if (this.activeTab() === "simulation") {
+         this.logSimulationEvent("ON_CHANGE_SUCCESS", `Executed onChange for ${field.name}`);
+      }
+    } catch (e: any) {
+      if (this.activeTab() === "simulation") {
+         this.logSimulationEvent("ON_CHANGE_ERROR", `Error in onChange for ${field.name}: ${e.message}`, { error: true });
+      }
+      console.error('Error executing onChangeExpression for', field.name, e);
+    }
+  }
+
   private buildFormRecursive(fields: FormField[]): FormGroup {
     const group: Record<string, any> = {};
     fields.forEach((field) => {
-      if (field.type === "divider" || field.type === "button") return;
+      if (field.type === "divider" || field.type === "button" || field.type === "table") return;
 
       if (field.type === "section") {
         if (field.fields) {
@@ -2789,11 +3113,9 @@ export class PreviewComponent implements OnInit {
                         console.log("dispatch:", action),
                     };
 
-                    const fn = new Function(
-                      ...paramNames,
-                      fnConfig.body,
-                    );
-                    isValid = fn(...args);
+                    const ctx: any = { ...helpers, formState };
+                    paramNames.forEach((name, i) => ctx[name] = args[i]);
+                    isValid = this.expressionEvaluator.evaluate(fnConfig.body, ctx);
                   }
                 }
               } catch (err) {
@@ -2802,9 +3124,7 @@ export class PreviewComponent implements OnInit {
               }
 
               if (isValid === false) {
-                const message = rule.translationKey
-                  ? this.i18n.translate(rule.translationKey)
-                  : rule.defaultMessage || "Validation failed.";
+                const message = rule.defaultMessage || "Validation failed.";
                 return { customValidation: { message } };
               }
               return null;
@@ -2926,11 +3246,9 @@ export class PreviewComponent implements OnInit {
                   };
 
                   // Using sync Function because validators are sync
-                  const fn = new Function(
-                    ...paramNames,
-                    fnConfig.body,
-                  );
-                  isValid = fn(...args);
+                  const ctx: any = { ...helpers, formState };
+                    paramNames.forEach((name, i) => ctx[name] = args[i]);
+                    isValid = this.expressionEvaluator.evaluate(fnConfig.body, ctx);
                 }
               }
             } catch (err) {
@@ -2939,9 +3257,7 @@ export class PreviewComponent implements OnInit {
             }
 
             if (isValid === false) {
-              const message = rule.translationKey
-                ? this.i18n.translate(rule.translationKey)
-                : rule.defaultMessage || "Validation failed.";
+              const message = rule.defaultMessage || "Validation failed.";
               return { customValidation: { message } };
             }
             return null;
@@ -2982,6 +3298,67 @@ export class PreviewComponent implements OnInit {
 
   isHydrating = signal(false);
 
+  private generateZodSchema(fields: FormField[]): z.ZodObject<any, any> {
+    const shape: any = {};
+    for (const field of fields) {
+      if (field.type === "section" || field.type === "container") {
+        if (field.fields) {
+          const nested = this.generateZodSchema(field.fields);
+          Object.assign(shape, nested.shape);
+        }
+      } else if (field.type === "group") {
+        if (field.fields) {
+          shape[field.name] = this.generateZodSchema(field.fields);
+        }
+      } else if (field.type === "array") {
+        if (field.fields) {
+          let arrSchema = z.array(this.generateZodSchema(field.fields));
+          if (field.required) {
+            arrSchema = arrSchema.min(1, { message: "Required array" });
+          }
+          shape[field.name] = arrSchema;
+        }
+      } else if (
+        ["divider", "button", "table", "form_embed"].includes(field.type)
+      ) {
+        continue;
+      } else {
+        let fieldSchema: any;
+        if (field.type === "number" || field.type === "slider" || field.type === "rating") {
+          fieldSchema = z.coerce.number();
+          if (field.min !== undefined && field.min !== null) fieldSchema = fieldSchema.min(field.min);
+          if (field.max !== undefined && field.max !== null) fieldSchema = fieldSchema.max(field.max);
+        } else if (field.type === "checkbox" || field.type === "switch") {
+          fieldSchema = z.boolean().optional();
+        } else if (field.type === "multiselect") {
+          fieldSchema = z.array(z.any());
+          if (field.required) fieldSchema = fieldSchema.min(1);
+        } else {
+          fieldSchema = z.any();
+          if (field.required) {
+            fieldSchema = fieldSchema.refine(
+              (v: any) => v !== null && v !== undefined && v !== "",
+              { message: "Required" }
+            );
+          }
+          if (field.type === "text" && field.email) {
+            fieldSchema = z.string().email();
+          }
+          if ((field.type === "text" || field.type === "textarea") && field.minLength) {
+            fieldSchema = z.string().min(field.minLength);
+          }
+          if ((field.type === "text" || field.type === "textarea") && field.maxLength) {
+            fieldSchema = z.string().max(field.maxLength);
+          }
+        }
+        shape[field.name] = field.required
+          ? fieldSchema
+          : fieldSchema.optional().or(z.literal("")).or(z.null());
+      }
+    }
+    return z.object(shape);
+  }
+
   buildForm() {
     const config = this.formBuilder.formConfig();
 
@@ -2994,7 +3371,18 @@ export class PreviewComponent implements OnInit {
     this.dynamicSubscriptions.forEach((sub) => sub.unsubscribe());
     this.dynamicSubscriptions = [];
 
-    this.liveForm = this.buildFormRecursive(this.formBuilder.fields());
+        this.liveForm = this.buildFormRecursive(this.formBuilder.fields());
+    this.attachOnChangeSubscriptions(this.formBuilder.fields(), this.liveForm);
+
+    const zodSchema = this.generateZodSchema(this.formBuilder.fields());
+    this.liveForm.addValidators((control: AbstractControl) => {
+      if (!control.value) return null;
+      const result = zodSchema.safeParse(control.value);
+      if (!result.success) {
+        return { zodError: result.error.format() };
+      }
+      return null;
+    });
 
     this.liveForm.valueChanges.subscribe((vals) => {
       this.evaluateConditions();
@@ -3029,7 +3417,7 @@ export class PreviewComponent implements OnInit {
     console.log(`Executing lifecycle hook [${hookName}]:`, functionStr);
     try {
       // In a real sandbox, safely evaluate. Here we simulate execution.
-      new Function("form", functionStr)(this.liveForm);
+      this.expressionEvaluator.evaluate(functionStr, { form: this.liveForm });
     } catch (e) {
       console.warn(`Error executing lifecycle hook ${hookName}:`, e);
     }
@@ -3117,7 +3505,8 @@ export class PreviewComponent implements OnInit {
       } else if (
         (field.type === "select" ||
           field.type === "multiselect" ||
-          field.type === "radio") &&
+          field.type === "radio" ||
+          field.type === "table") &&
         field.dataSourceType === "service" &&
         field.serviceId
       ) {
@@ -3167,7 +3556,8 @@ export class PreviewComponent implements OnInit {
       } else if (
         (field.type === "select" ||
           field.type === "multiselect" ||
-          field.type === "radio") &&
+          field.type === "radio" ||
+          field.type === "table") &&
         field.dataSourceType === "service" &&
         field.serviceId
       ) {
@@ -3328,28 +3718,33 @@ export class PreviewComponent implements OnInit {
           );
         }
         if (Array.isArray(data)) {
-          const opts = data.map((item: any) => {
-            let label = item;
-            let value = item;
-            if (field.labelPath) {
-              const lParts = field.labelPath.split(".");
-              label =
-                lParts.reduce(
-                  (acc: any, part: string) => acc && (acc as any)[part],
-                  item,
-                ) ?? item;
-            }
-            if (field.valuePath) {
-              const vParts = field.valuePath.split(".");
-              value =
-                vParts.reduce(
-                  (acc: any, part: string) => acc && (acc as any)[part],
-                  item,
-                ) ?? item;
-            }
-            return { label: String(label), value };
-          });
-          this.dynamicOptions.update((curr) => ({ ...curr, [field.id]: opts }));
+          if (field.type === 'table') {
+             this.tableData.update(curr => ({ ...curr, [field.id]: data }));
+             this.tableStates.update(curr => ({ ...curr, [field.id]: curr[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true } }));
+          } else {
+            const opts = data.map((item: any) => {
+              let label = item;
+              let value = item;
+              if (field.labelPath) {
+                const lParts = field.labelPath.split(".");
+                label =
+                  lParts.reduce(
+                    (acc: any, part: string) => acc && (acc as any)[part],
+                    item,
+                  ) ?? item;
+              }
+              if (field.valuePath) {
+                const vParts = field.valuePath.split(".");
+                value =
+                  vParts.reduce(
+                    (acc: any, part: string) => acc && (acc as any)[part],
+                    item,
+                  ) ?? item;
+              }
+              return { label: String(label), value };
+            });
+            this.dynamicOptions.update((curr) => ({ ...curr, [field.id]: opts }));
+          }
         }
       },
       error: (err) =>
@@ -3359,6 +3754,378 @@ export class PreviewComponent implements OnInit {
         ),
     });
   }
+
+  // Table Methods
+  getTableColumns(field: FormField) {
+    if (!field.tableConfig?.columns) return [];
+    let cols = field.tableConfig.columns.filter((c: any) => c.visible !== false);
+    const order = this.tableStates()[field.id]?.columnOrder;
+    if (order && order.length > 0) {
+      cols = [...cols].sort((a: any, b: any) => {
+        const idxA = order.indexOf(a.key);
+        const idxB = order.indexOf(b.key);
+        if (idxA === -1 && idxB === -1) return 0;
+        if (idxA === -1) return 1;
+        if (idxB === -1) return -1;
+        return idxA - idxB;
+      });
+    }
+    return cols;
+  }
+
+  getProcessedTableData(field: FormField) {
+    const rawData = this.tableData()[field.id] || [];
+    const state = this.tableStates()[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+    const config: any = field.tableConfig || { columns: [] };
+
+    let processed = [...rawData];
+
+    // Search
+    if ((config as any).search?.enabled && state.search) {
+      const q = state.search.toLowerCase();
+      const keys = (config as any).search.searchKeys && (config as any).search.searchKeys.length > 0 
+        ? (config as any).search.searchKeys 
+        : Object.keys(processed[0] || {});
+        
+      processed = processed.filter((row: any) => {
+        return keys.some((k: string) => String(row[k] || '').toLowerCase().includes(q));
+      });
+    }
+
+    // Sort
+    if (state.sortKey) {
+      processed.sort((a, b) => {
+        const valA = a[state.sortKey];
+        const valB = b[state.sortKey];
+        if (valA < valB) return state.sortAsc ? -1 : 1;
+        if (valA > valB) return state.sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
+
+    const isPaginationEnabled = config.pagination?.enabled || rawData.length > 10;
+    // Pagination
+    if (isPaginationEnabled) {
+      const pageSize = state.pageSize || config.pagination?.pageSize || 10;
+      const start = (state.page || 0) * pageSize;
+      processed = processed.slice(start, start + pageSize);
+    }
+
+    return processed;
+  }
+  
+  getFilteredTableDataLength(field: FormField) {
+    const rawData = this.tableData()[field.id] || [];
+    const state = this.tableStates()[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+    const config: any = field.tableConfig || {};
+    let processed = [...rawData];
+    if (config.search?.enabled && state.search) {
+      const q = state.search.toLowerCase();
+      const keys = config.search.searchKeys && config.search.searchKeys.length > 0 
+        ? config.search.searchKeys 
+        : Object.keys(processed[0] || {});
+      processed = processed.filter((row: any) => keys.some((k: string) => String(row[k] || '').toLowerCase().includes(q)));
+    }
+    return processed.length;
+  }
+
+  getTableTotalPages(field: FormField) {
+    const rawData = this.tableData()[field.id] || [];
+    const config: any = field.tableConfig || { columns: [] };
+    const isPaginationEnabled = config.pagination?.enabled || rawData.length > 10;
+    if (!isPaginationEnabled) return 1;
+    
+    const length = this.getFilteredTableDataLength(field);
+    const state = this.tableStates()[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+    const pageSize = state.pageSize || config.pagination?.pageSize || 10;
+    
+    return Math.max(1, Math.ceil(length / pageSize));
+  }
+
+  setTablePage(field: FormField, delta: number) {
+    this.tableStates.update((s: any) => {
+      const curr = s[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+      const newPage = Math.max(0, Math.min((curr.page || 0) + delta, this.getTableTotalPages(field) - 1));
+      return { ...s, [field.id]: { ...curr, page: newPage } };
+    });
+  }
+
+  setTablePageSize(field: FormField, event: Event) {
+    const size = parseInt((event.target as HTMLSelectElement).value, 10);
+    this.tableStates.update((s: any) => {
+      const curr = s[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+      return { ...s, [field.id]: { ...curr, pageSize: size, page: 0 } };
+    });
+  }
+
+  sortColumn(field: FormField, colKey: string) {
+    this.tableStates.update((s: any) => {
+      const curr = s[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+      if (curr.sortKey === colKey) {
+        if (!curr.sortAsc) {
+          // third click: clear sorting
+          return { ...s, [field.id]: { ...curr, sortKey: '', sortAsc: true } };
+        }
+        return { ...s, [field.id]: { ...curr, sortAsc: false } };
+      }
+      return { ...s, [field.id]: { ...curr, sortKey: colKey, sortAsc: true } };
+    });
+  }
+
+
+  onRowActionClick(field: FormField, action: import('../form-builder.service').RowAction, row: any) {
+    if (action.actionType === 'custom_function' && action.customFunctionId) {
+      const customFn = this.formBuilder.formConfig()?.global?.functions?.find((f: any) => f.id === action.customFunctionId);
+      if (customFn) {
+        try {
+          this.expressionEvaluator.evaluate(customFn.body, { field, row, formGroup: this.liveForm, apiService: null, snackBar: null });
+        } catch (e: any) {
+          console.error("Error executing row custom function:", e);
+          alert("Error: " + e.message);
+        }
+      }
+    } else if (action.actionType === 'navigation' && action.urlExpression) {
+      try {
+        const url = this.expressionEvaluator.evaluate(action.urlExpression, { row });
+        if (url) {
+          if (url.startsWith('http')) {
+            window.open(url, '_blank');
+          } else {
+            window.location.href = url;
+          }
+        }
+      } catch(e) {
+        console.error("Error evaluating URL expression:", e);
+      }
+    } else if (action.actionType === 'service' && action.serviceId) {
+      const srv = this.serviceManager.services().find(s => s.id === action.serviceId);
+      if (!srv || !srv.url) return;
+      
+      let finalUrl = srv.url;
+      const qParams = new URLSearchParams();
+      const body: any = {};
+      const headers: Record<string, string> = {};
+      
+      if (action.serviceParams) {
+        action.serviceParams.forEach(p => {
+          let val = p.value;
+          if (p.valueSource === 'field' && this.liveForm) {
+            val = this.liveForm.get(p.value)?.value;
+          } else if (p.valueSource === 'row') {
+            val = row[p.value];
+          }
+          
+          if (p.type === 'path') {
+             finalUrl = finalUrl.replace('{' + p.key + '}', encodeURIComponent(val));
+          } else if (p.type === 'query') {
+             qParams.append(p.key, val);
+          } else if (p.type === 'header') {
+             headers[p.key] = val;
+          } else if (p.type === 'body') {
+             body[p.key] = val;
+          }
+        });
+      }
+      
+      const qStr = qParams.toString();
+      if (qStr) {
+         finalUrl += (finalUrl.includes('?') ? '&' : '?') + qStr;
+      }
+      
+      this.httpClient.request(srv.method || 'GET', finalUrl, { headers, body: srv.method !== 'GET' ? body : undefined }).subscribe({
+        next: (res: any) => {
+          alert("Action successful");
+        },
+        error: (err: any) => {
+          alert("Action failed");
+        }
+      });
+    }
+  }
+
+  searchTable(field: FormField, event: Event) {
+    const q = (event.target as HTMLInputElement).value;
+    this.tableStates.update((s: any) => {
+      const curr = s[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+      return { ...s, [field.id]: { ...curr, search: q, page: 0 } }; // reset page on search
+    });
+  }
+
+  hasTableSummary(field: FormField): boolean {
+    return this.getTableColumns(field).some(c => c.summaryType && c.summaryType !== 'none');
+  }
+
+  calculateColumnSummary(field: FormField, col: any): string | number {
+    if (!col.summaryType || col.summaryType === 'none') return '';
+    const data = this.getProcessedTableData(field);
+    if (!data || data.length === 0) return '';
+
+    if (col.summaryType === 'count') {
+      return data.length;
+    }
+
+    if (col.summaryType === 'custom' && col.summaryExpression) {
+      try {
+        return this.expressionEvaluator.evaluate(col.summaryExpression, { rows: data });
+      } catch (e) {
+        return 'Error';
+      }
+    }
+
+    const values = data.map((row: any) => {
+      const val = parseFloat(row[col.key]);
+      return isNaN(val) ? 0 : val;
+    });
+
+    if (col.summaryType === 'sum') {
+      return values.reduce((a: number, b: number) => a + b, 0);
+    }
+    if (col.summaryType === 'avg') {
+      const sum = values.reduce((a: number, b: number) => a + b, 0);
+      return (sum / values.length).toFixed(2);
+    }
+    if (col.summaryType === 'min') {
+      return Math.min(...values);
+    }
+    if (col.summaryType === 'max') {
+      return Math.max(...values);
+    }
+
+    return '';
+  }
+
+  importTableFromCSV(field: FormField, event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (!text) return;
+
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+      if (lines.length < 2) return; // Need at least headers and one data row
+
+      // Parse headers (simple comma splitting, assuming no commas in headers for simplicity, but handling quotes if possible)
+      const parseCSVLine = (line: string) => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            result.push(current);
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current);
+        return result;
+      };
+
+      const headers = parseCSVLine(lines[0]).map(h => h.trim());
+      const columns = this.getTableColumns(field);
+      
+      // Try to match headers to column keys or labels
+      const colMapping: Record<number, string> = {};
+      headers.forEach((h, idx) => {
+        const matchedCol = columns.find((c: any) => c.key === h || c.label === h);
+        if (matchedCol) {
+          colMapping[idx] = (matchedCol as any).key;
+        } else {
+          // If no match, just use the header as the key
+          colMapping[idx] = h;
+        }
+      });
+
+      const newData: any[] = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const row: any = {};
+        values.forEach((v, idx) => {
+          if (colMapping[idx]) {
+            row[colMapping[idx]] = v;
+          }
+        });
+        // Generate an ID if needed
+        if (!row.id) row.id = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2);
+        newData.push(row);
+      }
+
+      this.tableData.update(d => ({ ...d, [field.id]: newData }));
+      // Reset input
+      (event.target as HTMLInputElement).value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  exportTableToCSV(field: FormField) {
+    const rawData = this.tableData()[field.id] || [];
+    const state = this.tableStates()[field.id] || { page: 0, search: '', sortKey: '', sortAsc: true };
+    const config: any = field.tableConfig || { columns: [] };
+    
+    let processed = [...rawData];
+    if (config.search?.enabled && state.search) {
+      const q = state.search.toLowerCase();
+      const keys = config.search.searchKeys && config.search.searchKeys.length > 0 
+        ? config.search.searchKeys 
+        : Object.keys(processed[0] || {});
+      processed = processed.filter((row: any) => keys.some((k: string) => String(row[k] || '').toLowerCase().includes(q)));
+    }
+    if (state.sortKey) {
+      processed.sort((a, b) => {
+        const valA = a[state.sortKey];
+        const valB = b[state.sortKey];
+        if (valA < valB) return state.sortAsc ? -1 : 1;
+        if (valA > valB) return state.sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
+
+    const columns = this.getTableColumns(field);
+    if (!columns.length || !processed.length) return;
+
+    const headers = columns.map((c: any) => `"${(c.label || c.key).replace(/"/g, '""')}"`).join(',');
+    
+    const rows = processed.map((row: any) => {
+      return columns.map((c: any) => {
+        const val = row[c.key] === null || row[c.key] === undefined ? '' : String(row[c.key]);
+        return `"${val.replace(/"/g, '""')}"`;
+      }).join(',');
+    });
+
+    const csv = [headers, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${field.name || 'table_export'}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  evalRowExpression(field: FormField, row: any): string | false {
+    if (!field.tableConfig?.rowExpression) return "";
+    try {
+      const formValues = this.liveForm?.value || {};
+      const result = this.evaluateExpression(field.tableConfig.rowExpression, { ...formValues, row });
+      return result as string | false;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  Math = Math;
 
   private updateValidationSignals() {
     if (!this.liveForm) return;
@@ -3851,14 +4618,7 @@ export class PreviewComponent implements OnInit {
           const paramNames = funcDef.isVoid
             ? []
             : funcDef.parameters.map((p) => p.name);
-          const AsyncFunction = Object.getPrototypeOf(
-            async function () {},
-          ).constructor;
-          const runner = new AsyncFunction(
-            ...paramNames,
-            funcDef.body,
-          );
-          runner()
+          this.expressionEvaluator.evaluateAsync(funcDef.body, [], paramNames, { ...helpers })
             .then((res: any) => {
               if (this.activeTab() === "simulation") {
                 this.logSimulationEvent(
@@ -3884,29 +4644,10 @@ export class PreviewComponent implements OnInit {
         const values = this.liveForm.getRawValue();
         try {
           const expression = field.buttonActionExpression.trim();
-          // Check if it's an arrow function
-          if (expression.startsWith("(") || expression.includes("=>")) {
-            const func = new Function("return (" + expression + ")")();
-            if (typeof func === "function") {
-              func(values, field, this.liveForm);
-              return;
-            }
+          const result = this.expressionEvaluator.evaluate(expression, { values, field, form: this.liveForm });
+          if (typeof result === 'function') {
+            result(values, field, this.liveForm);
           }
-
-          // Provide context for the expression
-          const executeAction = new Function(
-            "values",
-            "field",
-            "form",
-            `
-            try {
-              ${expression}
-            } catch (e) {
-              console.error('Error executing button action:', e);
-            }
-          `,
-          );
-          executeAction(values, field, this.liveForm);
         } catch (e) {
           console.error("Error creating button action:", e);
         }
@@ -3941,12 +4682,7 @@ export class PreviewComponent implements OnInit {
     for (const v of m.customValidations) {
       if (!v.expression.trim()) continue;
       try {
-        const valFunc = new Function(
-          "values",
-          "form",
-          `return (${v.expression})`,
-        );
-        if (!valFunc(context.values, context.form)) {
+        if (!this.expressionEvaluator.evaluateBoolean(v.expression, context)) {
           alert(v.errorMessage || "Validation failed.");
           return;
         }
@@ -3961,15 +4697,7 @@ export class PreviewComponent implements OnInit {
     for (const expr of m.preExpressions) {
       if (!expr.trim()) continue;
       try {
-        const preFunc = new Function(
-          "values",
-          "form",
-          "generateUUID",
-          `
-            try { ${expr} } catch (e) { console.error(e) }
-         `,
-        );
-        preFunc(context.values, context.form, context.generateUUID);
+        this.expressionEvaluator.evaluate(expr, context);
       } catch (err) {
         console.error("Pre-expression error", err);
       }
@@ -3987,8 +4715,7 @@ export class PreviewComponent implements OnInit {
     m.pathVariables.forEach((pv) => {
       if (!pv.value.trim()) return;
       try {
-        const valFunc = new Function("values", "form", `return (${pv.value});`);
-        const parsedVal = valFunc(context.values, context.form);
+        const parsedVal = this.expressionEvaluator.evaluate(pv.value, context);
         if (parsedVal !== undefined && parsedVal !== null) {
           const strVal = Array.isArray(parsedVal)
             ? parsedVal.join(",")
@@ -4009,8 +4736,7 @@ export class PreviewComponent implements OnInit {
     m.queryParams.forEach((qp) => {
       if (!qp.value.trim()) return;
       try {
-        const valFunc = new Function("values", "form", `return (${qp.value});`);
-        const parsedVal = valFunc(context.values, context.form);
+        const parsedVal = this.expressionEvaluator.evaluate(qp.value, context);
         if (parsedVal !== undefined && parsedVal !== null) {
           if (Array.isArray(parsedVal)) {
             parsedVal.forEach((v) => {
@@ -4031,12 +4757,7 @@ export class PreviewComponent implements OnInit {
     let bodyPayload = null;
     if (m.method !== "GET" && m.bodyMapping && m.bodyMapping.trim()) {
       try {
-        const bodyFunc = new Function(
-          "values",
-          "form",
-          `return ${m.bodyMapping}`,
-        );
-        bodyPayload = bodyFunc(context.values, context.form);
+        bodyPayload = this.expressionEvaluator.evaluate(m.bodyMapping, context);
       } catch (e) {
         console.error("Body mapping error", e);
         bodyPayload = context.values;
@@ -4074,13 +4795,7 @@ export class PreviewComponent implements OnInit {
         for (const expr of m.postExpressions) {
           if (!expr.trim()) continue;
           try {
-            const postFunc = new Function(
-              "values",
-              "form",
-              "response",
-              `try { ${expr} } catch (e) {}`,
-            );
-            postFunc(context.values, context.form, res);
+            this.expressionEvaluator.evaluate(expr, { ...context, response: res });
           } catch {
             /* ignore */
           }
@@ -4126,46 +4841,44 @@ export class PreviewComponent implements OnInit {
 
   evaluateExpression(expression: string, values: any): any {
     if (!expression) return null;
-    try {
-      const configFns = this.formBuilder.formConfig()?.global?.functions || [];
-      const functionsMap: Record<string, any> = {};
+    
+    const configFns = this.formBuilder.formConfig()?.global?.functions || [];
+    const functionsMap: Record<string, any> = {};
 
-      configFns.forEach((fnDef) => {
-        const paramNames = fnDef.isVoid
-          ? []
-          : (fnDef.parameters || []).map((p) => p.name);
-        // Inject the function mapping
-        functionsMap[fnDef.name] = (...args: any[]) => {
-          const AsyncFunction = Object.getPrototypeOf(
-            async function () {},
-          ).constructor;
-          const innerRunner = new AsyncFunction(
-            ...paramNames,
-            fnDef.body,
-          );
-          return innerRunner(...args);
-        };
-      });
+    const formWrapper = {
+      getValue: (path: string) => this.liveForm?.get(path)?.value,
+      setValue: (path: string, val: any) => {
+        const control = this.liveForm?.get(path);
+        if (control) {
+          control.setValue(val, { emitEvent: true });
+        }
+      }
+    };
 
-      const params = [
-        "values",
-        "functions",
-        "runFunction",
-        ...Object.keys(functionsMap),
-      ];
-      const args = [
-        values,
-        functionsMap,
-        (name: string, ...funcArgs: any[]) => functionsMap[name]?.(...funcArgs),
-        ...Object.values(functionsMap),
-      ];
+    configFns.forEach((fnDef) => {
+      const paramNames = fnDef.isVoid
+        ? []
+        : (fnDef.parameters || []).map((p) => p.name);
+      
+      functionsMap[fnDef.name] = (...args: any[]) => {
+        // Use the ExpressionEvaluatorService to securely evaluate the function body
+        // Note: this still returns a Promise
+        return this.expressionEvaluator.evaluateAsync(fnDef.body, args, paramNames, { values, form: formWrapper });
+      };
+    });
 
-      const fn = new Function(...params, `return ${expression};`);
-      return fn(...args);
-    } catch (e) {
-      console.warn("Error evaluating expression:", expression, e);
-      return null;
-    }
+    const pageContext = this.formContext?.context() || { pathParams: {}, queryParams: {} };
+
+    const context = {
+      values,
+      functions: functionsMap,
+      fns: functionsMap, // Aliased for easier access
+      runFunction: (name: string, ...funcArgs: any[]) => functionsMap[name]?.(...funcArgs),
+      pageContext,
+      ...functionsMap // Expose functions directly to the context as well
+    };
+
+    return this.expressionEvaluator.evaluate(expression, context);
   }
 
   utf8ToBase64(str: string): string {

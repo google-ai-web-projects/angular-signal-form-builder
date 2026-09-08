@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { NgxMaskDirective } from 'ngx-mask';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,13 +16,14 @@ export interface DynamicField {
   required?: boolean;
   options?: { label: string; value: string }[];
   placeholder?: string;
+  mask?: string;
   validationMessage?: string;
 }
 
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, MatIconModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="onSubmitForm()" class="space-y-4">
       @for (field of fields; track field.name) {
@@ -36,18 +38,18 @@ export interface DynamicField {
           
           @switch (field.type) {
             @case ('text') {
-              <input [id]="field.name" type="text" [formControlName]="field.name" [placeholder]="field.placeholder || ''"
-                class="w-full px-3 py-2 border rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+              <input [id]="field.name" type="text" [formControlName]="field.name" [placeholder]="field.placeholder || ''" [mask]="field.mask || ''"
+                class="w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 [ngClass]="{'border-red-300': form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched), 'border-gray-300': !(form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched))}">
             }
             @case ('email') {
               <input [id]="field.name" type="email" [formControlName]="field.name" [placeholder]="field.placeholder || ''"
-                class="w-full px-3 py-2 border rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                class="w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 [ngClass]="{'border-red-300': form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched), 'border-gray-300': !(form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched))}">
             }
             @case ('password') {
               <input [id]="field.name" type="password" [formControlName]="field.name" [placeholder]="field.placeholder || ''"
-                class="w-full px-3 py-2 border rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                class="w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 [ngClass]="{'border-red-300': form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched), 'border-gray-300': !(form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched))}">
             }
             @case ('date') {
@@ -77,10 +79,10 @@ export interface DynamicField {
       }
 
       <div class="flex gap-4 mt-6">
-        <button type="button" (click)="onCancelClick()" class="flex-1 button-secondary-pill">
+        <button type="button" (click)="onCancelClick()" class="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
           Cancel
         </button>
-        <button type="submit" class="flex-1 button-primary">
+        <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium">
           {{ submitLabel }}
         </button>
       </div>

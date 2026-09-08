@@ -8,9 +8,12 @@ import {
   OnDestroy,
   ChangeDetectionStrategy,
   NgZone,
+  Inject,
+  PLATFORM_ID,
+  inject,
 } from "@angular/core";
+import { isPlatformBrowser, CommonModule } from "@angular/common";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { CommonModule } from "@angular/common";
 import loader from "@monaco-editor/loader";
 
 @Component({
@@ -57,15 +60,18 @@ export class MonacoEditorComponent
     return this.singleLine ? "min-height: 38px;" : "min-height: 250px; height: 100%;";
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   onChange = (_value: string) => {};
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onTouched = () => {};
 
-  constructor(private ngZone: NgZone) {}
+  private ngZone = inject(NgZone);
+  private platformId = inject(PLATFORM_ID);
+
+  constructor() {}
 
   ngAfterViewInit() {
-    this.initMonaco();
+    if (isPlatformBrowser(this.platformId)) {
+      this.initMonaco();
+    }
   }
 
   ngOnDestroy() {
@@ -81,12 +87,10 @@ export class MonacoEditorComponent
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }

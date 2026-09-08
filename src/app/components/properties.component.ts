@@ -25,7 +25,6 @@ import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import { ExpressionEditorComponent } from "./expression-editor.component";
 import { PropertyTooltipComponent } from "./property-tooltip.component";
-import { TranslationsTabComponent } from "./translations-tab.component";
 import { NgxMaskDirective } from "ngx-mask";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
@@ -57,7 +56,6 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
     ExpressionEditorComponent,
     PropertyTooltipComponent,
     NgxMaskDirective,
-    TranslationsTabComponent,
     MatDatepickerModule,
     MatNativeDateModule,
     MatFormFieldModule,
@@ -102,9 +100,9 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
           type="button"
           (click)="activeTab.set('general')"
           class="flex-1 py-3 text-xs font-medium transition-colors"
-          [class.text-primary]="activeTab() === 'general'"
+          [class.text-indigo-600]="activeTab() === 'general'"
           [class.border-b-2]="activeTab() === 'general'"
-          [class.border-primary]="activeTab() === 'general'"
+          [class.border-indigo-600]="activeTab() === 'general'"
           [class.text-gray-500]="activeTab() !== 'general'"
         >
           General
@@ -113,24 +111,26 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
           type="button"
           (click)="activeTab.set('validation')"
           class="flex-1 py-3 text-xs font-medium transition-colors"
-          [class.text-primary]="activeTab() === 'validation'"
+          [class.text-indigo-600]="activeTab() === 'validation'"
           [class.border-b-2]="activeTab() === 'validation'"
-          [class.border-primary]="activeTab() === 'validation'"
+          [class.border-indigo-600]="activeTab() === 'validation'"
           [class.text-gray-500]="activeTab() !== 'validation'"
         >
           Validation
         </button>
-        <button
-          type="button"
-          (click)="activeTab.set('translations')"
-          class="flex-1 py-3 text-xs font-medium transition-colors"
-          [class.text-primary]="activeTab() === 'translations'"
-          [class.border-b-2]="activeTab() === 'translations'"
-          [class.border-primary]="activeTab() === 'translations'"
-          [class.text-gray-500]="activeTab() !== 'translations'"
-        >
-          Translations
-        </button>
+        @if (formBuilder.selectedField()?.type === 'table') {
+          <button
+            type="button"
+            (click)="activeTab.set('table')"
+            class="flex-1 py-3 text-xs font-medium transition-colors"
+            [class.text-indigo-600]="activeTab() === 'table'"
+            [class.border-b-2]="activeTab() === 'table'"
+            [class.border-indigo-600]="activeTab() === 'table'"
+            [class.text-gray-500]="activeTab() !== 'table'"
+          >
+            Table
+          </button>
+        }
       </div>
 
       <div class="p-4 flex-1 overflow-y-auto w-full overflow-x-hidden">
@@ -153,7 +153,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     id="prop-label"
                     type="text"
                     formControlName="label"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                   @if (
                     propertiesForm.get("label")?.invalid &&
@@ -178,7 +178,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     id="prop-description"
                     formControlName="description"
                     rows="2"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   ></textarea>
                 </div>
               }
@@ -199,7 +199,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     id="prop-content"
                     type="text"
                     formControlName="content"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
               }
@@ -274,7 +274,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       id="prop-showCloseButton"
                       type="checkbox"
                       formControlName="showCloseButton"
-                      class="h-4 w-4 text-primary border-gray-300 rounded"
+                      class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
                     />
                     <label
                       for="prop-showCloseButton"
@@ -396,7 +396,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       id="prop-multiSelect"
                       type="checkbox"
                       formControlName="multiSelect"
-                      class="h-4 w-4 text-primary border-gray-300 rounded"
+                      class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
                     />
                     <label
                       for="prop-multiSelect"
@@ -411,7 +411,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       id="prop-freeText"
                       type="checkbox"
                       formControlName="freeText"
-                      class="h-4 w-4 text-primary border-gray-300 rounded"
+                      class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
                     />
                     <label
                       for="prop-freeText"
@@ -490,7 +490,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     id="prop-name"
                     type="text"
                     formControlName="name"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                   @if (
                     propertiesForm.get("name")?.invalid &&
@@ -504,39 +504,6 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       ) {
                         Use only alphanumeric characters and underscores.
                       }
-                    </p>
-                  }
-                </div>
-
-                <div class="space-y-1">
-                  <div class="flex items-center gap-2">
-                    <label
-                      for="prop-trans-key"
-                      class="block text-sm font-medium text-gray-700"
-                      >Translation Key</label
-                    >
-                    <app-property-tooltip
-                      text="The key used to look up translations for this element. E.g. 'form.contact.email.label'"
-                    ></app-property-tooltip>
-                  </div>
-                  <input
-                    id="prop-trans-key"
-                    type="text"
-                    formControlName="translationKey"
-                    placeholder="e.g. form.field.name"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
-                  />
-                  @if (
-                    propertiesForm.get("translationKey")?.value &&
-                    !hasTranslation(propertiesForm.get("translationKey")?.value)
-                  ) {
-                    <p
-                      class="text-xs text-yellow-600 mt-1 flex items-center gap-1"
-                    >
-                      <mat-icon class="text-[14px] w-[14px] h-[14px]"
-                        >warning</mat-icon
-                      >
-                      Selected key is not mapped in translations JSON.
                     </p>
                   }
                 </div>
@@ -572,14 +539,14 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="text"
                       formControlName="placeholder"
                       mask="(000) 000-0000"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   } @else {
                     <input
                       id="prop-placeholder"
                       type="text"
                       formControlName="placeholder"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   }
                 </div>
@@ -602,7 +569,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     type="text"
                     formControlName="tooltip"
                     placeholder="Appears on hover"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
               }
@@ -630,26 +597,26 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       [class.ring-indigo-500]="
                         !propertiesForm.get('groupLayout')?.value
                       "
-                      [class.border-primary]="
+                      [class.border-indigo-500]="
                         !propertiesForm.get('groupLayout')?.value
                       "
-                      [class.bg-primary/10]="
+                      [class.bg-indigo-50]="
                         !propertiesForm.get('groupLayout')?.value
                       "
-                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-primary/50 p-2 gap-1 bg-white"
+                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-indigo-400 p-2 gap-1 bg-white"
                     >
                       <div class="w-full flex gap-1 h-3 pointer-events-none">
                         <div
-                          class="flex-1 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="flex-1 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                         <div
-                          class="flex-1 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="flex-1 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                         <div
-                          class="flex-1 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="flex-1 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                         <div
-                          class="flex-1 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="flex-1 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                       </div>
                       <span
@@ -667,17 +634,17 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       [class.ring-indigo-500]="
                         propertiesForm.get('groupLayout')?.value === '1'
                       "
-                      [class.border-primary]="
+                      [class.border-indigo-500]="
                         propertiesForm.get('groupLayout')?.value === '1'
                       "
-                      [class.bg-primary/10]="
+                      [class.bg-indigo-50]="
                         propertiesForm.get('groupLayout')?.value === '1'
                       "
-                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-primary/50 p-2 gap-1 bg-white"
+                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-indigo-400 p-2 gap-1 bg-white"
                     >
                       <div class="w-full flex gap-1 h-3 pointer-events-none">
                         <div
-                          class="w-full bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="w-full bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                       </div>
                       <span
@@ -695,20 +662,20 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       [class.ring-indigo-500]="
                         propertiesForm.get('groupLayout')?.value === '2'
                       "
-                      [class.border-primary]="
+                      [class.border-indigo-500]="
                         propertiesForm.get('groupLayout')?.value === '2'
                       "
-                      [class.bg-primary/10]="
+                      [class.bg-indigo-50]="
                         propertiesForm.get('groupLayout')?.value === '2'
                       "
-                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-primary/50 p-2 gap-1 bg-white"
+                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-indigo-400 p-2 gap-1 bg-white"
                     >
                       <div class="w-full flex gap-1 h-3 pointer-events-none">
                         <div
-                          class="w-1/2 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="w-1/2 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                         <div
-                          class="w-1/2 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="w-1/2 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                       </div>
                       <span
@@ -726,23 +693,23 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       [class.ring-indigo-500]="
                         propertiesForm.get('groupLayout')?.value === '3'
                       "
-                      [class.border-primary]="
+                      [class.border-indigo-500]="
                         propertiesForm.get('groupLayout')?.value === '3'
                       "
-                      [class.bg-primary/10]="
+                      [class.bg-indigo-50]="
                         propertiesForm.get('groupLayout')?.value === '3'
                       "
-                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-primary/50 p-2 gap-1 bg-white"
+                      class="h-14 border border-gray-300 rounded overflow-hidden flex flex-col justify-center items-center transition-all cursor-pointer group hover:border-indigo-400 p-2 gap-1 bg-white"
                     >
                       <div class="w-full flex gap-1 h-3 pointer-events-none">
                         <div
-                          class="w-1/3 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="w-1/3 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                         <div
-                          class="w-1/3 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="w-1/3 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                         <div
-                          class="w-1/3 bg-gray-200 group-hover:bg-primary/30 rounded-sm"
+                          class="w-1/3 bg-gray-200 group-hover:bg-indigo-200 rounded-sm"
                         ></div>
                       </div>
                       <span
@@ -774,16 +741,16 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         formControlName="defaultValue"
                         mask="(000) 000-0000"
                         placeholder="e.g., (555) 010-0000"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
-                    } @else if (field.type === "text" && field.mask) {
+                    } @else if ((field.type === "text" || field.type === "number") && field.mask) {
                       <input
                         id="prop-default-value"
                         type="text"
                         formControlName="defaultValue"
                         [mask]="field.mask"
                         placeholder="Enter default value"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     } @else if (field.type === "color") {
                       <div class="flex items-center gap-3">
@@ -807,7 +774,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         type="text"
                         formControlName="defaultValue"
                         placeholder="e.g., option1,option2 for multiselect"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     }
                   </div>
@@ -839,16 +806,16 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           [class.ring-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 12
                           "
-                          [class.border-primary]="
+                          [class.border-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 12
                           "
-                          [class.bg-primary/10]="
+                          [class.bg-indigo-50]="
                             propertiesForm.get('colSpan')?.value === 12
                           "
-                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-primary/50"
+                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-indigo-400"
                         >
                           <div
-                            class="w-full bg-gray-200 group-hover:bg-primary/20 h-full"
+                            class="w-full bg-gray-200 group-hover:bg-indigo-100 h-full"
                           ></div>
                         </button>
 
@@ -861,16 +828,16 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           [class.ring-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 6
                           "
-                          [class.border-primary]="
+                          [class.border-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 6
                           "
-                          [class.bg-primary/10]="
+                          [class.bg-indigo-50]="
                             propertiesForm.get('colSpan')?.value === 6
                           "
-                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-primary/50"
+                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-indigo-400"
                         >
                           <div
-                            class="w-1/2 bg-gray-200 group-hover:bg-primary/20 h-full border-r border-white"
+                            class="w-1/2 bg-gray-200 group-hover:bg-indigo-100 h-full border-r border-white"
                           ></div>
                           <div class="w-1/2 bg-gray-50 h-full"></div>
                         </button>
@@ -884,16 +851,16 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           [class.ring-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 4
                           "
-                          [class.border-primary]="
+                          [class.border-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 4
                           "
-                          [class.bg-primary/10]="
+                          [class.bg-indigo-50]="
                             propertiesForm.get('colSpan')?.value === 4
                           "
-                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-primary/50"
+                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-indigo-400"
                         >
                           <div
-                            class="w-1/3 bg-gray-200 group-hover:bg-primary/20 h-full border-r border-white"
+                            class="w-1/3 bg-gray-200 group-hover:bg-indigo-100 h-full border-r border-white"
                           ></div>
                           <div class="w-2/3 bg-gray-50 h-full"></div>
                         </button>
@@ -907,16 +874,16 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           [class.ring-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 3
                           "
-                          [class.border-primary]="
+                          [class.border-indigo-500]="
                             propertiesForm.get('colSpan')?.value === 3
                           "
-                          [class.bg-primary/10]="
+                          [class.bg-indigo-50]="
                             propertiesForm.get('colSpan')?.value === 3
                           "
-                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-primary/50"
+                          class="flex-1 h-8 border border-gray-300 rounded overflow-hidden flex transition-all cursor-pointer group hover:border-indigo-400"
                         >
                           <div
-                            class="w-1/4 bg-gray-200 group-hover:bg-primary/20 h-full border-r border-white"
+                            class="w-1/4 bg-gray-200 group-hover:bg-indigo-100 h-full border-r border-white"
                           ></div>
                           <div class="w-3/4 bg-gray-50 h-full"></div>
                         </button>
@@ -948,7 +915,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         min="1"
                         max="12"
                         formControlName="colSpan"
-                        class="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:ring-primary focus:border-primary text-sm font-mono"
+                        class="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono"
                       />
                     </div>
                   </div>
@@ -969,7 +936,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     <select
                       id="prop-button-type"
                       formControlName="buttonType"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
                       <option value="button">
                         Button (triggers JS expression)
@@ -1002,7 +969,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         <select
                           id="prop-custom-function"
                           formControlName="customFunctionId"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm bg-white"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
                         >
                           <option value="">-- Select a Function --</option>
                           @for (
@@ -1017,7 +984,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         </select>
                         @if (propertiesForm.get("customFunctionId")?.value) {
                           <p
-                            class="text-xs text-primary mt-2 bg-primary/10 p-2 rounded"
+                            class="text-xs text-indigo-600 mt-2 bg-indigo-50 p-2 rounded"
                           >
                             This function will be executed when the button is
                             clicked. It will receive (values, formState,
@@ -1040,7 +1007,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         </div>
                         <select
                           formControlName="submitMappingId"
-                          class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         >
                           <option value="">
                             Select a submission mapping...
@@ -1069,7 +1036,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                             type="text"
                             formControlName="successMessage"
                             placeholder="Successfully submitted!"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-xs"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-xs"
                           />
                         </div>
                         <div class="mb-3">
@@ -1081,7 +1048,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                             type="text"
                             formControlName="redirectUrl"
                             placeholder="/dashboard or https://example.com"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-xs"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-xs"
                           />
                         </div>
                       </div>
@@ -1101,7 +1068,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                             type="text"
                             formControlName="errorMessage"
                             placeholder="Error submitting form."
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-xs"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-xs"
                           />
                         </div>
                       </div>
@@ -1120,7 +1087,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         </div>
                         <select
                           formControlName="actionServiceId"
-                          class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         >
                           <option value="">Select a service...</option>
                           @for (
@@ -1144,7 +1111,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           type="number"
                           formControlName="actionTimeoutMs"
                           placeholder="Default (no timeout)"
-                          class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <p class="text-[10px] text-gray-500 mt-1">
                           Wait time before aborting request. Leave empty for no
@@ -1160,7 +1127,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           <button
                             type="button"
                             (click)="addPayloadMapping()"
-                            class="text-[10px] text-primary font-medium flex items-center gap-1"
+                            class="text-[10px] text-indigo-600 font-medium flex items-center gap-1"
                           >
                             <mat-icon class="text-[12px] w-[12px] h-[12px]"
                               >add</mat-icon
@@ -1228,7 +1195,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                               type="button"
                               (click)="testPayloadMappingRequest()"
                               [disabled]="isTestingPayload()"
-                              class="text-[10px] bg-primary hover:bg-primary/100 disabled:opacity-50 text-white px-2 py-0.5 rounded transition-colors flex items-center gap-1"
+                              class="text-[10px] bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-2 py-0.5 rounded transition-colors flex items-center gap-1"
                             >
                               @if (isTestingPayload()) {
                                 <mat-icon
@@ -1270,7 +1237,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           <button
                             type="button"
                             (click)="addActionMapping()"
-                            class="text-[10px] text-primary font-medium flex items-center gap-1"
+                            class="text-[10px] text-indigo-600 font-medium flex items-center gap-1"
                           >
                             <mat-icon class="text-[12px] w-[12px] h-[12px]"
                               >add</mat-icon
@@ -1336,7 +1303,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                             #sampleResponse
                             placeholder='{"data": {"user": {"email": "test@example.com"}}}'
                             (input)="(0)"
-                            class="w-full text-xs font-mono p-2 border border-gray-300 rounded mb-2 h-20 shadow-inner focus:ring-primary focus:border-primary"
+                            class="w-full text-xs font-mono p-2 border border-gray-300 rounded mb-2 h-20 shadow-inner focus:ring-indigo-500 focus:border-indigo-500"
                           ></textarea>
 
                           <div
@@ -1411,7 +1378,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="text"
                       formControlName="icon"
                       placeholder="e.g., mail, person, lock"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
                 }
@@ -1434,7 +1401,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       min="4"
                       max="8"
                       formControlName="otpLength"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
                 }
@@ -1457,7 +1424,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       min="1"
                       max="10"
                       formControlName="ratingMax"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
                   <div class="mt-4">
@@ -1474,7 +1441,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     <select
                       id="prop-rating-icon"
                       formControlName="ratingIcon"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
                       <option value="star">Star</option>
                       <option value="favorite">Heart</option>
@@ -1489,7 +1456,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="checkbox"
                       formControlName="ratingAllowHalf"
                       id="ratingAllowHalf"
-                      class="rounded border-gray-300 text-primary focus:ring-primary"
+                      class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       for="ratingAllowHalf"
@@ -1516,7 +1483,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="checkbox"
                       formControlName="required"
                       id="required"
-                      class="rounded border-gray-300 text-primary focus:ring-primary"
+                      class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       for="required"
@@ -1535,7 +1502,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="checkbox"
                       formControlName="disabled"
                       id="disabled"
-                      class="rounded border-gray-300 text-primary focus:ring-primary"
+                      class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       for="disabled"
@@ -1568,7 +1535,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="checkbox"
                       formControlName="readOnly"
                       id="readOnly"
-                      class="rounded border-gray-300 text-primary focus:ring-primary"
+                      class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       for="readOnly"
@@ -1705,7 +1672,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="checkbox"
                       formControlName="clearable"
                       id="clearable"
-                      class="rounded border-gray-300 text-primary focus:ring-primary"
+                      class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       for="clearable"
@@ -1732,7 +1699,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         id="prop-min-length"
                         type="number"
                         formControlName="minLength"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
                     <div class="flex-1">
@@ -1747,13 +1714,13 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         id="prop-max-length"
                         type="number"
                         formControlName="maxLength"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
                   </div>
                 }
 
-                @if (field.type === "text") {
+                @if (field.type === "text" || field.type === "number") {
                   <div class="mt-4">
                     <div class="flex items-center mb-1">
                       <label
@@ -1770,7 +1737,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="text"
                       formControlName="mask"
                       placeholder="e.g., (000) 000-0000"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm font-mono"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
                     />
                   </div>
 
@@ -1779,7 +1746,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       type="checkbox"
                       formControlName="email"
                       id="email-validation"
-                      class="rounded border-gray-300 text-primary focus:ring-primary"
+                      class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       for="email-validation"
@@ -1809,7 +1776,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         id="prop-min"
                         type="number"
                         formControlName="min"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
                     <div class="flex-1">
@@ -1827,7 +1794,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         id="prop-max"
                         type="number"
                         formControlName="max"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
                     <div class="flex-1">
@@ -1845,7 +1812,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         id="prop-step"
                         type="number"
                         formControlName="step"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
                   </div>
@@ -1918,7 +1885,8 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                   field.type === "select" ||
                   field.type === "radio" ||
                   field.type === "multiselect" ||
-                  field.type === "autocomplete"
+                  field.type === "autocomplete" ||
+                  field.type === "table"
                 ) {
                   <div class="mt-4 border-t border-gray-200 pt-4">
                     <div class="flex items-center justify-between mb-3">
@@ -1928,25 +1896,27 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     </div>
 
                     <div class="flex bg-gray-100 p-1 rounded mb-4">
-                      <button
-                        type="button"
-                        (click)="
-                          propertiesForm.patchValue({
-                            dataSourceType: 'static',
-                          })
-                        "
-                        [class.bg-white]="
-                          propertiesForm.get('dataSourceType')?.value ===
-                          'static'
-                        "
-                        [class.shadow-sm]="
-                          propertiesForm.get('dataSourceType')?.value ===
-                          'static'
-                        "
-                        class="flex-1 py-1.5 text-xs font-medium rounded text-gray-700 transition-all"
-                      >
-                        Static Options
-                      </button>
+                      @if (field.type !== "table") {
+                        <button
+                          type="button"
+                          (click)="
+                            propertiesForm.patchValue({
+                              dataSourceType: 'static',
+                            })
+                          "
+                          [class.bg-white]="
+                            propertiesForm.get('dataSourceType')?.value ===
+                            'static'
+                          "
+                          [class.shadow-sm]="
+                            propertiesForm.get('dataSourceType')?.value ===
+                            'static'
+                          "
+                          class="flex-1 py-1.5 text-xs font-medium rounded text-gray-700 transition-all"
+                        >
+                          Static Options
+                        </button>
+                      }
                       <button
                         type="button"
                         (click)="
@@ -1956,11 +1926,11 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         "
                         [class.bg-white]="
                           propertiesForm.get('dataSourceType')?.value ===
-                          'service'
+                          'service' || field.type === 'table'
                         "
                         [class.shadow-sm]="
                           propertiesForm.get('dataSourceType')?.value ===
-                          'service'
+                          'service' || field.type === 'table'
                         "
                         class="flex-1 py-1.5 text-xs font-medium rounded text-gray-700 transition-all"
                       >
@@ -1969,7 +1939,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     </div>
 
                     @if (
-                      propertiesForm.get("dataSourceType")?.value === "static"
+                      propertiesForm.get("dataSourceType")?.value === "static" && field.type !== "table"
                     ) {
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
@@ -1983,7 +1953,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         <button
                           type="button"
                           (click)="addOption()"
-                          class="text-xs text-primary hover:text-primary-focus font-medium flex items-center"
+                          class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
                         >
                           <mat-icon class="text-sm">add</mat-icon> Add Option
                         </button>
@@ -2028,7 +1998,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           </div>
                           <select
                             formControlName="serviceId"
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                           >
                             <option value="">Select a service...</option>
                             @for (
@@ -2137,7 +2107,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                               <button
                                 type="button"
                                 (click)="addServiceParam()"
-                                class="text-[10px] text-primary font-medium"
+                                class="text-[10px] text-indigo-600 font-medium"
                               >
                                 + Add
                               </button>
@@ -2251,7 +2221,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           type="text"
                           formControlName="labelKey"
                           placeholder="e.g., label"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
                       <div>
@@ -2270,7 +2240,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           type="text"
                           formControlName="valueKey"
                           placeholder="e.g., value"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
                     </div>
@@ -2307,7 +2277,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         type="text"
                         formControlName="pattern"
                         placeholder="e.g., ^[A-Z]+$"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm font-mono"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
                       />
                       @if (
                         propertiesForm.get("pattern")?.hasError("invalidRegex")
@@ -2328,7 +2298,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         type="text"
                         formControlName="patternMessage"
                         placeholder="e.g., Must contain only uppercase letters"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary sm:text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
                   </div>
@@ -2353,7 +2323,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     <button
                       type="button"
                       (click)="openValidationRuleModal()"
-                      class="text-xs text-primary hover:text-primary-focus flex items-center font-medium"
+                      class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center font-medium"
                     >
                       <mat-icon class="text-[16px] w-[16px] h-[16px]"
                         >add</mat-icon
@@ -2384,7 +2354,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                             <button
                               type="button"
                               (click)="editValidationRule(rule)"
-                              class="text-gray-400 hover:text-primary transition-colors"
+                              class="text-gray-400 hover:text-indigo-600 transition-colors"
                               title="Edit Rule"
                             >
                               <mat-icon class="text-[16px] w-[16px] h-[16px]"
@@ -2420,7 +2390,6 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           <span class="font-medium">Message:</span>
                           {{
                             rule.defaultMessage ||
-                              rule.translationKey ||
                               "Validation failed"
                           }}
                         </div>
@@ -2448,7 +2417,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                       <select
                         id="prop-validation-placement"
                         formControlName="validationPlacement"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md sm:text-sm focus:ring-primary focus:border-primary bg-white"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white"
                       >
                         <option value="bottom">Under the field (Bottom)</option>
                         <option value="top">Next to label (Top)</option>
@@ -2552,13 +2521,279 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                         [availableFields]="availableDependencyFields()"
                       ></app-expression-editor>
                     </div>
+                    
+                    <!-- On Change Expression -->
+                    <div class="mt-4">
+                      <div class="flex items-center mb-1">
+                        <label
+                          for="onChangeExpression"
+                          class="block text-xs font-medium text-gray-700"
+                          >On Change Action</label
+                        >
+                        <app-property-tooltip
+                          text="JavaScript code that runs when this field's value changes. You can await async functions here (e.g. await fns.myFunc()). Use form.setValue('otherField', val) to update fields."
+                        ></app-property-tooltip>
+                      </div>
+                      <app-expression-editor
+                        id="onChangeExpression"
+                        formControlName="onChangeExpression"
+                        placeholder="e.g., await fns.calculateDiscount(values.promo)"
+                        [availableFields]="availableDependencyFields()"
+                      ></app-expression-editor>
+                    </div>
                   }
                 </div>
               </div>
             }
+            @if (activeTab() === "table") {
+              <div class="space-y-6" formGroupName="tableConfig">
+                <!-- Columns -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                      <mat-icon class="text-[18px] text-gray-500">view_column</mat-icon>
+                      Columns
+                    </h3>
+                    <button type="button" (click)="addTableColumn()" class="text-xs bg-white border border-gray-200 hover:bg-gray-50 text-indigo-600 px-2.5 py-1 rounded-md shadow-sm transition-colors font-medium flex items-center gap-1">
+                      <mat-icon class="text-[14px]">add</mat-icon> Add
+                    </button>
+                  </div>
+                  
+                  <div class="flex flex-col gap-2" [formGroup]="propertiesForm">
+                    <div formArrayName="tableColumns" class="flex flex-col gap-2">
+                      @for (col of tableColumnsFormArray.controls; track $index) {
+                        <div [formGroupName]="$index" class="bg-white border border-gray-200 rounded p-2 flex flex-col gap-2 relative group">
+                          <button type="button" (click)="removeTableColumn($index)" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <mat-icon class="text-[16px]">close</mat-icon>
+                          </button>
+                          
+                          <div class="grid grid-cols-2 gap-2 pr-6">
+                            <div>
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Key</label>
+                              <input type="text" formControlName="key" placeholder="e.g. status" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+                            </div>
+                            <div>
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Label</label>
+                              <input type="text" formControlName="label" placeholder="e.g. Status" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+                            </div>
+                            <div class="col-span-2">
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Summary Type</label>
+                              <select formControlName="summaryType" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none bg-white">
+                                <option value="none">None</option>
+                                <option value="sum">Sum</option>
+                                <option value="avg">Average</option>
+                                <option value="count">Count</option>
+                                <option value="min">Min</option>
+                                <option value="max">Max</option>
+                                <option value="custom">Custom Expression</option>
+                              </select>
+                            </div>
+                            @if (col.get('summaryType')?.value === 'custom') {
+                              <div class="col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Custom Expression (rows)</label>
+                                <input type="text" formControlName="summaryExpression" placeholder="e.g. rows.length + ' items'" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 font-mono outline-none" />
+                              </div>
+                            }
+                          </div>
+                          
+                          <div class="flex items-center gap-4 mt-1">
+                            <label class="flex items-center gap-1.5 text-xs text-gray-700 cursor-pointer">
+                              <input type="checkbox" formControlName="visible" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                              Visible
+                            </label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-700 cursor-pointer">
+                              <input type="checkbox" formControlName="sortable" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                              Sortable
+                            </label>
+                          </div>
+                        </div>
+                      }
+                      @if (tableColumnsFormArray.controls.length === 0) {
+                        <div class="text-xs text-gray-500 italic text-center py-4 bg-white border border-dashed border-gray-300 rounded">
+                          No columns defined. Add a column to display data.
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
 
-            @if (activeTab() === "translations") {
-              <app-translations-tab [field]="field"></app-translations-tab>
+
+                <!-- Row Actions -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                      <mat-icon class="text-[18px] text-gray-500">smart_button</mat-icon>
+                      Row Actions
+                    </h3>
+                    <button type="button" (click)="addRowAction()" class="text-xs bg-white border border-gray-200 hover:bg-gray-50 text-indigo-600 px-2.5 py-1 rounded-md shadow-sm transition-colors font-medium flex items-center gap-1">
+                      <mat-icon class="text-[14px]">add</mat-icon> Add
+                    </button>
+                  </div>
+                  
+                  <div class="flex flex-col gap-2" [formGroup]="propertiesForm">
+                    <div formArrayName="rowActions" class="flex flex-col gap-3">
+                      @for (action of rowActionsFormArray.controls; track $index) {
+                        <div [formGroupName]="$index" class="bg-white border border-gray-200 rounded-md p-3 flex flex-col gap-3 relative shadow-sm">
+                          <button type="button" (click)="removeRowAction($index)" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
+                            <mat-icon class="text-[16px]">delete</mat-icon>
+                          </button>
+                          
+                          <div class="grid grid-cols-2 gap-3 pr-6">
+                            <div>
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">ID</label>
+                              <input type="text" formControlName="id" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                            </div>
+                            <div>
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Label</label>
+                              <input type="text" formControlName="label" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                            </div>
+                            <div>
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Icon (Material)</label>
+                              <input type="text" formControlName="icon" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                            </div>
+                            <div>
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Color (Tailwind text-)</label>
+                              <input type="text" formControlName="color" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                            </div>
+                            <div class="col-span-2">
+                              <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Action Type</label>
+                              <select formControlName="actionType" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none bg-white">
+                                <option value="custom_function">Custom Function</option>
+                                <option value="service">API Service</option>
+                                <option value="navigation">Navigation</option>
+                              </select>
+                            </div>
+                            
+                            @if (action.get('actionType')?.value === 'custom_function') {
+                              <div class="col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Function ID</label>
+                                <input type="text" formControlName="customFunctionId" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                              </div>
+                            }
+                            
+                            @if (action.get('actionType')?.value === 'navigation') {
+                              <div class="col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">URL Expression (e.g. '/details/' + row.id)</label>
+                                <input type="text" formControlName="urlExpression" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none font-mono" />
+                              </div>
+                            }
+                            
+                            @if (action.get('actionType')?.value === 'service') {
+                              <div class="col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Service ID</label>
+                                <input type="text" formControlName="serviceId" class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                              </div>
+                              
+                              <div class="col-span-2 border border-gray-200 rounded-md p-2 bg-gray-50 mt-1">
+                                <div class="flex items-center justify-between mb-2">
+                                  <label class="block text-[10px] uppercase font-bold text-gray-500">Service Parameters</label>
+                                  <button type="button" (click)="addRowActionServiceParam($index)" class="text-indigo-600 hover:text-indigo-800 text-[10px] font-medium flex items-center gap-1">
+                                    <mat-icon class="text-[12px] h-[12px] w-[12px] leading-[12px]">add</mat-icon> Add Param
+                                  </button>
+                                </div>
+                                <div formArrayName="serviceParams" class="flex flex-col gap-2">
+                                  @for (param of getRowActionServiceParamsFormArray($index).controls; track paramIdx; let paramIdx = $index) {
+                                    <div [formGroupName]="paramIdx" class="grid grid-cols-12 gap-1 relative bg-white p-1.5 border border-gray-200 rounded">
+                                      <div class="col-span-3">
+                                        <input type="text" formControlName="key" placeholder="Key" class="w-full text-[10px] px-1.5 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                                      </div>
+                                      <div class="col-span-3">
+                                        <select formControlName="type" class="w-full text-[10px] px-1 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none bg-white">
+                                          <option value="query">Query</option>
+                                          <option value="path">Path</option>
+                                          <option value="body">Body</option>
+                                        </select>
+                                      </div>
+                                      <div class="col-span-3">
+                                        <select formControlName="valueSource" class="w-full text-[10px] px-1 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none bg-white">
+                                          <option value="field">Field</option>
+                                          <option value="static">Static</option>
+                                          <option value="row">Row Key</option>
+                                        </select>
+                                      </div>
+                                      <div class="col-span-2">
+                                        <input type="text" formControlName="value" placeholder="Value" class="w-full text-[10px] px-1.5 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 outline-none" />
+                                      </div>
+                                      <div class="col-span-1 flex items-center justify-center">
+                                        <button type="button" (click)="removeRowActionServiceParam($index, paramIdx)" class="text-gray-400 hover:text-red-500 transition-colors">
+                                          <mat-icon class="text-[14px]">close</mat-icon>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  }
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <mat-icon class="text-[18px] text-gray-500">format_list_numbered</mat-icon>
+                    Pagination
+                  </h3>
+                  
+                  <div class="flex flex-col gap-3">
+                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input type="checkbox" formControlName="paginationEnabled" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                      Enable Pagination
+                    </label>
+                    
+                    @if (propertiesForm.get('tableConfig.paginationEnabled')?.value) {
+                      <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Page Size</label>
+                        <input type="number" formControlName="pageSize" class="w-full text-sm px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Search -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <mat-icon class="text-[18px] text-gray-500">search</mat-icon>
+                    Global Search
+                  </h3>
+                  
+                  <div class="flex flex-col gap-3">
+                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input type="checkbox" formControlName="searchEnabled" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                      Enable Search
+                    </label>
+                    
+                    @if (propertiesForm.get('tableConfig.searchEnabled')?.value) {
+                      <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                          Search Keys 
+                          <app-property-tooltip text="Comma separated list of keys to search against. Leave empty to search all columns."></app-property-tooltip>
+                        </label>
+                        <input type="text" formControlName="searchKeys" placeholder="e.g. name, email" class="w-full text-sm px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Row Expression -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <mat-icon class="text-[18px] text-gray-500">code</mat-icon>
+                    Dynamic Row Expression
+                  </h3>
+                  
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                      Expression 
+                      <app-property-tooltip text="Returns a CSS class string or false to hide the row. Available variable: 'row'"></app-property-tooltip>
+                    </label>
+                    <input type="text" formControlName="rowExpression" placeholder="e.g. row.status === 'active' ? 'bg-green-50' : ''" class="w-full font-mono text-xs px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+                  </div>
+                </div>
+              </div>
             }
           </form>
         } @else {
@@ -2588,7 +2823,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
             <h2
               class="text-sm font-semibold text-gray-800 flex items-center gap-2"
             >
-              <mat-icon class="text-[18px] text-primary">rule</mat-icon>
+              <mat-icon class="text-[18px] text-indigo-600">rule</mat-icon>
               {{
                 editingValidationRule()?.id?.startsWith("val_") &&
                 !editingValidationRule()?.isNew
@@ -2612,7 +2847,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
               <select
                 [ngModel]="editingValidationRule()?.type"
                 (ngModelChange)="updateDraftValidationRule({ type: $event })"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer"
               >
                 <option value="expression">JavaScript Expression</option>
                 <option value="function">Custom Function</option>
@@ -2643,7 +2878,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                   (ngModelChange)="
                     updateDraftValidationRule({ functionId: $event })
                   "
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer"
                 >
                   <option value="">Select a function...</option>
                   @for (fn of customFunctions; track fn.id) {
@@ -2662,7 +2897,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                   <button
                     type="button"
                     (click)="addDraftValidationArg()"
-                    class="text-[11px] font-medium bg-white border border-gray-200 hover:bg-gray-50 text-primary px-2.5 py-1 rounded-md shadow-sm transition-colors"
+                    class="text-[11px] font-medium bg-white border border-gray-200 hover:bg-gray-50 text-indigo-600 px-2.5 py-1 rounded-md shadow-sm transition-colors"
                   >
                     Add Arg
                   </button>
@@ -2693,7 +2928,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                             updateDraftValidationArg(argIdx, { name: $event })
                           "
                           placeholder="Argument Name"
-                          class="w-full text-xs px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all"
+                          class="w-full text-xs px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded focus:bg-white focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                         />
                         <app-expression-editor
                           [ngModel]="arg.expression"
@@ -2722,26 +2957,8 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
             }
 
             <div
-              class="grid grid-cols-2 gap-4 mt-2 p-3 bg-primary/10/50 border border-primary/20 rounded-lg"
+              class="mt-2 p-3 bg-indigo-50/50 border border-indigo-100 rounded-lg"
             >
-              <div>
-                <label
-                  class="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1"
-                  >Translation Key
-                  <app-property-tooltip
-                    text="Used for i18n mapping"
-                  ></app-property-tooltip
-                ></label>
-                <input
-                  type="text"
-                  [ngModel]="editingValidationRule()?.translationKey || ''"
-                  (ngModelChange)="
-                    updateDraftValidationRule({ translationKey: $event })
-                  "
-                  placeholder="e.g. error.required"
-                  class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                />
-              </div>
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1"
                   >Default Message</label
@@ -2753,7 +2970,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                     updateDraftValidationRule({ defaultMessage: $event })
                   "
                   placeholder="Fallback error message"
-                  class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 />
               </div>
             </div>
@@ -2772,7 +2989,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
             <button
               type="button"
               (click)="saveValidationRule()"
-              class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-focus transition-colors shadow-sm"
+              class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
             >
               Save Rule
             </button>
@@ -2783,7 +3000,7 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
   `,
 })
 export class PropertiesComponent {
-  activeTab = signal<"general" | "validation" | "translations">("general");
+  activeTab = signal<"general" | "validation" | "table">("general");
   formBuilder = inject(FormBuilderService);
   serviceManager = inject(ServiceManagerService);
   submissionMappingService = inject(SubmissionMappingService);
@@ -2810,7 +3027,6 @@ export class PropertiesComponent {
       functionId: "",
       functionArgs: [],
       defaultMessage: "",
-      translationKey: "",
       isNew: true,
     });
   }
@@ -2897,28 +3113,10 @@ export class PropertiesComponent {
   }
   closePanel = output<void>();
 
-  hasTranslation(key: string): boolean {
-    if (!key) return true; // empty mapped key is ignored/valid
-    const translations =
-      this.formBuilder.formConfig()?.global?.i18n?.translations;
-    if (!translations) return false;
-
-    // Check if it exists in any of the configured languages
-    const langs =
-      this.formBuilder.formConfig()?.global?.i18n?.supportedLanguages || [];
-    // Or if checking current only: but key must exist in all actually.
-    // We check if it exists in default lang at least.
-    const defaultLang =
-      this.formBuilder.formConfig()?.global?.i18n?.defaultLanguage || "en";
-
-    return !!(translations[defaultLang] && translations[defaultLang][key]);
-  }
-
   propertiesForm: FormGroup = this.fb.group({
     label: ["", Validators.required],
     description: [""],
     name: ["", [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
-    translationKey: [""],
     placeholder: [""],
     tooltip: [""],
     icon: [""],
@@ -3006,6 +3204,16 @@ export class PropertiesComponent {
     disabledExpression: [""],
     readOnlyExpression: [""],
     valueExpression: [""],
+    onChangeExpression: [""],
+    tableConfig: this.fb.group({
+      paginationEnabled: [false],
+      pageSize: [10],
+      searchEnabled: [false],
+      searchKeys: [""],
+      rowExpression: [""]
+    }),
+    tableColumns: this.fb.array([]),
+    rowActions: this.fb.array([]),
   });
 
   private currentFieldId: string | null = null;
@@ -3068,7 +3276,6 @@ export class PropertiesComponent {
         !this.isUpdatingForm
       ) {
         this.isUpdatingForm = true;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updates: any = { ...value };
 
         if (typeof updates.dependsOn === "string") {
@@ -3085,22 +3292,46 @@ export class PropertiesComponent {
           updates.options = undefined;
         }
 
-        delete updates.visibilityExpression;
-        delete updates.disabledExpression;
-        delete updates.readOnlyExpression;
-        delete updates.valueExpression;
-        delete updates.validationExpression;
 
-        if (value.visibilityExpression)
-          updates.visibilityExpression = value.visibilityExpression;
-        if (value.disabledExpression)
-          updates.disabledExpression = value.disabledExpression;
-        if (value.readOnlyExpression)
-          updates.readOnlyExpression = value.readOnlyExpression;
-        if (value.valueExpression)
-          updates.valueExpression = value.valueExpression;
-        if (value.validationExpression)
-          updates.validationExpression = value.validationExpression;
+
+
+
+
+
+        if (field?.type === 'table') {
+          const tc = value.tableConfig;
+          updates.tableConfig = {
+            columns: value.tableColumns || [],
+            rowActions: value.rowActions || [],
+            pagination: { enabled: tc.paginationEnabled, pageSize: tc.pageSize },
+            search: { 
+              enabled: tc.searchEnabled, 
+              searchKeys: tc.searchKeys ? tc.searchKeys.split(',').map((k:string)=>k.trim()).filter((k:string)=>k) : [] 
+            },
+            rowExpression: tc.rowExpression
+          };
+        } else {
+          delete updates.tableConfig;
+        }
+        delete updates.tableColumns;
+        delete updates.rowActions;
+
+        updates.visibilityExpression = value.visibilityExpression || "";
+        updates.disabledExpression = value.disabledExpression || "";
+        updates.readOnlyExpression = value.readOnlyExpression || "";
+        updates.valueExpression = value.valueExpression || "";
+        updates.validationExpression = value.validationExpression || "";
+
+
+
+
+
+
+
+
+
+
+
 
         this.formBuilder.updateField(this.currentFieldId, updates);
 
@@ -3115,6 +3346,18 @@ export class PropertiesComponent {
 
   get optionsFormArray() {
     return this.propertiesForm.get("options") as FormArray;
+  }
+
+  get tableColumnsFormArray() {
+    return this.propertiesForm.get("tableColumns") as FormArray;
+  }
+
+  get rowActionsFormArray() {
+    return this.propertiesForm.get("rowActions") as FormArray;
+  }
+
+  getRowActionServiceParamsFormArray(index: number) {
+    return this.rowActionsFormArray.at(index).get("serviceParams") as FormArray;
   }
 
   get serviceParamsFormArray() {
@@ -3135,7 +3378,6 @@ export class PropertiesComponent {
         label: field.label,
         description: field.description || "",
         name: field.name,
-        translationKey: field.translationKey || "",
         placeholder: field.placeholder || "",
         tooltip: field.tooltip || "",
         icon: field.icon || "",
@@ -3209,9 +3451,76 @@ export class PropertiesComponent {
         disabledExpression: field.disabledExpression || "",
         readOnlyExpression: field.readOnlyExpression || "",
         valueExpression: field.valueExpression || "",
+        onChangeExpression: field.onChangeExpression || "",
       },
       { emitEvent: false },
     );
+
+    const tableCfg = field.tableConfig || {
+      columns: [],
+      pagination: { enabled: false, pageSize: 10 },
+      search: { enabled: false, searchKeys: [] },
+      rowExpression: ""
+    };
+
+    const tableConfigGroup = this.propertiesForm.get('tableConfig') as FormGroup;
+    if (tableConfigGroup) {
+      tableConfigGroup.patchValue({
+        paginationEnabled: tableCfg.pagination?.enabled || false,
+        pageSize: tableCfg.pagination?.pageSize || 10,
+        searchEnabled: tableCfg.search?.enabled || false,
+        searchKeys: tableCfg.search?.searchKeys?.join(",") || "",
+        rowExpression: tableCfg.rowExpression || ""
+      }, { emitEvent: false });
+    }
+
+    this.tableColumnsFormArray.clear({ emitEvent: false });
+    if (tableCfg.columns) {
+      tableCfg.columns.forEach((col) => {
+        this.tableColumnsFormArray.push(
+          this.fb.group({
+            key: [col.key, Validators.required],
+            label: [col.label, Validators.required],
+            visible: [col.visible !== false],
+            sortable: [col.sortable || false],
+            summaryType: [col.summaryType || "none"],
+            summaryExpression: [col.summaryExpression || ""]
+          }), { emitEvent: false }
+        );
+      });
+    }
+
+
+    this.rowActionsFormArray.clear({ emitEvent: false });
+    if (tableCfg.rowActions) {
+      tableCfg.rowActions.forEach((action) => {
+        const actionGroup = this.fb.group({
+          id: [action.id, Validators.required],
+          label: [action.label, Validators.required],
+          icon: [action.icon || ""],
+          color: [action.color || ""],
+          actionType: [action.actionType || "function", Validators.required],
+          customFunctionId: [action.customFunctionId || ""],
+          serviceId: [action.serviceId || ""],
+          urlExpression: [action.urlExpression || ""],
+          serviceParams: this.fb.array([])
+        });
+        
+        if (action.serviceParams) {
+          const paramsArray = actionGroup.get('serviceParams') as import('@angular/forms').FormArray;
+          action.serviceParams.forEach(param => {
+            paramsArray.push(this.fb.group({
+              key: [param.key, Validators.required],
+              type: [param.type, Validators.required],
+              valueSource: [param.valueSource, Validators.required],
+              value: [param.value, Validators.required]
+            }));
+          });
+        }
+        
+        this.rowActionsFormArray.push(actionGroup, { emitEvent: false });
+      });
+    }
 
     this.optionsFormArray.clear({ emitEvent: false });
     if (field.options) {
@@ -3289,6 +3598,60 @@ export class PropertiesComponent {
     this.optionsFormArray.removeAt(index);
   }
 
+
+  addRowAction() {
+    this.rowActionsFormArray.push(
+      this.fb.group({
+        id: ["action_" + Math.random().toString(36).substr(2, 5), Validators.required],
+        label: ["New Action", Validators.required],
+        icon: [""],
+        color: [""],
+        actionType: ["custom_function", Validators.required],
+        customFunctionId: [""],
+        serviceId: [""],
+        urlExpression: [""],
+        serviceParams: this.fb.array([])
+      })
+    );
+  }
+
+  removeRowAction(index: number) {
+    this.rowActionsFormArray.removeAt(index);
+  }
+
+  addRowActionServiceParam(actionIndex: number) {
+    const paramsArray = this.getRowActionServiceParamsFormArray(actionIndex);
+    paramsArray.push(
+      this.fb.group({
+        key: ["", Validators.required],
+        type: ["query", Validators.required],
+        valueSource: ["row", Validators.required],
+        value: ["id", Validators.required],
+      })
+    );
+  }
+
+  removeRowActionServiceParam(actionIndex: number, paramIndex: number) {
+    this.getRowActionServiceParamsFormArray(actionIndex).removeAt(paramIndex);
+  }
+
+  addTableColumn() {
+    this.tableColumnsFormArray.push(
+      this.fb.group({
+        key: ["new_key", Validators.required],
+        label: ["New Column", Validators.required],
+        visible: [true],
+        sortable: [false],
+        summaryType: ["none"],
+        summaryExpression: [""]
+      })
+    );
+  }
+
+  removeTableColumn(index: number) {
+    this.tableColumnsFormArray.removeAt(index);
+  }
+
   addServiceParam() {
     this.serviceParamsFormArray.push(
       this.fb.group({
@@ -3358,7 +3721,6 @@ export class PropertiesComponent {
     const mappings = this.propertiesForm.get("payloadMappings")?.value || [];
     if (mappings.length === 0) return "{}";
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload: any = {};
     mappings.forEach(
       (m: { formFieldId: string; targetPayloadPath: string }) => {
@@ -3383,17 +3745,14 @@ export class PropertiesComponent {
       const mappings = this.actionMappingsFormArray.value;
       if (!mappings || mappings.length === 0) return "No mappings to test.";
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result: Record<string, any> = {};
       let hasError = false;
       let errorMsg = "";
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mappings.forEach((mapping: any) => {
         if (!mapping.sourcePath || !mapping.targetFieldId) return;
 
         const sourceParts = mapping.sourcePath.split(".");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let val: any = res;
         let isValidPath = true;
 
@@ -3423,7 +3782,6 @@ export class PropertiesComponent {
       }
 
       return output || "No matches found.";
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       return `Invalid JSON: ${e.message}`;
     }

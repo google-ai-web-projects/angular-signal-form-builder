@@ -39,7 +39,7 @@ import { EditorService, CodeEditorInstance } from "../editor.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
-      class="border border-gray-300 rounded-md bg-white text-sm font-mono focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-primary overflow-hidden"
+      class="border border-gray-300 rounded-md bg-white text-sm font-mono focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 overflow-hidden"
       [class.border-red-300]="syntaxError"
       [class.focus-within:ring-red-500]="syntaxError"
       [class.focus-within:border-red-500]="syntaxError"
@@ -127,9 +127,7 @@ export class ExpressionEditorComponent
     return this.singleLine ? "min-height: 38px;" : "min-height: 200px;";
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   onChange = (_value: string) => {};
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onTouched = () => {};
 
   ngAfterViewInit() {
@@ -156,12 +154,10 @@ export class ExpressionEditorComponent
     this.checkSyntax();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }

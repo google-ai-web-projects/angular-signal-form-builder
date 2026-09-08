@@ -32,7 +32,7 @@ interface JsonNode {
           [class.hover:bg-opacity-50]="!pickerMode()"
           [class.border]="pickerMode()"
           [class.border-transparent]="pickerMode()"
-          [class.hover:border-primary]="pickerMode()"
+          [class.hover:border-indigo-500]="pickerMode()"
           (click)="handleNodeClick(node, $event)"
           (keydown.enter)="handleNodeClick(node, $event)"
           tabindex="0"
@@ -122,14 +122,12 @@ export class JsonTreeComponent {
     return Array.isArray(value) ? value.length : 0;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getType(value: any): JsonNodeType {
     if (value === null) return 'null';
     if (Array.isArray(value)) return 'array';
     return typeof value as JsonNodeType;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   buildNode(key: string, value: any, path: string): JsonNode {
     const type = this.getType(value);
     const node: JsonNode = {

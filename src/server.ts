@@ -5,10 +5,15 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
-import {join} from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
 
-const browserDistFolder = join(import.meta.dirname, '../browser');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const browserDistFolder = join(__dirname, '../browser');
+
+process.env['NG_ALLOWED_HOSTS'] = 'localhost,127.0.0.1,*.run.app,*.webai.com,*.google.com';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -20,8 +25,8 @@ const angularApp = new AngularNodeAppEngine();
 app.post('/api/save', async (req, res) => {
   try {
     const data = req.body;
-    // Save to public folder so it's accessible as an asset
-    const filePath = join(process.cwd(), 'public', 'saved-form.json');
+    // Save to /tmp folder so it's accessible and writeable in Cloud Run
+    const filePath = '/tmp/saved-form.json';
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
     res.json({ success: true, message: 'Saved successfully' });
   } catch (error) {
@@ -32,7 +37,7 @@ app.post('/api/save', async (req, res) => {
 
 app.get('/saved-form.json', async (req, res) => {
   try {
-    const filePath = join(process.cwd(), 'public', 'saved-form.json');
+    const filePath = '/tmp/saved-form.json';
     await fs.access(filePath);
     res.sendFile(filePath);
   } catch {
@@ -67,9 +72,9 @@ app.use((req, res, next) => {
  * Start the server if this module is the main entry point, or it is ran via PM2.
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
-if (isMainModule(import.meta.url) || process.env['pm_id']) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(Number(port), '0.0.0.0', () => {
+if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE']) {
+  const port = 3000;
+  app.listen(port, '0.0.0.0', () => {
     console.log(`Node Express server listening on http://0.0.0.0:${port}`);
   });
 }

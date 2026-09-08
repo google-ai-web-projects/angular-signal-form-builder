@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { SidebarComponent } from '../components/sidebar.component';
-import { CanvasComponent } from '../components/canvas.component';
+import { FormCanvasComponent } from '../components/form-canvas.component';
 import { PropertiesComponent } from '../components/properties.component';
 import { FormBuilderService } from '../form-builder.service';
 import { TemplateManagerService } from '../template-manager.service';
@@ -10,21 +10,21 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-block-builder',
   standalone: true,
-  imports: [SidebarComponent, CanvasComponent, PropertiesComponent, MatIconModule, FormsModule],
+  imports: [SidebarComponent, FormCanvasComponent, PropertiesComponent, MatIconModule, FormsModule],
   providers: [FormBuilderService], // Separate instance
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex-1 flex flex-col h-full bg-gray-50">
       <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shrink-0 shadow-sm z-10 relative">
         <div class="flex items-center gap-4 w-full">
-          <mat-icon class="text-primary">extension</mat-icon>
+          <mat-icon class="text-indigo-600">extension</mat-icon>
           <div class="font-bold text-gray-700 whitespace-nowrap">Block Builder</div>
           <div class="w-px h-6 bg-gray-300 mx-2"></div>
           
           <input 
             type="text" 
             [(ngModel)]="blockName" 
-            class="flex-1 px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary max-w-sm"
+            class="flex-1 px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 max-w-sm"
             placeholder="Enter template name..." 
           />
           
@@ -41,7 +41,7 @@ import { FormsModule } from '@angular/forms';
           <button 
             (click)="saveBlock()" 
             [disabled]="!blockName() || formBuilder.fields().length === 0"
-            class="ml-auto bg-primary hover:bg-primary-focus disabled:bg-gray-300 text-white px-4 py-1.5 rounded-md font-medium text-sm transition-colors flex items-center gap-2"
+            class="ml-auto bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white px-4 py-1.5 rounded-md font-medium text-sm transition-colors flex items-center gap-2"
           >
             <mat-icon class="text-[18px]">save</mat-icon> Save as Template
           </button>
@@ -49,7 +49,7 @@ import { FormsModule } from '@angular/forms';
       </div>
       <div class="flex-1 flex overflow-hidden">
         <app-sidebar></app-sidebar>
-        <app-canvas class="flex-1 overflow-hidden flex flex-col"></app-canvas>
+        <app-form-canvas class="flex-1 overflow-hidden flex flex-col"></app-form-canvas>
         <app-properties></app-properties>
       </div>
     </div>

@@ -2,12 +2,12 @@ import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { EventBusService } from './events.service';
 
-export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'date-range' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'section' | 'calculated' | 'group' | 'array' | 'phone' | 'otp' | 'slider' | 'rating' | 'divider' | 'color' | 'button' | 'alert' | 'autocomplete' | 'file' | 'inline-message';
+export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'date-range' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'switch' | 'section' | 'calculated' | 'group' | 'array' | 'phone' | 'otp' | 'slider' | 'rating' | 'divider' | 'color' | 'button' | 'alert' | 'autocomplete' | 'file' | 'inline-message' | 'table' | 'container' | 'form_embed';
 
 export interface ServiceParamMapping {
   key: string;
   type: 'query' | 'path' | 'header' | 'body';
-  valueSource: 'static' | 'field';
+  valueSource: 'static' | 'field' | 'row';
   value: string;
 }
 
@@ -52,6 +52,8 @@ export interface CustomFunction {
   returnType: string;
   body: string;
   description?: string;
+  icon?: string;
+  category?: string;
 }
 
 export interface FieldValidationRule {
@@ -60,8 +62,43 @@ export interface FieldValidationRule {
   expression?: string;
   functionId?: string;
   functionArgs?: { name: string; expression: string }[];
-  translationKey?: string;
   defaultMessage?: string;
+}
+
+export interface TableColumn {
+  key: string;
+  label: string;
+  visible?: boolean;
+  sortable?: boolean;
+  summaryType?: 'none' | 'sum' | 'avg' | 'count' | 'min' | 'max' | 'custom';
+  summaryExpression?: string;
+}
+
+
+export interface RowAction {
+  id: string;
+  label: string;
+  icon?: string;
+  color?: string; // tailwind text color, e.g. text-blue-600
+  actionType: 'custom_function' | 'service' | 'navigation';
+  customFunctionId?: string;
+  serviceId?: string;
+  serviceParams?: ServiceParamMapping[];
+  urlExpression?: string; // string expression for navigation
+}
+
+export interface TableConfig {
+  columns: TableColumn[];
+  pagination?: {
+    enabled: boolean;
+    pageSize: number;
+  };
+  search?: {
+    enabled: boolean;
+    searchKeys?: string[]; // array of keys to search
+  };
+  rowExpression?: string; // string expression that returns a class or style, or false to hide row
+  rowActions?: RowAction[];
 }
 
 export interface FormField {
@@ -72,10 +109,11 @@ export interface FormField {
   name: string;
   required: boolean;
   placeholder?: string;
-  translationKey?: string;
+  maskExpression?: string;
   translations?: TranslationEntry[];
   options?: { label: string; value: string }[];
   validations?: FieldValidationRule[];
+  tableConfig?: TableConfig;
   dataSourceType?: 'static' | 'service';
   serviceId?: string;
   dataPath?: string;
@@ -101,6 +139,7 @@ export interface FormField {
   minDate?: string;
   maxDate?: string;
   visibilityExpression?: string;
+  onChangeExpression?: string;
   disabled?: boolean;
   disabledExpression?: string;
   readOnly?: boolean;
@@ -217,13 +256,21 @@ export interface FormConfig {
       description: string;
       version: string;
     };
+    theme?: {
+      primaryColor?: string;
+      backgroundColor?: string;
+      textColor?: string;
+      fontFamily?: string;
+      borderRadius?: string;
+    };
     functions?: CustomFunction[];
     i18n: {
       defaultLanguage: string;
       supportedLanguages: string[];
       languages?: { locale: string; label: string; isDefault: boolean }[];
       currentLocale?: string;
-      translations?: Record<string, Record<string, { label?: string; placeholder?: string; helpText?: string; content?: string }>>;
+      translations?: Record<string, Record<string, { label?: string; placeholder?: string;
+  maskExpression?: string; helpText?: string; content?: string }>>;
       translationKeyMapping: Record<string, string>;
       elementKeys: Record<string, string>;
       httpStatusMappings: {
@@ -258,6 +305,13 @@ export const defaultFormConfig: FormConfig = {
   },
   global: {
     functions: [],
+    theme: {
+      primaryColor: '#4f46e5',
+      backgroundColor: '#f9fafb',
+      textColor: '#1f2937',
+      fontFamily: 'Inter, sans-serif',
+      borderRadius: '0.5rem'
+    },
     formDefinition: { name: 'my-form', displayName: 'My Form', description: '', version: '1.0.0' },
     i18n: {
       defaultLanguage: 'en',
@@ -419,8 +473,14 @@ export class FormBuilderService {
     }
   }
 
+  private autoSaveEnabled = true;
+
+  disableAutoSave() {
+    this.autoSaveEnabled = false;
+  }
+
   saveToLocalStorage(fieldsToSave?: FormField[]) {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !this.autoSaveEnabled) return;
     try {
       const data = fieldsToSave || this.fields();
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
@@ -430,7 +490,7 @@ export class FormBuilderService {
   }
   
   saveConfigToLocalStorage(configToSave?: FormConfig) {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !this.autoSaveEnabled) return;
     try {
       const data = configToSave || this.formConfig();
       localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(data));

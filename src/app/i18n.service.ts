@@ -37,7 +37,7 @@ export class I18nService {
       
       if (mapping && mapping[lang]) {
         const path = mapping[lang];
-        if (path) {
+        if (typeof path === 'string' && path.trim() !== '') {
           this.http.get(path).subscribe({
             next: (data) => {
               this.translations.set({ ...(data as Record<string, unknown>), ...configTranslations });

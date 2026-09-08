@@ -17,7 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <div class="relative">
       <div 
-        class="min-h-[38px] w-full px-3 py-1.5 border rounded-md bg-white focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-primary flex items-center justify-between cursor-text"
+        class="min-h-[38px] w-full px-3 py-1.5 border rounded-md bg-white focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 flex items-center justify-between cursor-text"
         [ngClass]="{
           'border-red-300': invalid,
           'border-gray-300': !invalid
@@ -33,11 +33,11 @@ import { MatIconModule } from '@angular/material/icon';
             <span class="text-gray-500 sm:text-sm">{{ placeholder }}</span>
           }
           @for (val of selectedValues; track val) {
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary-focus">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
               {{ getLabelForValue(val) }}
               <button 
                 type="button" 
-                class="flex-shrink-0 ml-1.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-primary/30 hover:text-primary-focus focus:outline-none focus:bg-primary/100 focus:text-white"
+                class="flex-shrink-0 ml-1.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none focus:bg-indigo-500 focus:text-white"
                 (click)="removeValue(val, $event)"
               >
                 <span class="sr-only">Remove option</span>
@@ -70,7 +70,7 @@ import { MatIconModule } from '@angular/material/icon';
                 type="text" 
                 [(ngModel)]="searchText"
                 (click)="$event.stopPropagation()"
-                class="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                class="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Search..."
               />
             </div>
@@ -93,7 +93,7 @@ import { MatIconModule } from '@angular/material/icon';
                     type="checkbox" 
                     [checked]="isAllSelected()"
                     [indeterminate]="isPartiallySelected()"
-                    class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary mr-3 pointer-events-none"
+                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-3 pointer-events-none"
                   />
                   <span class="font-medium block truncate text-gray-700">
                     Select All
@@ -103,7 +103,7 @@ import { MatIconModule } from '@angular/material/icon';
             }
             @for (opt of filteredOptions; track getOptionValue(opt)) {
               <div 
-                class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary/10 flex items-center"
+                class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50 flex items-center"
                 (click)="toggleOption(opt, $event)"
                 (keydown.enter)="toggleOption(opt, $event)"
                 (keydown.space)="toggleOption(opt, $event)"
@@ -114,7 +114,7 @@ import { MatIconModule } from '@angular/material/icon';
                   <input 
                     type="checkbox" 
                     [checked]="isSelected(opt)"
-                    class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary mr-3 pointer-events-none"
+                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-3 pointer-events-none"
                   />
                   <span class="font-normal block truncate" [class.font-medium]="isSelected(opt)">
                     {{ getOptionLabel(opt) }}
@@ -129,7 +129,6 @@ import { MatIconModule } from '@angular/material/icon';
   `
 })
 export class MultiSelectComponent implements ControlValueAccessor, OnInit {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() options: any[] = [];
   @Input() labelKey = 'label';
   @Input() valueKey = 'value';
@@ -137,16 +136,13 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
   @Input() disabled = false;
   @Input() invalid = false;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedValues: any[] = [];
   isOpen = false;
   searchText = '';
 
   private eRef = inject(ElementRef);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: any = () => undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onTouched: any = () => undefined;
 
   @HostListener('document:click', ['$event'])
@@ -174,7 +170,6 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getOptionLabel(opt: any): string {
     if (opt === null || opt === undefined) return '';
     if (typeof opt === 'object') {
@@ -183,7 +178,6 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     return String(opt);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getOptionValue(opt: any): any {
     if (opt === null || opt === undefined) return opt;
     if (typeof opt === 'object') {
@@ -192,13 +186,11 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     return opt;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getLabelForValue(val: any): string {
     const opt = this.options.find(o => this.getOptionValue(o) === val);
     return opt ? this.getOptionLabel(opt) : String(val);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   isSelected(opt: any): boolean {
     const val = this.getOptionValue(opt);
     return this.selectedValues.includes(val);
@@ -246,7 +238,6 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toggleOption(opt: any, event: Event) {
     event.stopPropagation();
     if (this.disabled) return;
@@ -264,7 +255,6 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     this.onTouched();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   removeValue(val: any, event: Event) {
     event.stopPropagation();
     if (this.disabled) return;
@@ -283,7 +273,6 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     this.onTouched();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   writeValue(value: any): void {
     if (Array.isArray(value)) {
       this.selectedValues = [...value];
@@ -294,12 +283,10 @@ export class MultiSelectComponent implements ControlValueAccessor, OnInit {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
