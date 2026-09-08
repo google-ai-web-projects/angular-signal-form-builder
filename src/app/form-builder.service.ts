@@ -138,6 +138,10 @@ export interface FormField {
   step?: number;
   minDate?: string;
   maxDate?: string;
+  disabledDaysOfWeek?: number[];
+  dateThemeColor?: 'indigo' | 'purple' | 'blue' | 'emerald' | 'rose' | 'amber';
+  dateFormat?: string;
+  defaultRange?: { start?: string; end?: string };
   visibilityExpression?: string;
   onChangeExpression?: string;
   disabled?: boolean;

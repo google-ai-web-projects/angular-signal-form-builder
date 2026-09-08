@@ -8,6 +8,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
+import { DatePickerComponent } from './date-picker.component';
+
 export interface DynamicField {
   name: string;
   label: string;
@@ -23,7 +25,7 @@ export interface DynamicField {
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, MatIconModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, MatIconModule, DatePickerComponent],
   template: `
     <form [formGroup]="form" (ngSubmit)="onSubmitForm()" class="space-y-4">
       @for (field of fields; track field.name) {
@@ -53,11 +55,20 @@ export interface DynamicField {
                 [ngClass]="{'border-red-300': form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched), 'border-gray-300': !(form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched))}">
             }
             @case ('date') {
-              <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                <input matInput [matDatepicker]="picker" [id]="field.name" [formControlName]="field.name" [placeholder]="field.placeholder || ''">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
+              <app-date-picker
+                mode="single"
+                [id]="field.name"
+                [formControlName]="field.name"
+                [placeholder]="field.placeholder || 'Choose a date'"
+              ></app-date-picker>
+            }
+            @case ('date-range') {
+              <app-date-picker
+                mode="range"
+                [id]="field.name"
+                [formControlName]="field.name"
+                [placeholder]="field.placeholder || 'Choose date range'"
+              ></app-date-picker>
             }
           }
 

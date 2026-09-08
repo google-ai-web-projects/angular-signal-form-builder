@@ -516,60 +516,28 @@ import { FileUploadComponent } from "./file-upload.component";
                         </div>
                       }
                       @case ("date") {
-                        <mat-form-field
-                          appearance="outline"
-                          class="w-full pointer-events-none"
-                        >
-                          @if (field.placeholder) {
-                            <mat-label>{{ field.placeholder }}</mat-label>
-                          }
-                          <input matInput [matDatepicker]="picker" disabled />
-                          @if (field.clearable) {
-                            <button mat-icon-button matSuffix disabled>
-                              <mat-icon>close</mat-icon>
-                            </button>
-                          }
-                          <mat-datepicker-toggle
-                            matIconSuffix
-                            [for]="picker"
-                            disabled
-                          ></mat-datepicker-toggle>
-                          <mat-datepicker #picker></mat-datepicker>
-                        </mat-form-field>
+                        <div class="w-full flex items-center justify-between px-3 py-2 border border-gray-200 dark:border-[#333333] rounded-lg bg-white dark:bg-[#202020] text-gray-500 dark:text-gray-400 text-sm shadow-xs pointer-events-none">
+                          <div class="flex items-center gap-2 min-w-0">
+                            <mat-icon class="text-gray-400 dark:text-gray-500 text-[18px] w-[18px] h-[18px] flex-shrink-0">{{ field.icon || 'calendar_today' }}</mat-icon>
+                            <span class="truncate">{{ field.defaultValue || field.placeholder || 'Choose a date' }}</span>
+                          </div>
+                          <mat-icon class="text-gray-400 text-[20px] w-[20px] h-[20px] flex-shrink-0">arrow_drop_down</mat-icon>
+                        </div>
                       }
                       @case ("date-range") {
-                        <mat-form-field
-                          appearance="outline"
-                          class="w-full pointer-events-none"
-                        >
-                          @if (field.placeholder) {
-                            <mat-label>{{ field.placeholder }}</mat-label>
-                          }
-                          <mat-date-range-input
-                            [rangePicker]="rangePicker"
-                            disabled
-                          >
-                            <input
-                              matStartDate
-                              placeholder="Start date"
-                              disabled
-                            />
-                            <input matEndDate placeholder="End date" disabled />
-                          </mat-date-range-input>
-                          @if (field.clearable) {
-                            <button mat-icon-button matSuffix disabled>
-                              <mat-icon>close</mat-icon>
-                            </button>
-                          }
-                          <mat-datepicker-toggle
-                            matIconSuffix
-                            [for]="rangePicker"
-                            disabled
-                          ></mat-datepicker-toggle>
-                          <mat-date-range-picker
-                            #rangePicker
-                          ></mat-date-range-picker>
-                        </mat-form-field>
+                        <div class="w-full flex items-center justify-between px-3 py-2 border border-gray-200 dark:border-[#333333] rounded-lg bg-white dark:bg-[#202020] text-gray-500 dark:text-gray-400 text-sm shadow-xs pointer-events-none">
+                          <div class="flex items-center gap-2 min-w-0">
+                            <mat-icon class="text-gray-400 dark:text-gray-500 text-[18px] w-[18px] h-[18px] flex-shrink-0">{{ field.icon || 'date_range' }}</mat-icon>
+                            <span class="truncate">
+                              @if (field.defaultRange?.start && field.defaultRange?.end) {
+                                {{ field.defaultRange?.start }} - {{ field.defaultRange?.end }}
+                              } @else {
+                                {{ field.placeholder || 'Choose date range' }}
+                              }
+                            </span>
+                          </div>
+                          <mat-icon class="text-gray-400 text-[20px] w-[20px] h-[20px] flex-shrink-0">arrow_drop_down</mat-icon>
+                        </div>
                       }
                       @case ("phone") {
                         <div class="flex">

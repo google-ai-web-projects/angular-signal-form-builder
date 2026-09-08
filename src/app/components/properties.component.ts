@@ -810,6 +810,32 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           }}</span
                         >
                       </div>
+                    } @else if (field.type === "date") {
+                      <input
+                        id="prop-default-value"
+                        type="date"
+                        formControlName="defaultValue"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
+                    } @else if (field.type === "date-range") {
+                      <div class="grid grid-cols-2 gap-2">
+                        <div>
+                          <label class="block text-[11px] font-medium text-gray-500 mb-0.5">Start Date</label>
+                          <input
+                            type="date"
+                            formControlName="defaultStartDate"
+                            class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label class="block text-[11px] font-medium text-gray-500 mb-0.5">End Date</label>
+                          <input
+                            type="date"
+                            formControlName="defaultEndDate"
+                            class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-xs"
+                          />
+                        </div>
+                      </div>
                     } @else {
                       <input
                         id="prop-default-value"
@@ -1873,23 +1899,12 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           text="The earliest allowed date."
                         ></app-property-tooltip>
                       </div>
-                      <mat-form-field
-                        appearance="outline"
-                        class="w-full"
-                        subscriptSizing="dynamic"
-                      >
-                        <input
-                          matInput
-                          id="prop-min-date"
-                          [matDatepicker]="minDatePicker"
-                          formControlName="minDate"
-                        />
-                        <mat-datepicker-toggle
-                          matIconSuffix
-                          [for]="minDatePicker"
-                        ></mat-datepicker-toggle>
-                        <mat-datepicker #minDatePicker></mat-datepicker>
-                      </mat-form-field>
+                      <input
+                        type="date"
+                        id="prop-min-date"
+                        formControlName="minDate"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
                     </div>
                     <div class="flex-1 w-full relative">
                       <div class="flex items-center mb-1">
@@ -1902,23 +1917,105 @@ function validRegexValidator(): import("@angular/forms").ValidatorFn {
                           text="The latest allowed date."
                         ></app-property-tooltip>
                       </div>
-                      <mat-form-field
-                        appearance="outline"
-                        class="w-full"
-                        subscriptSizing="dynamic"
+                      <input
+                        type="date"
+                        id="prop-max-date"
+                        formControlName="maxDate"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Date Display Format -->
+                  <div class="mt-3">
+                    <div class="flex items-center mb-1">
+                      <label class="block text-sm font-medium text-gray-700">Display Format</label>
+                      <app-property-tooltip text="Format in which selected dates are displayed."></app-property-tooltip>
+                    </div>
+                    <select
+                      formControlName="dateFormat"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
+                    >
+                      <option value="YYYY-MM-DD">YYYY-MM-DD (ISO 8601)</option>
+                      <option value="MM/DD/YYYY">MM/DD/YYYY (US Format)</option>
+                      <option value="DD/MM/YYYY">DD/MM/YYYY (EU Format)</option>
+                      <option value="MMM D, YYYY">MMM D, YYYY (e.g. Sep 8, 2026)</option>
+                    </select>
+                  </div>
+
+                  <!-- Theme Color Palette -->
+                  <div class="mt-3">
+                    <div class="flex items-center mb-1.5">
+                      <label class="block text-sm font-medium text-gray-700">Theme Color Palette</label>
+                      <app-property-tooltip text="Accent color for active, selected, and connected range dates."></app-property-tooltip>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      @for (color of dateThemeColors; track color.name) {
+                        <button
+                          type="button"
+                          class="w-7 h-7 rounded-full transition-transform flex items-center justify-center border-2"
+                          [class]="color.bgClass + ' ' + (propertiesForm.get('dateThemeColor')?.value === color.name ? 'border-gray-900 dark:border-white scale-110 shadow-md' : 'border-transparent hover:scale-105')"
+                          (click)="setDateThemeColor(color.name)"
+                          [title]="color.label"
+                        >
+                          @if (propertiesForm.get('dateThemeColor')?.value === color.name) {
+                            <mat-icon class="text-white text-[16px] w-[16px] h-[16px]">check</mat-icon>
+                          }
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Disabled Days of Week (0-6) -->
+                  <div class="mt-3">
+                    <div class="flex items-center justify-between mb-1.5">
+                      <div class="flex items-center">
+                        <label class="block text-sm font-medium text-gray-700">Disabled Days of Week</label>
+                        <app-property-tooltip text="Dates falling on these weekdays (0=Sun, 6=Sat) cannot be selected."></app-property-tooltip>
+                      </div>
+                      <span class="text-xs text-gray-500">
+                        {{ propertiesForm.get('disabledDaysOfWeek')?.value?.length || 0 }} disabled
+                      </span>
+                    </div>
+
+                    <!-- Weekday buttons Sun (0) to Sat (6) -->
+                    <div class="grid grid-cols-7 gap-1">
+                      @for (day of weekdayOptions; track day.value) {
+                        <button
+                          type="button"
+                          class="py-1.5 text-xs font-semibold rounded-md border transition-all text-center"
+                          [class]="isDayDisabled(day.value) ? 'bg-red-500 text-white border-red-600 shadow-xs' : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
+                          (click)="toggleDisabledDay(day.value)"
+                          [title]="day.label + (isDayDisabled(day.value) ? ' (Disabled)' : ' (Enabled)')"
+                        >
+                          {{ day.short }}
+                        </button>
+                      }
+                    </div>
+
+                    <!-- Quick presets for disabling days -->
+                    <div class="flex items-center gap-1.5 mt-2">
+                      <button
+                        type="button"
+                        class="px-2 py-0.5 text-[11px] rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors"
+                        (click)="setDisabledWeekends()"
                       >
-                        <input
-                          matInput
-                          id="prop-max-date"
-                          [matDatepicker]="maxDatePicker"
-                          formControlName="maxDate"
-                        />
-                        <mat-datepicker-toggle
-                          matIconSuffix
-                          [for]="maxDatePicker"
-                        ></mat-datepicker-toggle>
-                        <mat-datepicker #maxDatePicker></mat-datepicker>
-                      </mat-form-field>
+                        Disable Weekends (Sun/Sat)
+                      </button>
+                      <button
+                        type="button"
+                        class="px-2 py-0.5 text-[11px] rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors"
+                        (click)="setDisabledWeekdays()"
+                      >
+                        Disable Weekdays (Mon-Fri)
+                      </button>
+                      <button
+                        type="button"
+                        class="px-2 py-0.5 text-[11px] rounded bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors ml-auto"
+                        (click)="clearDisabledDays()"
+                      >
+                        Reset
+                      </button>
                     </div>
                   </div>
                 }
@@ -3231,6 +3328,57 @@ export class PropertiesComponent {
   }
   closePanel = output<void>();
 
+  readonly weekdayOptions = [
+    { value: 0, short: 'Su', label: 'Sunday' },
+    { value: 1, short: 'Mo', label: 'Monday' },
+    { value: 2, short: 'Tu', label: 'Tuesday' },
+    { value: 3, short: 'We', label: 'Wednesday' },
+    { value: 4, short: 'Th', label: 'Thursday' },
+    { value: 5, short: 'Fr', label: 'Friday' },
+    { value: 6, short: 'Sa', label: 'Saturday' },
+  ];
+
+  readonly dateThemeColors = [
+    { name: 'indigo' as const, label: 'Indigo', bgClass: 'bg-indigo-600' },
+    { name: 'purple' as const, label: 'Purple', bgClass: 'bg-purple-600' },
+    { name: 'blue' as const, label: 'Blue', bgClass: 'bg-blue-600' },
+    { name: 'emerald' as const, label: 'Emerald', bgClass: 'bg-emerald-600' },
+    { name: 'rose' as const, label: 'Rose', bgClass: 'bg-rose-600' },
+    { name: 'amber' as const, label: 'Amber', bgClass: 'bg-amber-600' },
+  ];
+
+  toggleDisabledDay(dayIndex: number) {
+    const current = (this.propertiesForm.get('disabledDaysOfWeek')?.value as number[]) || [];
+    let updated: number[];
+    if (current.includes(dayIndex)) {
+      updated = current.filter((d) => d !== dayIndex);
+    } else {
+      updated = [...current, dayIndex].sort((a, b) => a - b);
+    }
+    this.propertiesForm.patchValue({ disabledDaysOfWeek: updated });
+  }
+
+  isDayDisabled(dayIndex: number): boolean {
+    const current = (this.propertiesForm.get('disabledDaysOfWeek')?.value as number[]) || [];
+    return current.includes(dayIndex);
+  }
+
+  setDisabledWeekends() {
+    this.propertiesForm.patchValue({ disabledDaysOfWeek: [0, 6] });
+  }
+
+  setDisabledWeekdays() {
+    this.propertiesForm.patchValue({ disabledDaysOfWeek: [1, 2, 3, 4, 5] });
+  }
+
+  clearDisabledDays() {
+    this.propertiesForm.patchValue({ disabledDaysOfWeek: [] });
+  }
+
+  setDateThemeColor(color: 'indigo' | 'purple' | 'blue' | 'emerald' | 'rose' | 'amber') {
+    this.propertiesForm.patchValue({ dateThemeColor: color });
+  }
+
   propertiesForm: FormGroup = this.fb.group({
     label: ["", Validators.required],
     description: [""],
@@ -3256,6 +3404,11 @@ export class PropertiesComponent {
     step: [null],
     minDate: [""],
     maxDate: [""],
+    disabledDaysOfWeek: [[]],
+    dateThemeColor: ["indigo"],
+    dateFormat: ["YYYY-MM-DD"],
+    defaultStartDate: [""],
+    defaultEndDate: [""],
     colSpan: [12, [Validators.min(1), Validators.max(12)]],
     groupLayout: [""],
     pattern: ["", validRegexValidator()],
@@ -3440,6 +3593,19 @@ export class PropertiesComponent {
         delete updates.tableColumns;
         delete updates.rowActions;
 
+        if (field?.type === 'date-range') {
+          if (value.defaultStartDate || value.defaultEndDate) {
+            updates.defaultRange = {
+              start: value.defaultStartDate || '',
+              end: value.defaultEndDate || '',
+            };
+          } else {
+            updates.defaultRange = undefined;
+          }
+        }
+        delete updates.defaultStartDate;
+        delete updates.defaultEndDate;
+
         updates.visibilityExpression = value.visibilityExpression || "";
         updates.disabledExpression = value.disabledExpression || "";
         updates.readOnlyExpression = value.readOnlyExpression || "";
@@ -3523,6 +3689,11 @@ export class PropertiesComponent {
         step: field.step ?? null,
         minDate: field.minDate || "",
         maxDate: field.maxDate || "",
+        disabledDaysOfWeek: field.disabledDaysOfWeek || [],
+        dateThemeColor: field.dateThemeColor || "indigo",
+        dateFormat: field.dateFormat || "YYYY-MM-DD",
+        defaultStartDate: field.defaultRange?.start || "",
+        defaultEndDate: field.defaultRange?.end || "",
         colSpan: field.colSpan || 12,
         groupLayout: field.groupLayout || "",
         pattern: field.pattern || "",

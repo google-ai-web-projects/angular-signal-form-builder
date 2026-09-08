@@ -33,6 +33,7 @@ import { MultiSelectComponent } from "./multi-select.component";
 import { OtpInputComponent } from "./otp-input.component";
 import { RatingInputComponent } from "./rating-input.component";
 import { FileUploadComponent } from "./file-upload.component";
+import { DatePickerComponent } from "./date-picker.component";
 import { PhoneNumberUtil } from "google-libphonenumber";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Subscription } from "rxjs";
@@ -84,6 +85,7 @@ export class ConfirmDialogComponent {}
     OtpInputComponent,
     RatingInputComponent,
     FileUploadComponent,
+    DatePickerComponent,
     MatButtonModule,
     MatDialogModule,
     MatDatepickerModule,
@@ -96,7 +98,7 @@ export class ConfirmDialogComponent {}
   template: `
     <div class="h-full flex flex-col bg-gray-50 overflow-hidden">
       <div
-        class="p-6 flex-1 overflow-y-auto flex flex-col gap-6 max-w-5xl mx-auto w-full"
+        class="p-6 pb-48 flex-1 overflow-y-auto flex flex-col gap-6 max-w-5xl mx-auto w-full"
       >
         <div class="flex items-center justify-between border-b border-gray-200">
           <div class="flex">
@@ -1028,85 +1030,50 @@ export class ConfirmDialogComponent {}
                                   </div>
                                 }
                                 @case ("date") {
-                                  <mat-form-field
-                                    appearance="outline"
-                                    class="w-full"
-                                    subscriptSizing="dynamic"
-                                  >
-                                    @if (field.icon) {
-                                      <mat-icon
-                                        matIconPrefix
-                                        class="text-gray-400 mr-2"
-                                        >{{ field.icon }}</mat-icon
-                                      >
-                                    }
-                                    <input
-                                      matInput
-                                      [id]="'live-' + field.id"
-                                      [matDatepicker]="picker"
-                                      [formControlName]="field.name"
-                                      [min]="field.minDate || null"
-                                      [max]="field.maxDate || null"
-                                      [placeholder]="
-                                        field.placeholder || 'Choose a date'
-                                      "
-                                      [readonly]="readOnlyFields()[field.id]"
-                                    />
-                                    <mat-datepicker-toggle
-                                      matIconSuffix
-                                      [for]="picker"
-                                      [disabled]="readOnlyFields()[field.id]"
-                                    ></mat-datepicker-toggle>
-                                    <mat-datepicker #picker></mat-datepicker>
-                                  </mat-form-field>
+                                  <app-date-picker
+                                    mode="single"
+                                    [id]="'live-' + field.id"
+                                    [formControlName]="field.name"
+                                    [placeholder]="field.placeholder || 'Choose a date'"
+                                    [minDate]="field.minDate || null"
+                                    [maxDate]="field.maxDate || null"
+                                    [disabledDaysOfWeek]="field.disabledDaysOfWeek || []"
+                                    [themeColor]="field.dateThemeColor || 'indigo'"
+                                    [dateFormat]="field.dateFormat || 'YYYY-MM-DD'"
+                                    [clearable]="field.clearable ?? true"
+                                    [readonly]="readOnlyFields()[field.id]"
+                                    [disabled]="disabledFields()[field.id] || field.disabled || false"
+                                    [invalid]="
+                                      (formGroup.get(field.name)?.invalid &&
+                                        (formGroup.get(field.name)?.dirty ||
+                                          formGroup.get(field.name)?.touched)) ||
+                                      false
+                                    "
+                                    [icon]="field.icon"
+                                  ></app-date-picker>
                                 }
                                 @case ("date-range") {
-                                  <mat-form-field
-                                    appearance="outline"
-                                    class="w-full"
-                                    subscriptSizing="dynamic"
-                                  >
-                                    <mat-date-range-input
-                                      [formGroup]="
-                                        getNestedFormGroup(
-                                          formGroup,
-                                          field.name
-                                        )
-                                      "
-                                      [rangePicker]="rangePicker"
-                                      [min]="field.minDate || null"
-                                      [max]="field.maxDate || null"
-                                    >
-                                      <input
-                                        matStartDate
-                                        formControlName="start"
-                                        [placeholder]="
-                                          field.placeholder
-                                            ? field.placeholder + ' (start)'
-                                            : 'Start date'
-                                        "
-                                        [readonly]="readOnlyFields()[field.id]"
-                                      />
-                                      <input
-                                        matEndDate
-                                        formControlName="end"
-                                        [placeholder]="
-                                          field.placeholder
-                                            ? field.placeholder + ' (end)'
-                                            : 'End date'
-                                        "
-                                        [readonly]="readOnlyFields()[field.id]"
-                                      />
-                                    </mat-date-range-input>
-                                    <mat-datepicker-toggle
-                                      matIconSuffix
-                                      [for]="rangePicker"
-                                      [disabled]="readOnlyFields()[field.id]"
-                                    ></mat-datepicker-toggle>
-                                    <mat-date-range-picker
-                                      #rangePicker
-                                    ></mat-date-range-picker>
-                                  </mat-form-field>
+                                  <app-date-picker
+                                    mode="range"
+                                    [id]="'live-' + field.id"
+                                    [formControlName]="field.name"
+                                    [placeholder]="field.placeholder || 'Choose date range'"
+                                    [minDate]="field.minDate || null"
+                                    [maxDate]="field.maxDate || null"
+                                    [disabledDaysOfWeek]="field.disabledDaysOfWeek || []"
+                                    [themeColor]="field.dateThemeColor || 'indigo'"
+                                    [dateFormat]="field.dateFormat || 'YYYY-MM-DD'"
+                                    [clearable]="field.clearable ?? true"
+                                    [readonly]="readOnlyFields()[field.id]"
+                                    [disabled]="disabledFields()[field.id] || field.disabled || false"
+                                    [invalid]="
+                                      (formGroup.get(field.name)?.invalid &&
+                                        (formGroup.get(field.name)?.dirty ||
+                                          formGroup.get(field.name)?.touched)) ||
+                                      false
+                                    "
+                                    [icon]="field.icon"
+                                  ></app-date-picker>
                                 }
                                 @case ("phone") {
                                   <div class="relative">
@@ -3277,11 +3244,17 @@ export class PreviewComponent implements OnInit {
       }
 
       if (field.type === "date-range") {
-        const rangeVal = initialValue as { start?: string; end?: string };
-        group[field.name] = this.fb.group({
-          start: [rangeVal?.start || "", validators],
-          end: [rangeVal?.end || "", validators],
-        });
+        let rangeVal: any = initialValue;
+        if (!rangeVal && field.defaultRange) {
+          rangeVal = field.defaultRange;
+        }
+        group[field.name] = [rangeVal || null, validators];
+      } else if (field.type === "date") {
+        let dateVal = initialValue;
+        if (!dateVal && field.defaultValue) {
+          dateVal = field.defaultValue;
+        }
+        group[field.name] = [dateVal || "", validators];
       } else {
         group[field.name] = [initialValue, validators];
       }
